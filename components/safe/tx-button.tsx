@@ -15,8 +15,10 @@ interface ButtonTxProps {
 
 export function ButtonTx({ tx, safeAddress, isQueue }: ButtonTxProps) {
   const { sign: signTx, isPending: isSignPending } = useSignTx(safeAddress);
-  const { sign: executeTx, isPending: isExecutePending } =
-    useExecuteTx(safeAddress);
+  const { sign: executeTx, isPending: isExecutePending } = useExecuteTx(
+    safeAddress,
+    tx
+  );
   const { signers, threshold, nonce } = useSafeParams(safeAddress);
   const { address } = useAccount();
 

@@ -2,18 +2,20 @@
 pragma solidity ^0.8.24;
 
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import {SafeTx, SafeTxExtended} from "./interfaces/Types.sol";
+import {SafeTx, SafeTxPointer, SafeTxExtended} from "./interfaces/Types.sol";
 import {Safe} from "@safe-smart-account/Safe.sol";
 import {IGuard} from "./interfaces/IGuard.sol";
 import {NoDelegateCallsGuard} from "./guards/NoDelegateCallsGuard.sol";
+import {SSTORE2} from "@solady/utils/SSTORE2.sol";
 
 address constant MULTISEND = 0x40A2aCCbd92BCA938b02010E17A5b8929b49130D;
 
 contract SafeStorage {
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.Bytes32Set;
-
+    using SSTORE2 for bytes;
     // Events
+
     event TransactionRegistered(address indexed safe, bytes32 indexed txHash, uint256 nonce);
     event TransactionExecuted(address indexed safe, bytes32 indexed txHash);
     event GuardAdded(address indexed safe, address indexed guard);
@@ -31,7 +33,7 @@ contract SafeStorage {
     // Stores transaction hashes for each Safe and nonce
     mapping(address => mapping(uint256 => EnumerableSet.Bytes32Set)) private hashes;
     // Stores the actual transaction data for each hash
-    mapping(bytes32 => SafeTx) public txs;
+    mapping(bytes32 => SafeTxPointer) public txs;
 
     // List of default guards applied to all Safes without custom guards
     address[] public defaultGuards;
@@ -102,7 +104,18 @@ contract SafeStorage {
         // Increase nonce and execute transaction.
 
         hashes[safe][safeTx.nonce].add(hash);
-        txs[hash] = safeTx;
+        txs[hash] = SafeTxPointer({
+            to: safeTx.to,
+            value: safeTx.value,
+            dataPointer: safeTx.data.write(),
+            operation: safeTx.operation,
+            safeTxGas: safeTx.safeTxGas,
+            baseGas: safeTx.baseGas,
+            gasPrice: safeTx.gasPrice,
+            gasToken: safeTx.gasToken,
+            refundReceiver: safeTx.refundReceiver,
+            nonce: safeTx.nonce
+        });
 
         if (safeTx.nonce > maxNonces[safe]) {
             maxNonces[safe] = safeTx.nonce;
@@ -125,7 +138,7 @@ contract SafeStorage {
             revert("Tx not found");
         }
 
-        SafeTx memory execTx = txs[hash];
+        SafeTx memory execTx = loadSafeTx(hash);
 
         if (nonce != execTx.nonce) {
             revert("Invalid nonce");
@@ -248,7 +261,7 @@ contract SafeStorage {
             uint256 length = hashes[safe][i].length();
             for (uint256 j = 0; j < length; ++j) {
                 bytes32 hash = hashes[safe][i].at(j);
-                SafeTx memory transaction = txs[hash];
+                SafeTx memory transaction = loadSafeTx(hash);
                 result[count] = SafeTxExtended({
                     hash: hash,
                     signedBy: getSignedBy(safe, hash),
@@ -289,5 +302,21 @@ contract SafeStorage {
         for (uint256 i = 0; i < count; i++) {
             result[i] = signers[i];
         }
+    }
+
+    function loadSafeTx(bytes32 hash) public view returns (SafeTx memory result) {
+        SafeTxPointer storage et = txs[hash];
+        result = SafeTx({
+            to: et.to,
+            value: et.value,
+            data: SSTORE2.read(et.dataPointer),
+            operation: et.operation,
+            safeTxGas: et.safeTxGas,
+            baseGas: et.baseGas,
+            gasPrice: et.gasPrice,
+            gasToken: et.gasToken,
+            refundReceiver: et.refundReceiver,
+            nonce: et.nonce
+        });
     }
 }

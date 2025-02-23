@@ -1,20 +1,22 @@
 "use client";
 
+import reserveJson from "@/reserve-upload.json";
+import reserveJson2 from "@/reserve-upload_vanok.json";
 import { useQuery } from "@tanstack/react-query";
 
-import { safeStorageAbi } from "@/bindings/generated";
+import { safeAbi } from "@/bindings/generated";
 import { SafeTx } from "@/core/safe-tx";
-import { SAFE_STORAGE_ADDRESS } from "@/utils/constant";
-import { Address } from "viem";
-import { usePublicClient } from "wagmi";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { decodeTransactions } from "@/utils/multisend";
-
+import { Address, Hex } from "viem";
+import { usePublicClient } from "wagmi";
 export function useCurrentTransactions(safeAddress: Address): {
   txs: SafeTx[];
   isLoading: boolean;
   error: Error | null;
 } {
   const publicClient = usePublicClient();
+  const { signers, nonce } = useSafeParams(safeAddress);
 
   console.log("CURRENT CHAIN", publicClient?.chain);
   console.log("CURRENT SAFE ADDRESS", safeAddress);
@@ -25,28 +27,45 @@ export function useCurrentTransactions(safeAddress: Address): {
   } = useQuery({
     queryKey: ["current-transactions"],
     queryFn: async () => {
-      if (!safeAddress || !publicClient) {
+      if (!safeAddress || !publicClient || !signers || !nonce) {
         throw new Error("Not connected or contract not initialized");
       }
+      const txs = [...reserveJson, ...reserveJson2]
+        .filter((t) => t.safe.toLowerCase() === safeAddress.toLowerCase())
+        .filter((t) => t.nonce >= nonce);
 
-      try {
-        const txs = await publicClient.readContract({
-          address: SAFE_STORAGE_ADDRESS,
-          abi: safeStorageAbi,
-          functionName: "getQueuedTxs",
-          args: [safeAddress],
-        });
-        return txs;
-      } catch (err) {
-        if (err instanceof Error) {
-          throw new Error(
-            `Failed to fetch current transactions: ${err.message}`
-          );
-        }
-        throw new Error(
-          "An unknown error occurred while fetching current transactions"
+      const readyTxs: SafeTx[] = [];
+
+      for (const tx of txs) {
+        const signedBy = await Promise.all(
+          signers.map((signer) =>
+            publicClient.readContract({
+              address: safeAddress,
+              abi: safeAbi,
+              functionName: "approvedHashes",
+              args: [signer, tx.hash as Hex],
+            })
+          )
         );
+        readyTxs.push({
+          ...tx,
+          to: tx.to as Address,
+          value: BigInt(tx.value),
+          data: tx.data as Hex,
+          operation: tx.operation,
+          safeTxGas: BigInt(tx.safeTxGas),
+          baseGas: BigInt(tx.baseGas),
+          gasPrice: BigInt(tx.gasPrice),
+          gasToken: tx.gasToken as Address,
+          refundReceiver: tx.refundReceiver as Address,
+          nonce: BigInt(tx.nonce),
+          hash: tx.hash as Hex,
+          signedBy: signers.filter(
+            (_, index) => signedBy[index] > 0
+          ) as Address[],
+        });
       }
+      return readyTxs;
     },
     enabled: !!safeAddress,
     retry: 3,

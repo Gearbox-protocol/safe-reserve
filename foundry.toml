@@ -1,10 +1,11 @@
 [profile.default]
 src = "contracts"
 out = "out"
-libs = ["lib"]
+libs = ["clib"]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
 remappings = [
     "@openzeppelin/=lib/openzeppelin-contracts/",
-    "@safe-smart-account/=lib/safe-smart-account/contracts/"
+    "@safe-smart-account/=lib/safe-smart-account/contracts/",
+    "@solady/=lib/solady/src/"
 ]

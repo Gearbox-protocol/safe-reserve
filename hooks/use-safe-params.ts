@@ -8,6 +8,8 @@ export function useSafeParams(safeAddress: Address) {
   const [nonce, setNonce] = useState<bigint>();
   const publicClient = usePublicClient();
 
+  console.log("SAFE CHAIN", publicClient?.chain.id);
+
   useEffect(() => {
     const fetchThreshold = async () => {
       if (!safeAddress || !publicClient) return;
@@ -29,6 +31,10 @@ export function useSafeParams(safeAddress: Address) {
           functionName: "nonce",
         }),
       ]);
+
+      console.log("SAFE THRESHOLD", safeThreshold);
+      console.log("SAFE SIGNERS", safeSigners);
+      console.log("SAFE NONCE", safeNonce);
       setThreshold(Number(safeThreshold));
       setSigners([...safeSigners]);
       setNonce(safeNonce);

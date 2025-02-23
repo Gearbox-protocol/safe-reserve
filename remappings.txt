@@ -5,3 +5,4 @@ forge-std/=lib/forge-std/src/
 halmos-cheatcodes/=lib/openzeppelin-contracts/lib/halmos-cheatcodes/src/
 openzeppelin-contracts/=lib/openzeppelin-contracts/
 safe-smart-account/=lib/safe-smart-account/
+solady/=lib/solady/src/

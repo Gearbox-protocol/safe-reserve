@@ -1,15 +1,12 @@
 import { getDefaultConfig } from "connectkit";
 import { createConfig, http } from "wagmi";
-import { base, mainnet, sonic, anvil } from "wagmi/chains";
+import { sonic, anvil } from "wagmi/chains";
 
 export const config = createConfig(
   getDefaultConfig({
-    chains: [mainnet, base, sonic, anvil],
+    chains: [sonic, anvil],
     transports: {
-      [mainnet.id]: http(),
-      [base.id]: http(),
       [sonic.id]: http(),
-      [anvil.id]: http(),
     },
 
     walletConnectProjectId:

@@ -16,6 +16,19 @@ struct SafeTx {
     uint256 nonce;
 }
 
+struct SafeTxPointer {
+    address to;
+    uint256 value;
+    address dataPointer;
+    Enum.Operation operation;
+    uint256 safeTxGas;
+    uint256 baseGas;
+    uint256 gasPrice;
+    address gasToken;
+    address refundReceiver;
+    uint256 nonce;
+}
+
 struct SafeTxExtended {
     bytes32 hash;
     address[] signedBy;

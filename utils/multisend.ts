@@ -17,8 +17,8 @@ import { Call } from "@/core/safe-tx";
 export function decodeTransactions(transactionsHex: Hex): Call[] {
   // Remove "0x" prefix if present
   const data = transactionsHex.startsWith("0x")
-    ? transactionsHex.slice(2)
-    : transactionsHex;
+    ? transactionsHex.slice(12)
+    : transactionsHex.slice(10);
 
   let index = 0;
   const decoded = [];
