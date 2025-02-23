@@ -11,7 +11,7 @@ interface TransactionCardProps {
   tx: SafeTx;
   safeAddress: Address;
   isQueue: boolean;
-  threshold: bigint;
+  threshold: number;
 }
 
 export function TransactionCard({

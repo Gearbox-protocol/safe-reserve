@@ -66,7 +66,7 @@ export function SafeView({ safeAddress, executedProposals }: SafeViewProps) {
                   tx={tx}
                   isQueue={activeTab === "queue"}
                   safeAddress={safeAddress}
-                  threshold={threshold}
+                  threshold={threshold || 0}
                 />
               ))}
             </div>
