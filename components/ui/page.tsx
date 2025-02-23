@@ -11,7 +11,7 @@ interface PageLayoutProps {
 
 export function PageLayout({ children, title, backButton }: PageLayoutProps) {
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <div className="min-h-screen bg-black text-white p-6 overflow-y-auto">
       {backButton && (
         <BackButton href={backButton.href} text={backButton.text} />
       )}

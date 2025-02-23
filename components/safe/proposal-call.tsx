@@ -18,7 +18,7 @@ export function ProposalCall({ index, call }: ProposalCallProps) {
       >
         <span className="text-gray-400">#{index}</span>
         <span className="text-gray-400">{call.to} :</span>
-        <span className="text-white">{call.data}</span>
+
         {isExpanded ? (
           <ChevronUp className="ml-auto h-4 w-4 text-gray-400" />
         ) : (
@@ -26,23 +26,15 @@ export function ProposalCall({ index, call }: ProposalCallProps) {
         )}
       </div>
 
-      {/* {isExpanded && (
+      {isExpanded && (
         <div className="border-t border-gray-800 p-4">
-          <div className="space-y-3">
-            {Object.entries(call.args).map(([key, value], idx) => (
-              <div
-                key={idx}
-                className="grid grid-cols-[140px_1fr] items-start gap-2"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-300">{key}</span>
-                  <span className="text-xs text-gray-400">{value}</span>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <code className="text-white break-all whitespace-pre-wrap">
+              {call.data}
+            </code>
           </div>
         </div>
-      )} */}
+      )}
     </div>
   );
 }

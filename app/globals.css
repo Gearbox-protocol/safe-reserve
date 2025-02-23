@@ -85,3 +85,27 @@
     color-scheme: dark;
   }
 }
+
+/* Custom scrollbar styles */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #888888 #f1f1f1;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #888888;
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}

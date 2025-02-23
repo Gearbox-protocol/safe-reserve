@@ -7,6 +7,7 @@ import { SafeTx } from "@/core/safe-tx";
 import { SAFE_STORAGE_ADDRESS } from "@/utils/constant";
 import { Address } from "viem";
 import { usePublicClient } from "wagmi";
+import { decodeTransactions } from "@/utils/multisend";
 
 export function useCurrentTransactions(safeAddress: Address): {
   txs: SafeTx[];
@@ -55,7 +56,7 @@ export function useCurrentTransactions(safeAddress: Address): {
     txs: [...(txs || [])].map((tx) => ({
       ...tx,
       signedBy: [...tx.signedBy], // Convert readonly array to mutable array
-      calls: [],
+      calls: decodeTransactions(tx.data),
     })),
     isLoading,
     error: error as Error | null,

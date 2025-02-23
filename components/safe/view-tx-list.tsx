@@ -8,6 +8,7 @@ import { useCurrentTransactions } from "@/hooks/use-current-transactions";
 import { useState } from "react";
 import { Address } from "viem";
 import { TransactionCard } from "./tx-card";
+
 interface SafeViewProps {
   safeAddress: Address;
   executedProposals: SafeTx[];
@@ -26,7 +27,7 @@ export function SafeView({ safeAddress, executedProposals }: SafeViewProps) {
 
   return (
     <PageLayout title={"Transactions"}>
-      <Card className="bg-black border-0">
+      <Card className="bg-black border-0 overflow-y-auto">
         <div className="p-4">
           <Tabs
             value={activeTab}
@@ -43,7 +44,7 @@ export function SafeView({ safeAddress, executedProposals }: SafeViewProps) {
         </div>
 
         {/* Proposals List */}
-        <div className="divide-y divide-gray-800 space-y-6">
+        <div className="divide-y divide-gray-800 space-y-6 overflow-y-auto">
           {isLoading && activeTab === "queue" ? (
             // Skeleton loading state
             <>
@@ -56,14 +57,16 @@ export function SafeView({ safeAddress, executedProposals }: SafeViewProps) {
               ))}
             </>
           ) : (
-            filteredTxs.map((tx) => (
-              <TransactionCard
-                key={tx.hash}
-                tx={tx}
-                isQueue={activeTab === "queue"}
-                safeAddress={safeAddress}
-              />
-            ))
+            <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
+              {filteredTxs.map((tx) => (
+                <TransactionCard
+                  key={tx.hash}
+                  tx={tx}
+                  isQueue={activeTab === "queue"}
+                  safeAddress={safeAddress}
+                />
+              ))}
+            </div>
           )}
         </div>
       </Card>
