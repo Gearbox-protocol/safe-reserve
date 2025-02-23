@@ -9,6 +9,7 @@ import {IGuard} from "../interfaces/IGuard.sol";
 import {NoDelegateCallsGuard} from "../guards/NoDelegateCallsGuard.sol";
 import {SafeProxyFactory} from "@safe-smart-account/proxies/SafeProxyFactory.sol";
 import {SafeProxy} from "@safe-smart-account/proxies/SafeProxy.sol";
+import {SafeTxExtended} from "../interfaces/Types.sol";
 
 contract MockGuard is IGuard {
     bool public shouldRevert;
@@ -42,6 +43,8 @@ contract SafeStorageTest is Test {
     event GuardRemoved(address indexed safe, address indexed guard);
 
     function setUp() public {
+        vm.startPrank(address(0xb4c79daB8f259C7Aee6E5b2Aa729821864227e84));
+
         // Setup owners
         owners.push(owner1);
         owners.push(owner2);
@@ -77,6 +80,8 @@ contract SafeStorageTest is Test {
         vm.deal(owner2, 100 ether);
         vm.deal(owner3, 100 ether);
         vm.deal(address(safe), 100 ether);
+
+        vm.stopPrank();
     }
 
     function test_RegisterTx() public {
@@ -255,7 +260,7 @@ contract SafeStorageTest is Test {
         safeStorage.registerTx(payable(address(safe)), safeTx2);
         vm.stopPrank();
 
-        SafeTx[] memory queuedTxs = safeStorage.getQueuedTxs(payable(address(safe)));
+        SafeTxExtended[] memory queuedTxs = safeStorage.getQueuedTxs(payable(address(safe)));
         assertEq(queuedTxs.length, 2, "Should have two queued transactions");
         assertEq(queuedTxs[0].value, 1 ether, "First tx should have correct value");
         assertEq(queuedTxs[1].value, 2 ether, "Second tx should have correct value");

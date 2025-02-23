@@ -2,8 +2,8 @@
 pragma solidity ^0.8.24;
 
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import {SafeTx} from "./interfaces/Types.sol";
-import {Safe, Enum} from "@safe-smart-account/Safe.sol";
+import {SafeTx, SafeTxExtended} from "./interfaces/Types.sol";
+import {Safe} from "@safe-smart-account/Safe.sol";
 import {IGuard} from "./interfaces/IGuard.sol";
 import {NoDelegateCallsGuard} from "./guards/NoDelegateCallsGuard.sol";
 
@@ -196,7 +196,7 @@ contract SafeStorage {
     /// @notice Returns all queued transactions for a Safe
     /// @param safe The Safe address to query
     /// @return result Array of pending SafeTx structs
-    function getQueuedTxs(address payable safe) public view returns (SafeTx[] memory result) {
+    function getQueuedTxs(address payable safe) public view returns (SafeTxExtended[] memory result) {
         uint256 nonce = Safe(safe).nonce();
         uint256 count;
         uint256 maxNonce = maxNonces[safe];
@@ -204,14 +204,52 @@ contract SafeStorage {
             count += hashes[safe][i].length();
         }
 
-        result = new SafeTx[](count);
+        result = new SafeTxExtended[](count);
         count = 0;
         for (uint256 i = nonce; i <= maxNonce; ++i) {
             uint256 length = hashes[safe][i].length();
             for (uint256 j = 0; j < length; ++j) {
-                result[count] = txs[hashes[safe][i].at(j)];
+                bytes32 hash = hashes[safe][i].at(j);
+                SafeTx memory transaction = txs[hash];
+                result[count] = SafeTxExtended({
+                    hash: hash,
+                    signedBy: getSignedBy(safe, hash),
+                    to: transaction.to,
+                    value: transaction.value,
+                    data: transaction.data,
+                    operation: transaction.operation,
+                    safeTxGas: transaction.safeTxGas,
+                    baseGas: transaction.baseGas,
+                    gasPrice: transaction.gasPrice,
+                    gasToken: transaction.gasToken,
+                    refundReceiver: transaction.refundReceiver,
+                    nonce: transaction.nonce
+                });
                 ++count;
             }
+        }
+    }
+
+    function getSignedBy(address payable safe, bytes32 hash) public view returns (address[] memory result) {
+        Safe safeContract = Safe(safe);
+        address[] memory owners = safeContract.getOwners();
+        uint256 ownerCount = owners.length;
+        address[] memory signers = new address[](ownerCount);
+        uint256 count = 0;
+
+        // Check each owner if they approved the hash
+
+        for (uint256 i = 0; i < ownerCount; i++) {
+            if (safeContract.approvedHashes(owners[i], hash) == 1) {
+                signers[count] = owners[i];
+                count++;
+            }
+        }
+
+        // Create correctly sized array with only signers
+        result = new address[](count);
+        for (uint256 i = 0; i < count; i++) {
+            result[i] = signers[i];
         }
     }
 }
