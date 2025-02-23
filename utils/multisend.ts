@@ -1,4 +1,4 @@
-import { Address, Hex } from "viem";
+import { Address, decodeFunctionData, Hex, parseAbi } from "viem";
 import { Call } from "@/core/safe-tx";
 /**
  * Decodes transactions from a single hex string, where each transaction is encoded as:
@@ -16,9 +16,18 @@ import { Call } from "@/core/safe-tx";
  */
 export function decodeTransactions(transactionsHex: Hex): Call[] {
   // Remove "0x" prefix if present
-  const data = transactionsHex.startsWith("0x")
-    ? transactionsHex.slice(12)
-    : transactionsHex.slice(10);
+  const rawData = transactionsHex.startsWith("0x")
+    ? transactionsHex
+    : `0x${transactionsHex}`;
+
+  const { args } = decodeFunctionData({
+    abi: parseAbi(["function multiSend(bytes memory transactions)"]),
+    data: rawData as Hex,
+  });
+
+  const data = args[0].slice(2);
+
+  console.log("data", data);
 
   let index = 0;
   const decoded = [];

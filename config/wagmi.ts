@@ -1,10 +1,10 @@
 import { getDefaultConfig } from "connectkit";
 import { createConfig, http } from "wagmi";
-import { sonic, anvil } from "wagmi/chains";
+import { sonic } from "wagmi/chains";
 
 export const config = createConfig(
   getDefaultConfig({
-    chains: [sonic, anvil],
+    chains: [sonic],
     transports: {
       [sonic.id]: http(),
     },

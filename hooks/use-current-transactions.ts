@@ -27,8 +27,10 @@ export function useCurrentTransactions(safeAddress: Address): {
   } = useQuery({
     queryKey: ["current-transactions"],
     queryFn: async () => {
-      if (!safeAddress || !publicClient || !signers || !nonce) {
-        throw new Error("Not connected or contract not initialized");
+      if (!safeAddress || !publicClient || !signers || nonce === undefined) {
+        console.log("signers", signers);
+        console.log("nonce", nonce);
+        return [];
       }
       const txs = [...reserveJson, ...reserveJson2]
         .filter((t) => t.safe.toLowerCase() === safeAddress.toLowerCase())

@@ -27,7 +27,9 @@ export function ButtonTx({ tx, safeAddress, isQueue }: ButtonTxProps) {
       (signers || [])
         .map((addr) => addr.toLowerCase())
         .some((s) => s === address?.toLowerCase()) &&
-      !tx.signedBy.map((s) => s.toLowerCase()).includes(address || zeroAddress)
+      !tx.signedBy
+        .map((s) => s.toLowerCase())
+        .includes(address?.toLowerCase() || zeroAddress)
     );
   }, [signers, address, tx.signedBy]);
 
