@@ -46,6 +46,14 @@ contract SafeStorage {
         _;
     }
 
+    // Ensures caller is an owner of the specified Safe
+    modifier onlySafeOwners(address payable safe) {
+        if (!Safe(safe).isOwner(msg.sender)) {
+            revert("Not a safe owner");
+        }
+        _;
+    }
+
     // Ensures caller is the Safe contract itself
     modifier onlySafe(address payable safe) {
         if (address(safe) != msg.sender) {
@@ -211,16 +219,16 @@ contract SafeStorage {
 
     /// @notice Adds a transaction submitter for the calling Safe
     /// @param submitter The address to add as a transaction submitter
-    function addTxSubmitter(address submitter) external {
-        txSubmitters[msg.sender].add(submitter);
-        emit TxSubmitterAdded(msg.sender, submitter);
+    function addTxSubmitter(address payable safe, address submitter) external onlySafeOwners(safe) {
+        txSubmitters[safe].add(submitter);
+        emit TxSubmitterAdded(safe, submitter);
     }
 
     /// @notice Removes a transaction submitter for the calling Safe
     /// @param submitter The address to remove as a transaction submitter
-    function removeTxSubmitter(address submitter) external {
-        txSubmitters[msg.sender].remove(submitter);
-        emit TxSubmitterRemoved(msg.sender, submitter);
+    function removeTxSubmitter(address payable safe, address submitter) external onlySafeOwners(safe) {
+        txSubmitters[safe].remove(submitter);
+        emit TxSubmitterRemoved(safe, submitter);
     }
 
     /// @notice Returns all queued transactions for a Safe
