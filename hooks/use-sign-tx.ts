@@ -9,7 +9,10 @@ import {
 import { safeAbi } from "@/bindings/generated";
 import { Address, Hex } from "viem";
 
-export function useSignTx(safeAddress: Address) {
+export function useSignTx(
+  safeAddress: Address,
+  onSuccess: (txHash: Hex) => void
+) {
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient();
@@ -31,9 +34,8 @@ export function useSignTx(safeAddress: Address) {
           args: [args.txHash],
         });
 
-        console.log("tx", tx);
-
         await publicClient.waitForTransactionReceipt({ hash: tx });
+        onSuccess(args.txHash);
       } catch (error) {
         console.error(error);
         throw error;

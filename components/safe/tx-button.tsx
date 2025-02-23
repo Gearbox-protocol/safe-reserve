@@ -1,11 +1,11 @@
 import { SafeTx } from "@/core/safe-tx";
-import { useSafeParams } from "@/hooks/use-safe-params";
-import { useSignTx } from "@/hooks/use-sign-tx";
 import { useExecuteTx } from "@/hooks/use-execute-tx";
-import { Button } from "../ui/button";
-import { useMemo } from "react";
+import { useSafeParams } from "@/hooks/use-safe-params";
+import { useMemo, useState } from "react";
 import { Address, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
+import { Button } from "../ui/button";
+import { useSignTx } from "@/hooks/use-sign-tx";
 
 interface ButtonTxProps {
   tx: SafeTx;
@@ -14,16 +14,26 @@ interface ButtonTxProps {
 }
 
 export function ButtonTx({ tx, safeAddress, isQueue }: ButtonTxProps) {
-  const { sign: signTx, isPending: isSignPending } = useSignTx(safeAddress);
   const { sign: executeTx, isPending: isExecutePending } = useExecuteTx(
     safeAddress,
     tx
+  );
+
+  const [alreadySigned, setAlreadySigned] = useState(false);
+  const { sign: signTx, isPending: isSignPending } = useSignTx(
+    safeAddress,
+    (txHash) => {
+      if (txHash.toLowerCase() === tx.hash.toLowerCase()) {
+        setAlreadySigned(true);
+      }
+    }
   );
   const { signers, threshold, nonce } = useSafeParams(safeAddress);
   const { address } = useAccount();
 
   const canSign = useMemo(() => {
     return (
+      !alreadySigned &&
       (signers || [])
         .map((addr) => addr.toLowerCase())
         .some((s) => s === address?.toLowerCase()) &&
@@ -31,7 +41,7 @@ export function ButtonTx({ tx, safeAddress, isQueue }: ButtonTxProps) {
         .map((s) => s.toLowerCase())
         .includes(address?.toLowerCase() || zeroAddress)
     );
-  }, [signers, address, tx.signedBy]);
+  }, [signers, address, tx.signedBy, alreadySigned]);
 
   const canExecute = tx.signedBy.length >= Number(threshold || 0n);
   const isNonceReady = tx.nonce === (nonce || 0n);

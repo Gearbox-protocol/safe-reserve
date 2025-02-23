@@ -10,6 +10,7 @@ import { useSafeParams } from "@/hooks/use-safe-params";
 import { decodeTransactions } from "@/utils/multisend";
 import { Address, Hex } from "viem";
 import { usePublicClient } from "wagmi";
+
 export function useCurrentTransactions(safeAddress: Address): {
   txs: SafeTx[];
   isLoading: boolean;
@@ -18,8 +19,6 @@ export function useCurrentTransactions(safeAddress: Address): {
   const publicClient = usePublicClient();
   const { signers, nonce } = useSafeParams(safeAddress);
 
-  console.log("CURRENT CHAIN", publicClient?.chain);
-  console.log("CURRENT SAFE ADDRESS", safeAddress);
   const {
     data: txs,
     isLoading,
@@ -69,9 +68,9 @@ export function useCurrentTransactions(safeAddress: Address): {
       }
       return readyTxs;
     },
-    enabled: !!safeAddress,
+    enabled:
+      !!safeAddress && !!publicClient && !!signers && nonce !== undefined,
     retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
   return {
     txs: [...(txs || [])].map((tx) => ({
