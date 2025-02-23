@@ -11,12 +11,14 @@ interface TransactionCardProps {
   tx: SafeTx;
   safeAddress: Address;
   isQueue: boolean;
+  threshold: bigint;
 }
 
 export function TransactionCard({
   tx,
   isQueue,
   safeAddress,
+  threshold,
 }: TransactionCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -41,7 +43,7 @@ export function TransactionCard({
         <div className="flex items-center gap-4">
           <span className="text-gray-400">{tx.calls.length} actions</span>
           <span className="text-gray-400">
-            {/* {tx.timestamp ? formatTimestamp(tx.timestamp) : "N/A"} */}
+            {tx.signedBy.length} / {Number(threshold)}
           </span>
 
           <ButtonTx tx={tx} safeAddress={safeAddress} isQueue={isQueue} />

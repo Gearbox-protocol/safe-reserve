@@ -8,6 +8,7 @@ import { useCurrentTransactions } from "@/hooks/use-current-transactions";
 import { useState } from "react";
 import { Address } from "viem";
 import { TransactionCard } from "./tx-card";
+import { useSafeParams } from "@/hooks/use-safe-params";
 
 interface SafeViewProps {
   safeAddress: Address;
@@ -16,6 +17,7 @@ interface SafeViewProps {
 
 export function SafeView({ safeAddress, executedProposals }: SafeViewProps) {
   const { txs, isLoading, error } = useCurrentTransactions(safeAddress);
+  const { threshold } = useSafeParams(safeAddress);
 
   const [activeTab, setActiveTab] = useState<"queue" | "history">("queue");
 
@@ -64,6 +66,7 @@ export function SafeView({ safeAddress, executedProposals }: SafeViewProps) {
                   tx={tx}
                   isQueue={activeTab === "queue"}
                   safeAddress={safeAddress}
+                  threshold={threshold}
                 />
               ))}
             </div>
