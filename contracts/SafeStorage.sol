@@ -18,6 +18,8 @@ contract SafeStorage {
     event TransactionExecuted(address indexed safe, bytes32 indexed txHash);
     event GuardAdded(address indexed safe, address indexed guard);
     event GuardRemoved(address indexed safe, address indexed guard);
+    event TxSubmitterAdded(address indexed safe, address indexed submitter);
+    event TxSubmitterRemoved(address indexed safe, address indexed submitter);
 
     // Mapping of Safe address to its custom guards
     mapping(address => EnumerableSet.AddressSet) private guards;
@@ -34,9 +36,11 @@ contract SafeStorage {
     // List of default guards applied to all Safes without custom guards
     address[] public defaultGuards;
 
+    mapping(address => EnumerableSet.AddressSet) internal txSubmitters;
+
     // Ensures caller is an owner of the specified Safe
-    modifier onlySafeOwners(address payable safe) {
-        if (!Safe(safe).isOwner(msg.sender)) {
+    modifier onlyTxSubmitter(address payable safe) {
+        if (!Safe(safe).isOwner(msg.sender) && !txSubmitters[safe].contains(msg.sender)) {
             revert("Not a safe owner");
         }
         _;
@@ -59,7 +63,11 @@ contract SafeStorage {
     /// @param safe The Safe contract address
     /// @param safeTx The transaction to register
     /// @return hash The unique identifier for the registered transaction
-    function registerTx(address payable safe, SafeTx calldata safeTx) external onlySafeOwners(safe) returns (bytes32) {
+    function registerTx(address payable safe, SafeTx calldata safeTx)
+        external
+        onlyTxSubmitter(safe)
+        returns (bytes32)
+    {
         {
             address[] memory guard = customGuards[safe] ? guards[safe].values() : defaultGuards;
             uint256 length = guard.length;
@@ -191,6 +199,28 @@ contract SafeStorage {
         customGuards[msg.sender] = false;
         guards[msg.sender].remove(guard);
         emit GuardRemoved(msg.sender, guard);
+    }
+
+    /// @notice Returns whether an address is allowed to submit transactions for a Safe
+    /// @param safe The Safe address to query
+    /// @param submitter The address to check
+    /// @return bool True if the address is allowed to submit transactions
+    function isTxSubmitter(address safe, address submitter) public view returns (bool) {
+        return txSubmitters[safe].contains(submitter);
+    }
+
+    /// @notice Adds a transaction submitter for the calling Safe
+    /// @param submitter The address to add as a transaction submitter
+    function addTxSubmitter(address submitter) external {
+        txSubmitters[msg.sender].add(submitter);
+        emit TxSubmitterAdded(msg.sender, submitter);
+    }
+
+    /// @notice Removes a transaction submitter for the calling Safe
+    /// @param submitter The address to remove as a transaction submitter
+    function removeTxSubmitter(address submitter) external {
+        txSubmitters[msg.sender].remove(submitter);
+        emit TxSubmitterRemoved(msg.sender, submitter);
     }
 
     /// @notice Returns all queued transactions for a Safe
