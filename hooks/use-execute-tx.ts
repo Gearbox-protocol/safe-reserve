@@ -16,8 +16,6 @@ export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
   const { switchChainAsync } = useSwitchChain();
   const publicClient = usePublicClient();
 
-  console.log("CHAIN", walletClient?.chain.id);
-
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (args: { txHash: Hex }) => {
       if (!walletClient || !publicClient || !address || !safeAddress) return;
@@ -36,7 +34,6 @@ export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
         })
         .join("");
 
-      console.log("SIGS", signatures);
       try {
         const txHash = await walletClient.writeContract({
           address: safeAddress,
@@ -55,8 +52,6 @@ export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
             `0x${signatures}`,
           ],
         });
-
-        console.log("txHash", txHash);
 
         await publicClient.waitForTransactionReceipt({ hash: txHash });
 

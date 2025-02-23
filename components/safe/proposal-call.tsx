@@ -17,7 +17,7 @@ export function ProposalCall({ index, call }: ProposalCallProps) {
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <span className="text-gray-400">#{index}</span>
-        <span className="text-gray-400">{call.to} :</span>
+        <span className="text-gray-400">{call.functionName}</span>
 
         {isExpanded ? (
           <ChevronUp className="ml-auto h-4 w-4 text-gray-400" />
@@ -26,15 +26,12 @@ export function ProposalCall({ index, call }: ProposalCallProps) {
         )}
       </div>
 
-      {isExpanded && (
-        <div className="border-t border-gray-800 p-4">
-          <div className="overflow-x-auto">
-            <code className="text-white break-all whitespace-pre-wrap">
-              {call.data}
-            </code>
+      {isExpanded &&
+        call.functionArgs.map((arg) => (
+          <div className="border-t border-gray-800 p-4 text-sm text-gray-400">
+            {arg}
           </div>
-        </div>
-      )}
+        ))}
     </div>
   );
 }

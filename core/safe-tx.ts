@@ -25,4 +25,6 @@ export interface Call {
   to: Address;
   value: bigint;
   data: Hex;
+  functionName: string;
+  functionArgs: string[];
 }

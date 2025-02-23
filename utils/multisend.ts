@@ -1,5 +1,14 @@
-import { Address, decodeFunctionData, Hex, parseAbi } from "viem";
 import { Call } from "@/core/safe-tx";
+import { P } from "pino";
+import {
+  AbiFunction,
+  Address,
+  decodeAbiParameters,
+  decodeFunctionData,
+  Hex,
+  parseAbi,
+} from "viem";
+import { shortenHash } from "./format";
 /**
  * Decodes transactions from a single hex string, where each transaction is encoded as:
  *   1) operation (1 byte, must be 0 in this version),
@@ -14,6 +23,42 @@ import { Call } from "@/core/safe-tx";
  * @param transactionsHex The hex string containing the packed transactions.
  *                        (Should NOT include a function selector at the front.)
  */
+
+function json_stringify(obj: unknown): string {
+  return JSON.stringify(obj, (_, value) => {
+    if (typeof value === "bigint") {
+      return value.toString();
+    }
+    return value;
+  });
+}
+
+function parseHumanReadable(abi: string, data: Hex): [string, string[]] {
+  const abiParsed = parseAbi([
+    `function ${abi}` as unknown as string,
+  ])[0] as AbiFunction;
+
+  const params = decodeAbiParameters(abiParsed.inputs, data);
+  const functionArgs: string[] = [];
+  if (abiParsed.inputs && abiParsed.inputs.length > 0) {
+    return [
+      abiParsed.name,
+      params.map((value, i) =>
+        abiParsed.inputs[i].type === "address"
+          ? value
+          : abiParsed.inputs[i].type.startsWith("tuple")
+            ? json_stringify(value)
+            : abiParsed.inputs[i].type === "bytes"
+              ? (value as Hex).length > 50
+                ? shortenHash(value as Hex, 40)
+                : value
+              : value
+      ) as string[],
+    ];
+  }
+  return [abiParsed.name, []];
+}
+
 export function decodeTransactions(transactionsHex: Hex): Call[] {
   // Remove "0x" prefix if present
   const rawData = transactionsHex.startsWith("0x")
@@ -26,8 +71,6 @@ export function decodeTransactions(transactionsHex: Hex): Call[] {
   });
 
   const data = args[0].slice(2);
-
-  console.log("data", data);
 
   let index = 0;
   const decoded = [];
@@ -51,7 +94,7 @@ export function decodeTransactions(transactionsHex: Hex): Call[] {
 
     // 2) 'to' address (20 bytes => 40 hex chars)
     const toHex = readHexChars(40);
-    const to = "0x" + toHex;
+    let to = "0x" + toHex;
 
     // 3) value (32 bytes => 64 hex chars)
     const valueHex = readHexChars(64);
@@ -65,11 +108,38 @@ export function decodeTransactions(transactionsHex: Hex): Call[] {
     const callDataHex = readHexChars(dataLength * 2);
     const callData = "0x" + callDataHex;
 
+    let functionName = "unknown";
+    let functionArgs: string[] = [];
+    if (callData.toLowerCase().startsWith("0x3a66f901")) {
+      const data = decodeFunctionData({
+        abi: parseAbi([
+          "function queueTransaction(address,uint256,string,bytes,uint256)",
+        ]),
+        data: callData as Hex,
+      });
+
+      // humanReadable = `queueTransaction(\nto: ${data.args[0]}, \nnonce: ${data.args[1]}, \nname: ${data.args[2]}, \ndata: ${shortenHash(data.args[3] as Hex, 10)}, \nvalue: ${data.args[4]})\n`;
+      [functionName, functionArgs] = parseHumanReadable(
+        data.args[2],
+        data.args[3]
+      );
+      to = data.args[0];
+    } else {
+      const data = decodeFunctionData({
+        abi: parseAbi(["function startBatch(uint80)"]),
+        data: callData as Hex,
+      });
+      functionName = "startBatch";
+      functionArgs = [data.args[0].toString()];
+    }
+
     // Push the transaction object without the 'operation' field
     decoded.push({
       to: to as Address,
       value: BigInt(value),
       data: callData as Hex,
+      functionName: functionName,
+      functionArgs: functionArgs,
     });
   }
 

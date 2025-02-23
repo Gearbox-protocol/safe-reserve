@@ -8,7 +8,7 @@ import { safeAbi } from "@/bindings/generated";
 import { SafeTx } from "@/core/safe-tx";
 import { useSafeParams } from "@/hooks/use-safe-params";
 import { decodeTransactions } from "@/utils/multisend";
-import { Address, Hex } from "viem";
+import { Address, decodeFunctionData, Hex, parseAbi } from "viem";
 import { usePublicClient } from "wagmi";
 
 export function useCurrentTransactions(safeAddress: Address): {
@@ -27,9 +27,7 @@ export function useCurrentTransactions(safeAddress: Address): {
     queryKey: ["current-transactions"],
     queryFn: async () => {
       if (!safeAddress || !publicClient || !signers || nonce === undefined) {
-        console.log("signers", signers);
-        console.log("nonce", nonce);
-        return [];
+        throw new Error("Missing required parameters");
       }
       const txs = [...reserveJson, ...reserveJson2]
         .filter((t) => t.safe.toLowerCase() === safeAddress.toLowerCase())
@@ -61,11 +59,33 @@ export function useCurrentTransactions(safeAddress: Address): {
           refundReceiver: tx.refundReceiver as Address,
           nonce: BigInt(tx.nonce),
           hash: tx.hash as Hex,
-          signedBy: signers.filter(
-            (_, index) => signedBy[index] > 0
-          ) as Address[],
+          signedBy: [
+            ...(signers.filter((_, index) => signedBy[index] > 0) as Address[]),
+          ],
+          calls: decodeTransactions(tx.data as Hex),
         });
       }
+
+      const functionSignatures = new Set<string>();
+
+      for (const tx of readyTxs) {
+        for (const call of tx.calls) {
+          const functionSignature = call.data.slice(0, 10);
+          if (functionSignature.toLowerCase() === "0x3a66f901") {
+            const data = decodeFunctionData({
+              abi: parseAbi([
+                "function queueTransaction(address,uint256,string,bytes,uint256)",
+              ]),
+              data: call.data,
+            });
+            const internalTx = data.args[3] as Hex;
+
+            functionSignatures.add(internalTx.slice(0, 10));
+          }
+          functionSignatures.add(functionSignature);
+        }
+      }
+
       return readyTxs;
     },
     enabled:
@@ -73,11 +93,7 @@ export function useCurrentTransactions(safeAddress: Address): {
     retry: 3,
   });
   return {
-    txs: [...(txs || [])].map((tx) => ({
-      ...tx,
-      signedBy: [...tx.signedBy], // Convert readonly array to mutable array
-      calls: decodeTransactions(tx.data),
-    })),
+    txs: txs || [],
     isLoading,
     error: error as Error | null,
   };

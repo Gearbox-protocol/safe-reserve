@@ -22,8 +22,6 @@ export function TransactionCard({
 }: TransactionCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  console.log(tx.calls);
-
   return (
     <Card className={`flex flex-col cursor-pointer`}>
       <div
