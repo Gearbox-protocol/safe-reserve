@@ -30,8 +30,6 @@ contract SafeStorage {
 
     // Stores transaction hashes for each Safe and nonce
     mapping(address => mapping(uint256 => EnumerableSet.Bytes32Set)) private hashes;
-    // Stores the actual transaction data for each hash
-    mapping(bytes32 => SafeTx) public txs;
 
     // List of default guards applied to all Safes without custom guards
     address[] public defaultGuards;
@@ -84,25 +82,10 @@ contract SafeStorage {
             }
         }
 
-        bytes32 hash = Safe(safe).getTransactionHash(
-            // Transaction info
-            safeTx.to,
-            safeTx.value,
-            safeTx.data,
-            safeTx.operation,
-            safeTx.safeTxGas,
-            // Payment info
-            safeTx.baseGas,
-            safeTx.gasPrice,
-            safeTx.gasToken,
-            safeTx.refundReceiver,
-            // Signature info
-            safeTx.nonce
-        );
+        bytes32 hash = _getTransactionHash(safe, safeTx);
         // Increase nonce and execute transaction.
 
         hashes[safe][safeTx.nonce].add(hash);
-        txs[hash] = safeTx;
 
         if (safeTx.nonce > maxNonces[safe]) {
             maxNonces[safe] = safeTx.nonce;
@@ -114,21 +97,16 @@ contract SafeStorage {
 
     /// @notice Executes a previously registered transaction if it has enough signatures
     /// @param safe The Safe contract address
-    /// @param hash The transaction hash to execute
-    function executeTx(address payable safe, bytes32 hash) external {
+    /// @param safeTx The transaction to execute
+    function executeTx(address payable safe, SafeTx calldata safeTx) external {
         bytes memory signaturesData;
         address[] memory owners = Safe(safe).getOwners();
         uint256 threshold = Safe(safe).getThreshold();
         uint256 nonce = Safe(safe).nonce();
+        bytes32 hash = _getTransactionHash(safe, safeTx);
 
         if (!hashes[safe][nonce].contains(hash)) {
             revert("Tx not found");
-        }
-
-        SafeTx memory execTx = txs[hash];
-
-        if (nonce != execTx.nonce) {
-            revert("Invalid nonce");
         }
 
         uint256 signed = 0;
@@ -163,7 +141,7 @@ contract SafeStorage {
             signaturesData = bytes.concat(signaturesData, signatures[i], bytes32(0), bytes1(0x01));
         }
 
-        _executeTx(safe, execTx, signaturesData);
+        _executeTx(safe, safeTx, signaturesData);
         emit TransactionExecuted(safe, hash);
     }
 
@@ -183,6 +161,24 @@ contract SafeStorage {
             safeTx.gasToken,
             payable(safeTx.refundReceiver),
             signaturesData
+        );
+    }
+
+    function _getTransactionHash(address payable safe, SafeTx calldata safeTx) internal view returns (bytes32) {
+        return Safe(safe).getTransactionHash(
+            // Transaction info
+            safeTx.to,
+            safeTx.value,
+            safeTx.data,
+            safeTx.operation,
+            safeTx.safeTxGas,
+            // Payment info
+            safeTx.baseGas,
+            safeTx.gasPrice,
+            safeTx.gasToken,
+            safeTx.refundReceiver,
+            // Signature info
+            safeTx.nonce
         );
     }
 
@@ -234,7 +230,7 @@ contract SafeStorage {
     /// @notice Returns all queued transactions for a Safe
     /// @param safe The Safe address to query
     /// @return result Array of pending SafeTx structs
-    function getQueuedTxs(address payable safe) public view returns (SafeTxExtended[] memory result) {
+    function getQueuedHashes(address payable safe) public view returns (bytes32[] memory result) {
         uint256 nonce = Safe(safe).nonce();
         uint256 count;
         uint256 maxNonce = maxNonces[safe];
@@ -242,27 +238,12 @@ contract SafeStorage {
             count += hashes[safe][i].length();
         }
 
-        result = new SafeTxExtended[](count);
+        result = new bytes32[](count);
         count = 0;
         for (uint256 i = nonce; i <= maxNonce; ++i) {
             uint256 length = hashes[safe][i].length();
             for (uint256 j = 0; j < length; ++j) {
-                bytes32 hash = hashes[safe][i].at(j);
-                SafeTx memory transaction = txs[hash];
-                result[count] = SafeTxExtended({
-                    hash: hash,
-                    signedBy: getSignedBy(safe, hash),
-                    to: transaction.to,
-                    value: transaction.value,
-                    data: transaction.data,
-                    operation: transaction.operation,
-                    safeTxGas: transaction.safeTxGas,
-                    baseGas: transaction.baseGas,
-                    gasPrice: transaction.gasPrice,
-                    gasToken: transaction.gasToken,
-                    refundReceiver: transaction.refundReceiver,
-                    nonce: transaction.nonce
-                });
+                result[count] = hashes[safe][i].at(j);
                 ++count;
             }
         }

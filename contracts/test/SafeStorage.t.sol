@@ -154,7 +154,7 @@ contract SafeStorageTest is Test {
         uint256 recipientBalanceBefore = recipient.balance;
 
         // Execute transaction
-        safeStorage.executeTx(payable(address(safe)), txHash);
+        safeStorage.executeTx(payable(address(safe)), safeTx);
 
         assertEq(recipient.balance - recipientBalanceBefore, amount, "Recipient should receive correct amount");
     }
@@ -181,7 +181,7 @@ contract SafeStorageTest is Test {
         safe.approveHash(txHash);
 
         vm.expectRevert("Not enough signatures");
-        safeStorage.executeTx(payable(address(safe)), txHash);
+        safeStorage.executeTx(payable(address(safe)), safeTx);
     }
 
     function test_CustomGuards() public {
@@ -227,7 +227,7 @@ contract SafeStorageTest is Test {
         safeStorage.registerTx(payable(address(safe)), safeTx);
     }
 
-    function test_GetQueuedTxs() public {
+    function test_GetQueuedHashes() public {
         // Register multiple transactions
         SafeTx memory safeTx1 = SafeTx({
             to: address(0x123),
@@ -260,10 +260,42 @@ contract SafeStorageTest is Test {
         safeStorage.registerTx(payable(address(safe)), safeTx2);
         vm.stopPrank();
 
-        SafeTxExtended[] memory queuedTxs = safeStorage.getQueuedTxs(payable(address(safe)));
-        assertEq(queuedTxs.length, 2, "Should have two queued transactions");
-        assertEq(queuedTxs[0].value, 1 ether, "First tx should have correct value");
-        assertEq(queuedTxs[1].value, 2 ether, "Second tx should have correct value");
+        bytes32 txHash1 = safe.getTransactionHash(
+            // Transaction info
+            safeTx1.to,
+            safeTx1.value,
+            safeTx1.data,
+            safeTx1.operation,
+            safeTx1.safeTxGas,
+            // Payment info
+            safeTx1.baseGas,
+            safeTx1.gasPrice,
+            safeTx1.gasToken,
+            safeTx1.refundReceiver,
+            // Signature info
+            safeTx1.nonce
+        );
+
+        bytes32 txHash2 = safe.getTransactionHash(
+            // Transaction info
+            safeTx2.to,
+            safeTx2.value,
+            safeTx2.data,
+            safeTx2.operation,
+            safeTx2.safeTxGas,
+            // Payment info
+            safeTx2.baseGas,
+            safeTx2.gasPrice,
+            safeTx2.gasToken,
+            safeTx2.refundReceiver,
+            // Signature info
+            safeTx2.nonce
+        );
+
+        bytes32[] memory queuedHashes = safeStorage.getQueuedHashes(payable(address(safe)));
+        assertEq(queuedHashes.length, 2, "Should have two queued transactions");
+        assertEq(queuedHashes[0], txHash1, "First tx hash should have correct value");
+        assertEq(queuedHashes[1], txHash2, "Second tx hash should have correct value");
     }
 
     function test_RevertWhen_InvalidNonce() public {
@@ -293,6 +325,6 @@ contract SafeStorageTest is Test {
 
         // Expect the correct error message
         vm.expectRevert("Tx not found");
-        safeStorage.executeTx(payable(address(safe)), txHash);
+        safeStorage.executeTx(payable(address(safe)), safeTx);
     }
 }
