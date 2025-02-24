@@ -125,12 +125,17 @@ export function decodeTransactions(transactionsHex: Hex): Call[] {
       );
       to = data.args[0];
     } else {
-      const data = decodeFunctionData({
-        abi: parseAbi(["function startBatch(uint80)"]),
-        data: callData as Hex,
-      });
-      functionName = "startBatch";
-      functionArgs = [data.args[0].toString()];
+      try {
+        const data = decodeFunctionData({
+          abi: parseAbi(["function startBatch(uint80)"]),
+          data: callData as Hex,
+        });
+        functionName = "startBatch";
+        functionArgs = [data.args[0].toString()];
+      } catch {
+        functionName = callData.slice(0, 10);
+        functionArgs = [callData.slice(10)];
+      }
     }
 
     // Push the transaction object without the 'operation' field
