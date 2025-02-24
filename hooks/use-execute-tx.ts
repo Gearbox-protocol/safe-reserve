@@ -9,9 +9,10 @@ import {
   useWalletClient,
 } from "wagmi";
 import { toast } from "sonner";
-
+import { useSafeParams } from "@/hooks/use-safe-params";
 export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
   const { address } = useAccount();
+  const { threshold } = useSafeParams(safeAddress);
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
   const publicClient = usePublicClient();
@@ -25,7 +26,8 @@ export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
       });
 
       const signatures = tx.signedBy
-        .sort((a, b) => (a > b ? 1 : -1))
+        .slice(0, threshold)
+        .sort((a, b) => a.localeCompare(b))
         .map((signer) => {
           return ("000000000000000000000000" +
             signer.slice(2) +
@@ -76,7 +78,11 @@ export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
 
         console.log("txHash", txHash);
 
-        await publicClient.waitForTransactionReceipt({ hash: txHash });
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash: txHash,
+        });
+
+        console.log("receipt", receipt);
 
         toast.success("Transaction executed successfully");
       } catch (error) {
