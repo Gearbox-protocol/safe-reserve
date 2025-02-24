@@ -2,6 +2,7 @@
 
 import reserveJson from "@/reserve-upload.json";
 import reserveJson2 from "@/reserve-upload_vanok.json";
+import reserveJson3 from "@/reserve-upload_197.json";
 import { useQuery } from "@tanstack/react-query";
 
 import { safeAbi } from "@/bindings/generated";
@@ -29,7 +30,7 @@ export function useCurrentTransactions(safeAddress: Address): {
       if (!safeAddress || !publicClient || !signers || nonce === undefined) {
         throw new Error("Missing required parameters");
       }
-      const txs = [...reserveJson, ...reserveJson2]
+      const txs = [...reserveJson, ...reserveJson2, ...reserveJson3]
         .filter((t) => t.safe.toLowerCase() === safeAddress.toLowerCase())
         .filter((t) => t.nonce >= nonce);
 
