@@ -35,6 +35,27 @@ export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
         .join("");
 
       try {
+        // const dataHash = await publicClient.readContract({
+        //   address: safeAddress,
+        //   abi: safeAbi,
+        //   functionName: "getTransactionHash",
+        //   args: [
+        //     tx.to as Address,
+        //     tx.value,
+        //     tx.data as Hex,
+        //     tx.operation,
+        //     tx.safeTxGas,
+        //     tx.baseGas,
+        //     tx.gasPrice,
+        //     tx.gasToken as Address,
+        //     tx.refundReceiver as Address,
+        //     tx.nonce,
+        //   ],
+        // });
+
+        // console.log("dataHash!!!", dataHash);
+        // console.log("tx.hash!!!", tx.hash);
+
         const txHash = await walletClient.writeContract({
           address: safeAddress,
           abi: safeAbi,
@@ -52,6 +73,8 @@ export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
             `0x${signatures}`,
           ],
         });
+
+        console.log("txHash", txHash);
 
         await publicClient.waitForTransactionReceipt({ hash: txHash });
 
