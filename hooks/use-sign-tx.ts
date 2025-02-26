@@ -23,7 +23,7 @@ export function useSignTx(
       if (!walletClient || !publicClient || !address || !safeAddress) return;
 
       await switchChainAsync({
-        chainId: 146,
+        chainId: 1,
       });
 
       try {

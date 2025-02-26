@@ -22,7 +22,7 @@ export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
       if (!walletClient || !publicClient || !address || !safeAddress) return;
 
       await switchChainAsync({
-        chainId: 146,
+        chainId: 1,
       });
 
       const signatures = tx.signedBy
