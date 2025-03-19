@@ -33,9 +33,7 @@ export function useCurrentTransactions(safeAddress: Address): {
       const txs = [
         ...reserveJson211,
         // ...reserveJson217,
-      ]
-        .filter((t) => t.safe.toLowerCase() === safeAddress.toLowerCase())
-        .filter((t) => t.nonce >= nonce);
+      ].filter((t) => t.safe.toLowerCase() === safeAddress.toLowerCase());
 
       const readyTxs: SafeTx[] = [];
 

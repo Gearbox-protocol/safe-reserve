@@ -1,4 +1,5 @@
 import { SafeTx } from "@/core/safe-tx";
+import { MULTISEND_ADDRESS } from "@/utils/constant";
 import { ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useState } from "react";
 import { Address } from "viem";
@@ -6,17 +7,18 @@ import { Card } from "../ui/card";
 import { ProposalCall } from "./proposal-call";
 import { ProposalSignatures } from "./proposal-signatures";
 import { ButtonTx } from "./tx-button";
-import { MULTISEND_ADDRESS } from "@/utils/constant";
+import { TabType } from "./view-tx-list";
+
 interface TransactionCardProps {
   tx: SafeTx;
   safeAddress: Address;
-  isQueue: boolean;
+  activeTab: TabType;
   threshold: number;
 }
 
 export function TransactionCard({
   tx,
-  isQueue,
+  activeTab,
   safeAddress,
   threshold,
 }: TransactionCardProps) {
@@ -40,11 +42,13 @@ export function TransactionCard({
         </div>
         <div className="flex items-center gap-4">
           <span className="text-gray-400">{tx.calls.length} actions</span>
-          <span className="text-gray-400">
-            {tx.signedBy.length} / {Number(threshold)}
-          </span>
+          {activeTab === "queue" && (
+            <span className="text-gray-400">
+              {tx.signedBy.length} / {Number(threshold)}
+            </span>
+          )}
 
-          <ButtonTx tx={tx} safeAddress={safeAddress} isQueue={isQueue} />
+          <ButtonTx tx={tx} safeAddress={safeAddress} activeTab={activeTab} />
 
           <span className="text-gray-400 transform transition-transform">
             {isExpanded ? (

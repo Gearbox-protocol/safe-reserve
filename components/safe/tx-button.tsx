@@ -5,20 +5,27 @@ import { useSignTx } from "@/hooks/use-sign-tx";
 import { useMemo, useState } from "react";
 import { Address, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
+import { useTimelockExecuteTx } from "../../hooks/use-timelock-execute-tx";
+import {
+  TimelockTxStatus,
+  useTransactionStatus,
+} from "../../hooks/use-transactions-status";
 import { Button } from "../ui/button";
+import { TabType } from "./view-tx-list";
 
 interface ButtonTxProps {
   tx: SafeTx;
   safeAddress: Address;
-  isQueue: boolean;
+  activeTab: TabType;
 }
 
-export function ButtonTx({ tx, safeAddress, isQueue }: ButtonTxProps) {
+export function ButtonTx({ tx, safeAddress, activeTab }: ButtonTxProps) {
   const { sign: executeTx, isPending: isExecutePending } = useExecuteTx(
     safeAddress,
     tx
   );
 
+  const [isExecuted, setIsExecuted] = useState(false);
   const [alreadySigned, setAlreadySigned] = useState(false);
   const { sign: signTx, isPending: isSignPending } = useSignTx(
     safeAddress,
@@ -28,8 +35,14 @@ export function ButtonTx({ tx, safeAddress, isQueue }: ButtonTxProps) {
       }
     }
   );
+
+  const { sign: timelockExecuteTx, isPending: isTimelockExecutePending } =
+    useTimelockExecuteTx(safeAddress, tx);
+
   const { signers, threshold, nonce } = useSafeParams(safeAddress);
   const { address } = useAccount();
+
+  const { status } = useTransactionStatus(tx);
 
   const canSign = useMemo(() => {
     return (
@@ -43,20 +56,57 @@ export function ButtonTx({ tx, safeAddress, isQueue }: ButtonTxProps) {
     );
   }, [signers, address, tx.signedBy, alreadySigned]);
 
-  const canSignaAndExecute =
-    canSign && tx.signedBy.length + 1 >= Number(threshold || 0n);
-  const canExecute = tx.signedBy.length >= Number(threshold || 0n);
-  const isNonceReady = tx.nonce === (nonce || 0n);
+  const [canSignaAndExecute, canExecute] = useMemo(() => {
+    return [
+      canSign && tx.signedBy.length + 1 >= Number(threshold || 0n),
+      tx.signedBy.length >= Number(threshold || 0n),
+    ];
+  }, [canSign, threshold, tx.signedBy]);
 
-  const isSignButton = !isExecutePending && !canExecute;
-  const isExecuteButton = canExecute || (!isSignPending && canSignaAndExecute);
+  const isNonceReady = useMemo(() => {
+    return tx.nonce === (nonce || 0n);
+  }, [nonce, tx.nonce]);
 
-  if (!isQueue) {
+  const isSignButton = useMemo(() => {
+    return !isExecutePending && !canExecute;
+  }, [isExecutePending, canExecute]);
+
+  const isExecuteButton = useMemo(() => {
+    return canExecute || (!isSignPending && canSignaAndExecute);
+  }, [canExecute, isSignPending, canSignaAndExecute]);
+
+  if (activeTab === "history") {
     return (
       <span className="flex items-center gap-1.5">
         <span className="h-2 w-2 rounded-full bg-white"></span>
         <span className="text-white">Signed</span>
       </span>
+    );
+  }
+
+  if (activeTab === "execute") {
+    if (status === TimelockTxStatus.NotFound) {
+      return <></>;
+    }
+    return (
+      <Button
+        variant="outline"
+        onClick={async (e) => {
+          e.stopPropagation();
+          const isExecuted = await timelockExecuteTx();
+          setIsExecuted(!!isExecuted);
+        }}
+        disabled={status !== TimelockTxStatus.ReadyToExecute || isExecuted}
+        className="px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
+      >
+        {isExecuted
+          ? "Executed"
+          : status !== TimelockTxStatus.ReadyToExecute
+            ? "ETA not reached"
+            : isTimelockExecutePending
+              ? "Executing..."
+              : "Execute"}
+      </Button>
     );
   }
 
@@ -81,20 +131,23 @@ export function ButtonTx({ tx, safeAddress, isQueue }: ButtonTxProps) {
       {isExecuteButton && (
         <Button
           variant="outline"
-          onClick={(e) => {
+          onClick={async (e) => {
             e.stopPropagation();
-            executeTx();
+            const isExecuted = await executeTx();
+            setIsExecuted(!!isExecuted);
           }}
-          disabled={!isNonceReady}
+          disabled={!isNonceReady || isExecuted}
           className="px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
         >
-          {isNonceReady
-            ? isExecutePending
-              ? "Executing..."
-              : isSignButton
-                ? "Confirm and Execute"
-                : "Execute"
-            : "Ready"}
+          {isExecuted
+            ? "Executed "
+            : isNonceReady
+              ? isExecutePending
+                ? "Executing..."
+                : isSignButton
+                  ? "Confirm and Execute"
+                  : "Execute"
+              : "Ready"}
         </Button>
       )}
     </div>

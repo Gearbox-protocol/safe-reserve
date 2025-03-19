@@ -87,6 +87,8 @@ export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
         console.log("receipt", receipt);
 
         toast.success("Transaction executed successfully");
+
+        return true;
       } catch (error) {
         console.error(error);
         toast.error("Transaction execution failed" + error);
