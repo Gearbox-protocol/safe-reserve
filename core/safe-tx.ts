@@ -26,5 +26,8 @@ export interface Call {
   value: bigint;
   data: Hex;
   functionName: string;
-  functionArgs: string[];
+  functionArgs: unknown[];
+
+  parsedFunctionName?: string;
+  parsedFunctionArgs: string[];
 }

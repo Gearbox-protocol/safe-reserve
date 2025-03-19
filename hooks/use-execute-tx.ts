@@ -1,6 +1,8 @@
 import { safeAbi } from "@/bindings/generated";
 import { SafeTx } from "@/core/safe-tx";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Address, Hex } from "viem";
 import {
   useAccount,
@@ -8,8 +10,6 @@ import {
   useSwitchChain,
   useWalletClient,
 } from "wagmi";
-import { toast } from "sonner";
-import { useSafeParams } from "@/hooks/use-safe-params";
 export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
   const { address } = useAccount();
   const { threshold } = useSafeParams(safeAddress);
@@ -18,22 +18,24 @@ export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
   const publicClient = usePublicClient();
 
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (args: { txHash: Hex }) => {
+    mutationFn: async () => {
       if (!walletClient || !publicClient || !address || !safeAddress) return;
 
       await switchChainAsync({
         chainId: 1,
       });
 
+      if (!tx.signedBy.includes(walletClient.account.address)) {
+        tx.signedBy.push(walletClient.account.address);
+      }
+
       const signatures = tx.signedBy
         .slice(0, threshold)
         .sort((a, b) => a.localeCompare(b))
-        .map((signer) => {
-          return ("000000000000000000000000" +
-            signer.slice(2) +
-            "0".repeat(64) +
-            "01") as Hex;
-        })
+        .map(
+          (signer) =>
+            "000000000000000000000000" + signer.slice(2) + "0".repeat(64) + "01"
+        )
         .join("");
 
       try {
@@ -85,6 +87,8 @@ export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
         console.log("receipt", receipt);
 
         toast.success("Transaction executed successfully");
+
+        return true;
       } catch (error) {
         console.error(error);
         toast.error("Transaction execution failed" + error);

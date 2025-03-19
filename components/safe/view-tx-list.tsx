@@ -5,23 +5,25 @@ import { PageLayout } from "@/components/ui/page";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SafeTx } from "@/core/safe-tx";
 import { useCurrentTransactions } from "@/hooks/use-current-transactions";
+import { useSafeParams } from "@/hooks/use-safe-params";
 import { useState } from "react";
 import { Address } from "viem";
 import { TransactionCard } from "./tx-card";
-import { useSafeParams } from "@/hooks/use-safe-params";
 
 interface SafeViewProps {
   safeAddress: Address;
   executedProposals: SafeTx[];
 }
 
+export type TabType = "queue" | "execute" | "history";
+
 export function SafeView({ safeAddress, executedProposals }: SafeViewProps) {
+  const [activeTab, setActiveTab] = useState<TabType>("queue");
+
   const { txs, isLoading, error } = useCurrentTransactions(safeAddress);
-  const { threshold } = useSafeParams(safeAddress);
+  const { threshold, nonce } = useSafeParams(safeAddress);
 
-  const [activeTab, setActiveTab] = useState<"queue" | "history">("queue");
-
-  const filteredTxs = activeTab === "queue" ? txs || [] : executedProposals;
+  const filteredTxs = activeTab === "history" ? executedProposals : txs || [];
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -33,13 +35,12 @@ export function SafeView({ safeAddress, executedProposals }: SafeViewProps) {
         <div className="p-4">
           <Tabs
             value={activeTab}
-            onValueChange={(value) =>
-              setActiveTab(value as "queue" | "history")
-            }
+            onValueChange={(value) => setActiveTab(value as TabType)}
             className="w-full"
           >
             <TabsList>
-              <TabsTrigger value="queue">Queue</TabsTrigger>
+              <TabsTrigger value="queue">New Txs</TabsTrigger>
+              <TabsTrigger value="execute">Queued Txs</TabsTrigger>
               <TabsTrigger value="history">History</TabsTrigger>
             </TabsList>
           </Tabs>
@@ -47,7 +48,7 @@ export function SafeView({ safeAddress, executedProposals }: SafeViewProps) {
 
         {/* Proposals List */}
         <div className="divide-y divide-gray-800 space-y-6 overflow-y-auto">
-          {isLoading && activeTab === "queue" ? (
+          {isLoading && activeTab !== "history" ? (
             // Skeleton loading state
             <>
               {[1, 2, 3].map((i) => (
@@ -60,15 +61,23 @@ export function SafeView({ safeAddress, executedProposals }: SafeViewProps) {
             </>
           ) : (
             <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
-              {filteredTxs.map((tx) => (
-                <TransactionCard
-                  key={tx.hash}
-                  tx={tx}
-                  isQueue={activeTab === "queue"}
-                  safeAddress={safeAddress}
-                  threshold={threshold || 0}
-                />
-              ))}
+              {filteredTxs
+                .filter((t) => {
+                  if (activeTab === "queue") {
+                    return t.nonce >= (nonce ?? 0n);
+                  } else {
+                    return t.nonce < (nonce ?? 0n);
+                  }
+                })
+                .map((tx) => (
+                  <TransactionCard
+                    key={tx.hash}
+                    tx={tx}
+                    activeTab={activeTab}
+                    safeAddress={safeAddress}
+                    threshold={threshold || 0}
+                  />
+                ))}
             </div>
           )}
         </div>
