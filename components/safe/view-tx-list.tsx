@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SafeTx } from "@/core/safe-tx";
 import { useCurrentTransactions } from "@/hooks/use-current-transactions";
 import { useSafeParams } from "@/hooks/use-safe-params";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Address } from "viem";
 import { TransactionCard } from "./tx-card";
 
@@ -17,13 +17,21 @@ interface SafeViewProps {
 
 export type TabType = "queue" | "execute" | "history";
 
-export function SafeView({ safeAddress, executedProposals }: SafeViewProps) {
+export function SafeView({ safeAddress }: SafeViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>("queue");
 
   const { txs, isLoading, error } = useCurrentTransactions(safeAddress);
   const { threshold, nonce } = useSafeParams(safeAddress);
 
-  const filteredTxs = activeTab === "history" ? executedProposals : txs || [];
+  const txsToShow = useMemo(() => {
+    return (txs || []).filter((t) => {
+      if (activeTab === "history") {
+        return t.nonce < (nonce ?? 0n);
+      } else {
+        return t.nonce >= (nonce ?? 0n);
+      }
+    });
+  }, [txs, activeTab, nonce]);
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -61,23 +69,15 @@ export function SafeView({ safeAddress, executedProposals }: SafeViewProps) {
             </>
           ) : (
             <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
-              {filteredTxs
-                .filter((t) => {
-                  if (activeTab === "queue") {
-                    return t.nonce >= (nonce ?? 0n);
-                  } else {
-                    return t.nonce < (nonce ?? 0n);
-                  }
-                })
-                .map((tx) => (
-                  <TransactionCard
-                    key={tx.hash}
-                    tx={tx}
-                    activeTab={activeTab}
-                    safeAddress={safeAddress}
-                    threshold={threshold || 0}
-                  />
-                ))}
+              {txsToShow.map((tx) => (
+                <TransactionCard
+                  key={tx.hash}
+                  tx={tx}
+                  activeTab={activeTab}
+                  safeAddress={safeAddress}
+                  threshold={threshold || 0}
+                />
+              ))}
             </div>
           )}
         </div>
