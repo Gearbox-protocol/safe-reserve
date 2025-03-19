@@ -10,9 +10,10 @@ import {
   useSwitchChain,
   useWalletClient,
 } from "wagmi";
+
 export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
   const { address } = useAccount();
-  const { threshold } = useSafeParams(safeAddress);
+  const { threshold, update } = useSafeParams(safeAddress);
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
   const publicClient = usePublicClient();
@@ -87,7 +88,7 @@ export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
         console.log("receipt", receipt);
 
         toast.success("Transaction executed successfully");
-
+        update();
         return true;
       } catch (error) {
         console.error(error);
