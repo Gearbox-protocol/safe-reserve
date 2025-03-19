@@ -27,8 +27,6 @@ export function ProposalSignatures({
   const [showAll, setShowAll] = useState(false);
   const { threshold } = useSafeParams(safeAddress);
 
-  const readyToExecute = threshold ? signers.length >= threshold : false;
-
   const hasConfirmations = signers.length > 0;
 
   return (

@@ -29,5 +29,5 @@ export interface Call {
   functionArgs: unknown[];
 
   parsedFunctionName?: string;
-  parsedFunctionArgs?: unknown[];
+  parsedFunctionArgs: string[];
 }

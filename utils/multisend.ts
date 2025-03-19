@@ -7,6 +7,7 @@ import {
   Hex,
   parseAbi,
 } from "viem";
+import { shortenHash } from "./format";
 /**
  * Decodes transactions from a single hex string, where each transaction is encoded as:
  *   1) operation (1 byte, must be 0 in this version),
@@ -31,7 +32,7 @@ function json_stringify(obj: unknown): string {
   });
 }
 
-function parseHumanReadable(abi: string, data: Hex): [string, unknown[]] {
+function parseHumanReadable(abi: string, data: Hex): [string, string[]] {
   const abiParsed = parseAbi([
     `function ${abi}` as unknown as string,
   ])[0] as AbiFunction;
@@ -41,18 +42,17 @@ function parseHumanReadable(abi: string, data: Hex): [string, unknown[]] {
   if (abiParsed.inputs && abiParsed.inputs.length > 0) {
     return [
       abiParsed.name,
-      params as unknown[],
-      // params.map((value, i) =>
-      //   abiParsed.inputs[i].type === "address"
-      //     ? value
-      //     : abiParsed.inputs[i].type.startsWith("tuple")
-      //       ? json_stringify(value)
-      //       : abiParsed.inputs[i].type === "bytes"
-      //         ? (value as Hex).length > 50
-      //           ? shortenHash(value as Hex, 40)
-      //           : value
-      //         : value
-      // ) as string[],
+      params.map((value, i) =>
+        abiParsed.inputs[i].type === "address"
+          ? value
+          : abiParsed.inputs[i].type.startsWith("tuple")
+            ? json_stringify(value)
+            : abiParsed.inputs[i].type === "bytes"
+              ? (value as Hex).length > 50
+                ? shortenHash(value as Hex, 40)
+                : value
+              : value
+      ) as string[],
     ];
   }
   return [abiParsed.name, []];
@@ -111,7 +111,7 @@ export function decodeTransactions(transactionsHex: Hex): Call[] {
     let functionArgs: unknown[] = [];
 
     let parsedFunctionName;
-    let parsedFunctionArgs;
+    let parsedFunctionArgs: string[] = [];
 
     // 0xf2b06537
     if (callData.toLowerCase().startsWith("0x3a66f901")) {
@@ -139,9 +139,11 @@ export function decodeTransactions(transactionsHex: Hex): Call[] {
         });
         functionName = "startBatch";
         functionArgs = data.args as unknown as unknown[];
+        parsedFunctionArgs = [data.args[0].toString()];
       } catch {
         functionName = callData.slice(0, 10);
         functionArgs = [callData.slice(10)];
+        parsedFunctionArgs = [callData.slice(10)];
       }
     }
 

@@ -29,9 +29,12 @@ export function ProposalCall({ index, call }: ProposalCallProps) {
       </div>
 
       {isExpanded &&
-        (call.parsedFunctionArgs ?? call.functionArgs).map((arg) => (
-          <div className="border-t border-gray-800 p-4 text-sm text-gray-400">
-            {arg}
+        call.parsedFunctionArgs.map((arg, i) => (
+          <div
+            key={i}
+            className="border-t border-gray-800 p-4 text-sm text-gray-400"
+          >
+            {arg as string}
           </div>
         ))}
     </div>

@@ -1,12 +1,9 @@
 "use client";
 
 import { ConnectKitButton } from "connectkit";
-import { usePathname } from "next/navigation";
 import Image from "next/image";
 
 export default function Header() {
-  const pathname = usePathname();
-
   return (
     <header className="sticky top-0 z-50 border-b border-gray-800 bg-background px-4 py-2">
       <div className="flex items-center justify-between">
