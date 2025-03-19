@@ -1,44 +1,50 @@
 import { safeAbi } from "@/bindings/generated";
-import { useEffect, useState, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 import { usePublicClient } from "wagmi";
 
 export function useSafeParams(safeAddress: Address) {
-  const [threshold, setThreshold] = useState<number>();
-  const [signers, setSigners] = useState<Address[]>();
-  const [nonce, setNonce] = useState<bigint>();
   const publicClient = usePublicClient();
 
-  const update = useCallback(async () => {
-    if (!safeAddress || !publicClient) return;
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["safe-params"],
+    queryFn: async () => {
+      if (!safeAddress || !publicClient) return;
 
-    const [safeThreshold, safeSigners, safeNonce] = await Promise.all([
-      publicClient.readContract({
-        address: safeAddress,
-        abi: safeAbi,
-        functionName: "getThreshold",
-      }),
-      publicClient.readContract({
-        address: safeAddress,
-        abi: safeAbi,
-        functionName: "getOwners",
-      }),
-      publicClient.readContract({
-        address: safeAddress,
-        abi: safeAbi,
-        functionName: "nonce",
-      }),
-    ]);
+      const [safeThreshold, safeSigners, safeNonce] = await Promise.all([
+        publicClient.readContract({
+          address: safeAddress,
+          abi: safeAbi,
+          functionName: "getThreshold",
+        }),
+        publicClient.readContract({
+          address: safeAddress,
+          abi: safeAbi,
+          functionName: "getOwners",
+        }),
+        publicClient.readContract({
+          address: safeAddress,
+          abi: safeAbi,
+          functionName: "nonce",
+        }),
+      ]);
 
-    setThreshold(Number(safeThreshold));
-    setSigners([...safeSigners]);
-    setNonce(safeNonce);
-  }, [safeAddress, publicClient]);
+      return {
+        threshold: Number(safeThreshold),
+        signers: [...safeSigners],
+        nonce: safeNonce,
+      };
+    },
+    enabled: !!safeAddress && !!publicClient,
+    retry: 3,
+  });
 
-  useEffect(() => {
-    // Only fetch once when component mounts and crossChainMultisig is available
-    update();
-  }, [update]); // Now only depends on the memoized function
-
-  return { threshold, signers, nonce, update };
+  return {
+    threshold: data?.threshold,
+    signers: data?.signers,
+    nonce: data?.nonce,
+    isLoading,
+    error: error as Error | null,
+    refetch,
+  };
 }

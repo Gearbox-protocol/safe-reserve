@@ -25,10 +25,10 @@ export function SafeView({ safeAddress }: SafeViewProps) {
 
   const txsToShow = useMemo(() => {
     return (txs || []).filter((t) => {
-      if (activeTab === "history") {
-        return t.nonce < (nonce ?? 0n);
-      } else {
+      if (activeTab === "queue") {
         return t.nonce >= (nonce ?? 0n);
+      } else {
+        return t.nonce < (nonce ?? 0n);
       }
     });
   }, [txs, activeTab, nonce]);

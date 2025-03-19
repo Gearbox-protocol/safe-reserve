@@ -13,7 +13,7 @@ import {
 
 export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
   const { address } = useAccount();
-  const { threshold, update } = useSafeParams(safeAddress);
+  const { threshold, refetch } = useSafeParams(safeAddress);
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
   const publicClient = usePublicClient();
@@ -88,7 +88,8 @@ export function useExecuteTx(safeAddress: Address, tx: SafeTx) {
         console.log("receipt", receipt);
 
         toast.success("Transaction executed successfully");
-        update();
+
+        refetch();
         return true;
       } catch (error) {
         console.error(error);
