@@ -1,4 +1,4 @@
-import { SafeTx } from "@/core/safe-tx";
+import { ParsedSafeTx } from "@/core/safe-tx";
 import { useExecuteTx } from "@/hooks/use-execute-tx";
 import { useSafeParams } from "@/hooks/use-safe-params";
 import { useSignTx } from "@/hooks/use-sign-tx";
@@ -6,15 +6,12 @@ import { useMemo, useState } from "react";
 import { Address, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
 import { useTimelockExecuteTx } from "../../hooks/use-timelock-execute-tx";
-import {
-  TimelockTxStatus,
-  useTransactionStatus,
-} from "../../hooks/use-transactions-status";
+import { TimelockTxStatus } from "../../utils/tx-status";
 import { Button } from "../ui/button";
 import { TabType } from "./view-tx-list";
 
 interface ButtonTxProps {
-  tx: SafeTx;
+  tx: ParsedSafeTx;
   safeAddress: Address;
   activeTab: TabType;
 }
@@ -41,8 +38,6 @@ export function ButtonTx({ tx, safeAddress, activeTab }: ButtonTxProps) {
 
   const { signers, threshold, nonce } = useSafeParams(safeAddress);
   const { address } = useAccount();
-
-  const { status } = useTransactionStatus(tx);
 
   const canSign = useMemo(() => {
     return (
@@ -79,15 +74,18 @@ export function ButtonTx({ tx, safeAddress, activeTab }: ButtonTxProps) {
     return (
       <span className="flex items-center gap-1.5">
         <span className="h-2 w-2 rounded-full bg-white"></span>
-        <span className="text-white">Signed</span>
+        <span className="text-white">
+          {tx.status === TimelockTxStatus.Stale
+            ? "Skipped"
+            : tx.status === TimelockTxStatus.Canceled
+              ? "Canceled"
+              : " Executed"}
+        </span>
       </span>
     );
   }
 
   if (activeTab === "execute") {
-    if (status === TimelockTxStatus.NotFound) {
-      return <></>;
-    }
     return (
       <Button
         variant="outline"
@@ -96,12 +94,12 @@ export function ButtonTx({ tx, safeAddress, activeTab }: ButtonTxProps) {
           const isExecuted = await timelockExecuteTx();
           setIsExecuted(!!isExecuted);
         }}
-        disabled={status !== TimelockTxStatus.ReadyToExecute || isExecuted}
+        disabled={tx.status !== TimelockTxStatus.Ready || isExecuted}
         className="px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
       >
         {isExecuted
           ? "Executed"
-          : status !== TimelockTxStatus.ReadyToExecute
+          : tx.status !== TimelockTxStatus.Ready
             ? "ETA not reached"
             : isTimelockExecutePending
               ? "Executing..."
@@ -140,13 +138,13 @@ export function ButtonTx({ tx, safeAddress, activeTab }: ButtonTxProps) {
           className="px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
         >
           {isExecuted
-            ? "Executed "
+            ? "Queued "
             : isNonceReady
               ? isExecutePending
-                ? "Executing..."
+                ? "Queueing..."
                 : isSignButton
-                  ? "Confirm and Execute"
-                  : "Execute"
+                  ? "Confirm and Queue"
+                  : "Queue"
               : "Ready"}
         </Button>
       )}

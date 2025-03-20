@@ -1,8 +1,9 @@
-import { SafeTx } from "@/core/safe-tx";
+import { ParsedSafeTx } from "@/core/safe-tx";
 import { MULTISEND_ADDRESS } from "@/utils/constant";
 import { ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useState } from "react";
 import { Address } from "viem";
+import { shortenHash } from "../../utils/format";
 import { Card } from "../ui/card";
 import { ProposalCall } from "./proposal-call";
 import { ProposalSignatures } from "./proposal-signatures";
@@ -10,7 +11,7 @@ import { ButtonTx } from "./tx-button";
 import { TabType } from "./view-tx-list";
 
 interface TransactionCardProps {
-  tx: SafeTx;
+  tx: ParsedSafeTx;
   safeAddress: Address;
   activeTab: TabType;
   threshold: number;
@@ -62,15 +63,15 @@ export function TransactionCard({
 
       {/* Expanded View */}
       {isExpanded && (
-        <div className="border-t border-gray-800 bg-gray-900/30 p-4">
-          <div className="grid grid-cols-[1fr_400px] gap-12">
+        <div className="border-t border-gray-800 bg-gray-900/30 p-4 ">
+          <div className="grid grid-cols-[1fr_300px] gap-12">
             <div className="space-y-4">
               <div className="space-y-2 text-sm">
-                <div className="grid grid-cols-[140px_1fr] items-center gap-2">
-                  <span className="text-gray-300">Hash:</span>
-                  <code className="flex items-center gap-1 text-gray-100">
-                    {tx.hash}
-                    <Copy className="h-3 w-3 cursor-pointer text-gray-400 hover:text-white" />
+                <div className="flex w-full items-center justify-between gap-2">
+                  <span className="min-w-[140px] text-gray-300">Hash:</span>
+                  <code className="flex items-center gap-2 text-gray-100">
+                    {shortenHash(tx.hash)}
+                    <Copy className="h-3 w-3 cursor-pointer text-gray-400 hover:text-white ml-2" />
                   </code>
                 </div>
               </div>
@@ -93,6 +94,8 @@ export function TransactionCard({
               <ProposalSignatures
                 signers={tx.signedBy || []}
                 safeAddress={safeAddress}
+                activeTab={activeTab}
+                status={tx.status}
               />
             </div>
           </div>

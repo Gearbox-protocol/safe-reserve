@@ -8,6 +8,7 @@ import { useCurrentTransactions } from "@/hooks/use-current-transactions";
 import { useSafeParams } from "@/hooks/use-safe-params";
 import { useMemo, useState } from "react";
 import { Address } from "viem";
+import { TimelockTxStatus } from "../../utils/tx-status";
 import { TransactionCard } from "./tx-card";
 
 interface SafeViewProps {
@@ -27,8 +28,20 @@ export function SafeView({ safeAddress }: SafeViewProps) {
     return (txs || []).filter((t) => {
       if (activeTab === "queue") {
         return t.nonce >= (nonce ?? 0n);
-      } else {
-        return t.nonce < (nonce ?? 0n);
+      } else if (activeTab === "execute") {
+        return (
+          t.nonce < (nonce ?? 0n) &&
+          [TimelockTxStatus.Ready, TimelockTxStatus.Queued].includes(t.status)
+        );
+      } else if (activeTab === "history") {
+        return (
+          t.nonce < (nonce ?? 0n) &&
+          ![
+            TimelockTxStatus.NotFound,
+            TimelockTxStatus.Queued,
+            TimelockTxStatus.Ready,
+          ].includes(t.status)
+        );
       }
     });
   }, [txs, activeTab, nonce]);

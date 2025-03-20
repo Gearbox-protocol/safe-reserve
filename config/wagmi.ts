@@ -1,12 +1,13 @@
 import { getDefaultConfig } from "connectkit";
 import { createConfig, http } from "wagmi";
-import { mainnet } from "wagmi/chains";
+import { localhost, mainnet } from "wagmi/chains";
 
 export const config = createConfig(
   getDefaultConfig({
-    chains: [mainnet],
+    chains: process.env.NODE_ENV === "development" ? [localhost] : [mainnet],
     transports: {
       [mainnet.id]: http(),
+      [localhost.id]: http(),
     },
 
     walletConnectProjectId:
@@ -21,3 +22,5 @@ export const config = createConfig(
     appIcon: "https://static.gearbox.fi/logo/logo_symbol.png", // your app's icon, no bigger than 1024x1024px (max. 1MB)
   })
 );
+
+export const defaultChainId = process.env.NODE_ENV === "development" ? 1337 : 1;
