@@ -16,11 +16,14 @@ export async function getTxStatus(args: {
   timelock: Address;
   txHash: Hash;
   eta: number;
-}): Promise<TimelockTxStatus> {
+}): Promise<{ status: TimelockTxStatus; blockNumber: number }> {
   const { publicClient, timelock, txHash, eta } = args;
 
   if (eta > Math.floor(Date.now() / 1000) + 14 * HOUR_24) {
-    return TimelockTxStatus.Stale;
+    return {
+      blockNumber: -1,
+      status: TimelockTxStatus.Stale,
+    };
   }
 
   const timelockContract = getContract({
@@ -41,7 +44,10 @@ export async function getTxStatus(args: {
       .length > 0;
 
   if (isExecuted) {
-    return TimelockTxStatus.Executed;
+    return {
+      blockNumber: -1,
+      status: TimelockTxStatus.Executed,
+    };
   }
 
   const isCanceled =
@@ -49,20 +55,34 @@ export async function getTxStatus(args: {
       .length > 0;
 
   if (isCanceled) {
-    return TimelockTxStatus.Canceled;
+    return {
+      blockNumber: -1,
+      status: TimelockTxStatus.Canceled,
+    };
   }
 
-  const isQueued =
-    (await timelockContract.getEvents.QueueTransaction({ txHash }, range))
-      .length > 0;
+  const queueEvent = await timelockContract.getEvents.QueueTransaction(
+    { txHash },
+    range
+  );
+  const isQueued = queueEvent.length > 0;
 
   if (isQueued) {
     if (eta > Math.floor(Date.now() / 1000)) {
-      return TimelockTxStatus.Queued;
+      return {
+        blockNumber: Number(queueEvent[0].blockNumber),
+        status: TimelockTxStatus.Queued,
+      };
     } else {
-      return TimelockTxStatus.Ready;
+      return {
+        blockNumber: Number(queueEvent[0].blockNumber),
+        status: TimelockTxStatus.Ready,
+      };
     }
   }
 
-  return TimelockTxStatus.NotFound;
+  return {
+    blockNumber: -1,
+    status: TimelockTxStatus.NotFound,
+  };
 }

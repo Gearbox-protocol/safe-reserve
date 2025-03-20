@@ -167,7 +167,9 @@ export function useCurrentTransactions(safeAddress: Address): {
       !!txs && !!statuses && txs.length === statuses.length
         ? txs.map((tx, index) => ({
             ...tx,
-            status: statuses[index].data ?? TimelockTxStatus.NotFound,
+            governor: tx.calls[0].to,
+            status: statuses[index].data?.status ?? TimelockTxStatus.NotFound,
+            queueBlock: statuses[index].data?.blockNumber ?? -1,
             fetchStatus: statuses[index].refetch,
           }))
         : [],
