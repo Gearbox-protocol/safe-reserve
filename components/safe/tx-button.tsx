@@ -142,9 +142,7 @@ export function ButtonTx({ tx, safeAddress, activeTab }: ButtonTxProps) {
             : isNonceReady
               ? isExecutePending
                 ? "Queueing..."
-                : isSignButton
-                  ? "Confirm and Queue"
-                  : "Queue"
+                : "Queue"
               : "Ready"}
         </Button>
       )}
