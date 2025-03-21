@@ -1,4 +1,11 @@
-import { Address, getContract, Hash, PublicClient } from "viem";
+import {
+  Address,
+  BlockTag,
+  encodeEventTopics,
+  Hash,
+  parseEventLogs,
+  PublicClient,
+} from "viem";
 import { timelockAbi } from "../bindings/generated";
 import { HOUR_24 } from "./constant";
 
@@ -26,63 +33,78 @@ export async function getTxStatus(args: {
     };
   }
 
-  const timelockContract = getContract({
-    address: timelock,
-    abi: timelockAbi,
-    client: {
-      public: publicClient,
-    },
-  });
+  const events = [
+    "ExecuteTransaction",
+    "CancelTransaction",
+    "QueueTransaction",
+  ].map(
+    (eventName) =>
+      encodeEventTopics({
+        abi: timelockAbi,
+        eventName: eventName as
+          | "CancelTransaction"
+          | "ExecuteTransaction"
+          | "QueueTransaction",
+        args: {},
+      })[0]
+  );
 
-  const range: { fromBlock: bigint; toBlock: "latest" } = {
+  const logs = await publicClient.getLogs({
+    address: timelock,
     fromBlock: 0n,
     toBlock: "latest",
-  };
+    topics: [events, [txHash]],
+  } as {
+    address: `0x${string}`;
+    fromBlock: bigint;
+    toBlock: BlockTag | bigint;
+    topics: (string[] | string | null)[];
+  });
 
-  const isExecuted =
-    (await timelockContract.getEvents.ExecuteTransaction({ txHash }, range))
-      .length > 0;
-
-  if (isExecuted) {
-    return {
-      blockNumber: -1,
-      status: TimelockTxStatus.Executed,
-    };
-  }
-
-  const isCanceled =
-    (await timelockContract.getEvents.CancelTransaction({ txHash }, range))
-      .length > 0;
-
-  if (isCanceled) {
-    return {
-      blockNumber: -1,
-      status: TimelockTxStatus.Canceled,
-    };
-  }
-
-  const queueEvent = await timelockContract.getEvents.QueueTransaction(
-    { txHash },
-    range
+  const parsedLogs = parseEventLogs({
+    abi: timelockAbi,
+    logs,
+  }).filter(
+    (log) =>
+      (log.eventName === "ExecuteTransaction" ||
+        log.eventName === "CancelTransaction" ||
+        log.eventName === "QueueTransaction") &&
+      (log.args?.txHash ?? "").toLowerCase() === txHash.toLowerCase()
   );
-  const isQueued = queueEvent.length > 0;
 
-  if (isQueued) {
+  let status = TimelockTxStatus.NotFound;
+  let blockNumber = -1;
+
+  for (const log of parsedLogs) {
+    switch (log.eventName) {
+      case "ExecuteTransaction": {
+        blockNumber = Number(log.blockNumber);
+        status = TimelockTxStatus.Executed;
+        break;
+      }
+      case "CancelTransaction": {
+        blockNumber = Number(log.blockNumber);
+        status = TimelockTxStatus.Canceled;
+        break;
+      }
+      case "QueueTransaction": {
+        blockNumber = Number(log.blockNumber);
+        if (status === TimelockTxStatus.NotFound) {
+          status = TimelockTxStatus.Queued;
+        }
+        break;
+      }
+    }
+  }
+
+  if (status === TimelockTxStatus.Queued) {
     if (eta > Math.floor(Date.now() / 1000)) {
-      return {
-        blockNumber: Number(queueEvent[0].blockNumber),
-        status: TimelockTxStatus.Queued,
-      };
-    } else {
-      return {
-        blockNumber: Number(queueEvent[0].blockNumber),
-        status: TimelockTxStatus.Ready,
-      };
+      status = TimelockTxStatus.Ready;
     }
   }
 
   return {
-    blockNumber: -1,
-    status: TimelockTxStatus.NotFound,
+    blockNumber,
+    status,
   };
 }
