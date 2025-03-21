@@ -8,7 +8,9 @@ import { useCurrentTransactions } from "@/hooks/use-current-transactions";
 import { useSafeParams } from "@/hooks/use-safe-params";
 import { useMemo, useState } from "react";
 import { Address } from "viem";
+import { getReportRef } from "../../utils/get-report";
 import { TimelockTxStatus } from "../../utils/tx-status";
+import { Button } from "../ui/button";
 import { TransactionCard } from "./tx-card";
 
 interface SafeViewProps {
@@ -21,7 +23,8 @@ export type TabType = "queue" | "execute" | "history";
 export function SafeView({ safeAddress }: SafeViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>("queue");
 
-  const { txs, isLoading, error } = useCurrentTransactions(safeAddress);
+  const { txs, governor, isLoading, error } =
+    useCurrentTransactions(safeAddress);
   const { threshold, nonce } = useSafeParams(safeAddress);
 
   const txsToShow = useMemo(() => {
@@ -51,7 +54,31 @@ export function SafeView({ safeAddress }: SafeViewProps) {
   }
 
   return (
-    <PageLayout title={"Transactions"}>
+    <PageLayout
+      title={"Transactions"}
+      actionButton={
+        activeTab === "execute" && governor && txsToShow.length > 0 ? (
+          <a
+            href={getReportRef({
+              network: "Mainnet",
+              governor,
+              fromBlock: txsToShow[0].queueBlock,
+              toBlock: txsToShow[txsToShow.length - 1].queueBlock,
+            })}
+            target="_blank"
+          >
+            <Button
+              variant="outline"
+              className="px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
+            >
+              {"View Report"}
+            </Button>
+          </a>
+        ) : (
+          <></>
+        )
+      }
+    >
       <Card className="bg-black border-0 overflow-y-auto">
         <div className="p-4">
           <Tabs
@@ -67,9 +94,8 @@ export function SafeView({ safeAddress }: SafeViewProps) {
           </Tabs>
         </div>
 
-        {/* Proposals List */}
         <div className="divide-y divide-gray-800 space-y-6 overflow-y-auto">
-          {isLoading && activeTab !== "history" ? (
+          {isLoading ? (
             // Skeleton loading state
             <>
               {[1, 2, 3].map((i) => (
@@ -80,6 +106,16 @@ export function SafeView({ safeAddress }: SafeViewProps) {
                 </div>
               ))}
             </>
+          ) : txsToShow.length === 0 ? (
+            <div className="p-4">
+              <text className="font-semibold text-white">
+                {activeTab === "queue"
+                  ? "There is no new transactions to queue"
+                  : activeTab === "execute"
+                    ? "There is no new transactions to execute"
+                    : "There is no transactions"}
+              </text>
+            </div>
           ) : (
             <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
               {txsToShow.map((tx) => (

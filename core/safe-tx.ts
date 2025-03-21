@@ -23,7 +23,6 @@ export interface SafeTx {
 }
 
 export interface ParsedSafeTx extends SafeTx {
-  governor: Address;
   queueBlock: number;
   status: TimelockTxStatus;
   fetchStatus: () => Promise<unknown>;
