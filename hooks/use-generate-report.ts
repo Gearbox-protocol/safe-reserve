@@ -1,8 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Address } from "viem";
-
-export type NetworkType = "Mainnet" | "Arbitrum" | "Optimism" | "Sonic";
+import { NetworkType } from "../config/wagmi";
 
 export function useGenerateReport(
   network: NetworkType,

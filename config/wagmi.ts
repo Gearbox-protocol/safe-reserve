@@ -1,14 +1,55 @@
 import { getDefaultConfig } from "connectkit";
+import { defineChain } from "viem";
 import { createConfig, http } from "wagmi";
-import { localhost, mainnet } from "wagmi/chains";
+
+export type NetworkType = "Mainnet" | "Arbitrum" | "Optimism" | "Sonic";
+
+export const getRpc = (chain: NetworkType) => {
+  let rpc;
+  switch (chain) {
+    case "Mainnet":
+      rpc =
+        process.env.NEXT_PUBLIC_MAINNET_NODE_URI ??
+        process.env.NEXT_PUBLIC_RPC_URL;
+      break;
+    default:
+      rpc = process.env.NEXT_PUBLIC_RPC_URL;
+      break;
+  }
+
+  if (!rpc) {
+    throw new Error("Missing rpc");
+  }
+
+  return rpc;
+};
+
+const mainnet = defineChain({
+  id: 1,
+  name: "Mainnet",
+  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: [getRpc("Mainnet")],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Etherscan",
+      url: "https://etherscan.io",
+      apiUrl: "https://api.etherscan.io/api",
+    },
+  },
+});
+
+const chains = [mainnet] as const;
 
 export const config = createConfig(
   getDefaultConfig({
-    chains: process.env.NODE_ENV === "development" ? [localhost] : [mainnet],
-    transports: {
-      [mainnet.id]: http(),
-      [localhost.id]: http(),
-    },
+    chains,
+    transports: Object.fromEntries(
+      chains.map((ch) => [ch.id, http(getRpc(ch.name), { retryDelay: 1_000 })])
+    ),
 
     walletConnectProjectId:
       process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
@@ -23,4 +64,4 @@ export const config = createConfig(
   })
 );
 
-export const defaultChainId = process.env.NODE_ENV === "development" ? 1337 : 1;
+export const defaultChainId = 1;
