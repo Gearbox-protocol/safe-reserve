@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Address } from "viem";
-import { NetworkType } from "../utils/report-link";
+
+export type NetworkType = "Mainnet" | "Arbitrum" | "Optimism" | "Sonic";
 
 export function useGenerateReport(
   network: NetworkType,
