@@ -4,9 +4,16 @@ import { localhost, mainnet } from "wagmi/chains";
 
 export const config = createConfig(
   getDefaultConfig({
-    chains: process.env.NODE_ENV === "development" ? [localhost] : [mainnet],
+    chains: [mainnet],
     transports: {
-      [mainnet.id]: http(),
+      [mainnet.id]: http(
+        process.env.MAINNET_NODE_URI || mainnet.rpcUrls.default.http[0],
+        {
+          retryCount: 3,
+          retryDelay: 1000,
+          timeout: 10000,
+        }
+      ),
       [localhost.id]: http(),
     },
 
@@ -23,4 +30,4 @@ export const config = createConfig(
   })
 );
 
-export const defaultChainId = process.env.NODE_ENV === "development" ? 1337 : 1;
+export const defaultChainId = 1;
