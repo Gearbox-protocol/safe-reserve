@@ -1,15 +1,14 @@
 import { safeAbi } from "@/bindings/generated";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 import { usePublicClient } from "wagmi";
+
 export function useSafeParams(safeAddress: Address) {
-  const [threshold, setThreshold] = useState<number>();
-  const [signers, setSigners] = useState<Address[]>();
-  const [nonce, setNonce] = useState<bigint>();
   const publicClient = usePublicClient();
 
-  useEffect(() => {
-    const fetchThreshold = async () => {
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["safe-params"],
+    queryFn: async () => {
       if (!safeAddress || !publicClient) return;
 
       const [safeThreshold, safeSigners, safeNonce] = await Promise.all([
@@ -30,14 +29,22 @@ export function useSafeParams(safeAddress: Address) {
         }),
       ]);
 
-      setThreshold(Number(safeThreshold));
-      setSigners([...safeSigners]);
-      setNonce(safeNonce);
-    };
+      return {
+        threshold: Number(safeThreshold),
+        signers: [...safeSigners],
+        nonce: safeNonce,
+      };
+    },
+    enabled: !!safeAddress && !!publicClient,
+    retry: 3,
+  });
 
-    // Only fetch once when component mounts and crossChainMultisig is available
-    fetchThreshold();
-  }, [safeAddress, publicClient]); // Only re-run if safeAddress or publicClient changes
-
-  return { threshold, signers, nonce };
+  return {
+    threshold: data?.threshold,
+    signers: data?.signers,
+    nonce: data?.nonce,
+    isLoading,
+    error: error as Error | null,
+    refetch,
+  };
 }

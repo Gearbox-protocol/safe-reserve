@@ -7,7 +7,10 @@ import {
 } from "wagmi";
 
 import { safeAbi } from "@/bindings/generated";
+import { toast } from "sonner";
 import { Address, Hex } from "viem";
+import { defaultChainId } from "../config/wagmi";
+import { useCurrentTransactions } from "./use-current-transactions";
 
 export function useSignTx(
   safeAddress: Address,
@@ -18,12 +21,14 @@ export function useSignTx(
   const publicClient = usePublicClient();
   const { switchChainAsync } = useSwitchChain();
 
+  const { refetchSigs } = useCurrentTransactions(safeAddress);
+
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (args: { txHash: Hex }) => {
       if (!walletClient || !publicClient || !address || !safeAddress) return;
 
       await switchChainAsync({
-        chainId: 1,
+        chainId: defaultChainId,
       });
 
       try {
@@ -34,7 +39,19 @@ export function useSignTx(
           args: [args.txHash],
         });
 
-        await publicClient.waitForTransactionReceipt({ hash: tx });
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash: tx,
+        });
+
+        console.log("receipt", receipt);
+
+        if (receipt.status === "reverted") {
+          throw new Error("Transaction reverted");
+        }
+
+        toast.success("Transaction executed successfully");
+
+        refetchSigs();
         onSuccess(args.txHash);
       } catch (error) {
         console.error(error);

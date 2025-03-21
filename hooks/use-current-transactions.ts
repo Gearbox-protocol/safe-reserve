@@ -3,29 +3,40 @@
 // import reserveJson217 from "@/reserve-upload_217.json";
 import reserveJson211 from "@/deploy-state/reserve-upload_211.json";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 
 import { safeAbi } from "@/bindings/generated";
-import { SafeTx } from "@/core/safe-tx";
+import { ParsedSafeTx, SafeTx } from "@/core/safe-tx";
 import { useSafeParams } from "@/hooks/use-safe-params";
 import { decodeTransactions } from "@/utils/multisend";
-import { Address, decodeFunctionData, Hex, parseAbi } from "viem";
+import {
+  Address,
+  decodeFunctionData,
+  encodeAbiParameters,
+  Hex,
+  keccak256,
+  parseAbi,
+} from "viem";
 import { usePublicClient } from "wagmi";
+import { getTxStatus, TimelockTxStatus } from "../utils/tx-status";
+import { useTimelock } from "./use-timelock-address";
 
 export function useCurrentTransactions(safeAddress: Address): {
-  txs: SafeTx[];
+  txs: ParsedSafeTx[];
   isLoading: boolean;
   error: Error | null;
+  refetchSigs: () => Promise<unknown>;
 } {
   const publicClient = usePublicClient();
   const { signers, nonce } = useSafeParams(safeAddress);
 
   const {
     data: txs,
-    isLoading,
-    error,
+    isLoading: isLoadingTxs,
+    error: errorTxs,
+    refetch,
   } = useQuery({
-    queryKey: ["current-transactions"],
+    queryKey: ["current-transactions", safeAddress],
     queryFn: async () => {
       if (!safeAddress || !publicClient || !signers || nonce === undefined) {
         throw new Error("Missing required parameters");
@@ -94,9 +105,81 @@ export function useCurrentTransactions(safeAddress: Address): {
       !!safeAddress && !!publicClient && !!signers && nonce !== undefined,
     retry: 3,
   });
+
+  const {
+    timelock,
+    isLoading: isLoadingTimelock,
+    error: errorTimelock,
+  } = useTimelock(txs?.[0].calls[0].to);
+
+  const statuses = useQueries({
+    queries: (txs ?? []).map((tx) => ({
+      queryKey: ["tx-status", safeAddress, tx.hash],
+      queryFn: async () => {
+        if (!publicClient || !safeAddress || !timelock) return;
+
+        if (tx.calls.length < 2) {
+          throw new Error("Batch does not have enough transactions");
+        }
+
+        if (tx.calls[0].functionName !== "startBatch") {
+          throw new Error("First transaction is not a startBatch");
+        }
+        if (tx.calls[1].functionName !== "queueTransaction") {
+          throw new Error("Second transaction is not a queueTransaction");
+        }
+
+        const eta = Number(tx.calls[0].functionArgs[0]);
+        const txHash = keccak256(
+          encodeAbiParameters(
+            [
+              { type: "address", name: "target" },
+              { type: "uint", name: "value" },
+              { type: "string", name: "signature" },
+              { type: "bytes", name: "data" },
+              { type: "uint", name: "eta" },
+            ],
+            [
+              tx.calls[1].functionArgs[0] as Address,
+              tx.calls[1].functionArgs[1] as bigint,
+              tx.calls[1].functionArgs[2] as string,
+              tx.calls[1].functionArgs[3] as Hex,
+              tx.calls[1].functionArgs[4] as bigint,
+            ]
+          )
+        );
+
+        return await getTxStatus({
+          publicClient,
+          timelock,
+          txHash,
+          eta,
+        });
+      },
+
+      enabled: !!safeAddress && !!publicClient && !!txs && !!timelock,
+      retry: 3,
+    })),
+  });
+
   return {
-    txs: txs || [],
-    isLoading,
-    error: error as Error | null,
+    txs:
+      !!txs && !!statuses && txs.length === statuses.length
+        ? txs.map((tx, index) => ({
+            ...tx,
+            governor: tx.calls[0].to,
+            status: statuses[index].data?.status ?? TimelockTxStatus.NotFound,
+            queueBlock: statuses[index].data?.blockNumber ?? -1,
+            fetchStatus: statuses[index].refetch,
+          }))
+        : [],
+    isLoading:
+      isLoadingTxs ||
+      isLoadingTimelock ||
+      !!statuses.find(({ isLoading }) => !!isLoading),
+    error: (errorTxs ||
+      errorTimelock ||
+      statuses.find(({ error }) => error)) as Error | null,
+    refetchSigs: refetch,
   };
 }

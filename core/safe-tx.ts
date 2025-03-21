@@ -1,4 +1,5 @@
 import { Address, Hex } from "viem";
+import { TimelockTxStatus } from "../utils/tx-status";
 
 export enum Operation {
   Call = 0,
@@ -19,6 +20,13 @@ export interface SafeTx {
   hash: Hex;
   signedBy: Address[];
   calls: Call[];
+}
+
+export interface ParsedSafeTx extends SafeTx {
+  governor: Address;
+  queueBlock: number;
+  status: TimelockTxStatus;
+  fetchStatus: () => Promise<unknown>;
 }
 
 export interface Call {

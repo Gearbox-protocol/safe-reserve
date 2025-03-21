@@ -1,5 +1,5 @@
 import { governorAbi } from "@/bindings/generated";
-import { SafeTx } from "@/core/safe-tx";
+import { ParsedSafeTx } from "@/core/safe-tx";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Address, Hex } from "viem";
@@ -9,8 +9,9 @@ import {
   useSwitchChain,
   useWalletClient,
 } from "wagmi";
+import { defaultChainId } from "../config/wagmi";
 
-export function useTimelockExecuteTx(safeAddress: Address, tx: SafeTx) {
+export function useTimelockExecuteTx(safeAddress: Address, tx: ParsedSafeTx) {
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
@@ -21,7 +22,7 @@ export function useTimelockExecuteTx(safeAddress: Address, tx: SafeTx) {
       if (!walletClient || !publicClient || !address || !safeAddress) return;
 
       await switchChainAsync({
-        chainId: 1,
+        chainId: defaultChainId,
       });
 
       const executionBatch = tx.calls
@@ -50,7 +51,14 @@ export function useTimelockExecuteTx(safeAddress: Address, tx: SafeTx) {
 
         console.log("receipt", receipt);
 
+        if (receipt.status === "reverted") {
+          throw new Error("Transaction reverted");
+        }
+
         toast.success("Transaction executed successfully");
+
+        tx.fetchStatus();
+
         return true;
       } catch (error) {
         console.error(error);
