@@ -98,7 +98,7 @@ export async function getTxStatus(args: {
   }
 
   if (status === TimelockTxStatus.Queued) {
-    if (eta > Math.floor(Date.now() / 1000)) {
+    if (eta <= Math.floor(Date.now() / 1000)) {
       status = TimelockTxStatus.Ready;
     }
   }
