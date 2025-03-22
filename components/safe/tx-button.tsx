@@ -5,7 +5,7 @@ import { useSignTx } from "@/hooks/use-sign-tx";
 import { useMemo, useState } from "react";
 import { Address, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
-import { useGenerateReport } from "../../hooks/use-generate-report";
+
 import { useTimelockExecuteTx } from "../../hooks/use-timelock-execute-tx";
 import { TimelockTxStatus } from "../../utils/tx-status";
 import { Button } from "../ui/button";
@@ -21,12 +21,6 @@ export function ButtonTx({ tx, safeAddress, activeTab }: ButtonTxProps) {
   const { sign: executeTx, isPending: isExecutePending } = useExecuteTx(
     safeAddress,
     tx
-  );
-
-  const { generate, isPending: isGeneratePending } = useGenerateReport(
-    "Mainnet",
-    tx.governor,
-    tx.queueBlock
   );
 
   const [isExecuted, setIsExecuted] = useState(false);
@@ -95,18 +89,6 @@ export function ButtonTx({ tx, safeAddress, activeTab }: ButtonTxProps) {
   if (activeTab === "execute") {
     return (
       <div className="flex items-center gap-4">
-        <Button
-          variant="outline"
-          onClick={async (e) => {
-            e.stopPropagation();
-            const ref = await generate();
-            window.open(ref, "_blank");
-          }}
-          className="px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
-        >
-          {isGeneratePending ? "Generating..." : "Generate Report"}
-        </Button>
-
         <Button
           variant="outline"
           onClick={async (e) => {
