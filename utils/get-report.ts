@@ -12,5 +12,5 @@ export function getReportRef({
   fromBlock: number;
   toBlock: number;
 }) {
-  return `https://anvil.gearbox.foundation/governor/${network.toLowerCase()}${governor}/report?fromBlock=${fromBlock}&toBlock=${toBlock}`;
+  return `https://anvil.gearbox.foundation/governor/${network.toLowerCase()}/${governor}/report?fromBlock=${fromBlock}&toBlock=${toBlock}&governor=${governor}`;
 }
