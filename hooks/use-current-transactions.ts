@@ -113,7 +113,7 @@ export function useCurrentTransactions(safeAddress: Address): {
     timelock,
     isLoading: isLoadingTimelock,
     error: errorTimelock,
-  } = useTimelock(txs?.[0].calls[0].to);
+  } = useTimelock(txs?.[0]?.calls[0].to);
 
   const statuses = useQueries({
     queries: (txs ?? []).map((tx) => ({
