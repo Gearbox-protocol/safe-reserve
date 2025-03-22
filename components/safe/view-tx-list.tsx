@@ -39,11 +39,7 @@ export function SafeView({ safeAddress }: SafeViewProps) {
       } else if (activeTab === "history") {
         return (
           t.nonce < (nonce ?? 0n) &&
-          ![
-            TimelockTxStatus.NotFound,
-            TimelockTxStatus.Queued,
-            TimelockTxStatus.Ready,
-          ].includes(t.status)
+          ![TimelockTxStatus.Queued, TimelockTxStatus.Ready].includes(t.status)
         );
       }
     });
