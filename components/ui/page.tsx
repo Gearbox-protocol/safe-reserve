@@ -7,9 +7,15 @@ interface PageLayoutProps {
     href: string;
     text: string;
   };
+  actionButton?: JSX.Element;
 }
 
-export function PageLayout({ children, title, backButton }: PageLayoutProps) {
+export function PageLayout({
+  children,
+  title,
+  backButton,
+  actionButton,
+}: PageLayoutProps) {
   return (
     <div className="min-h-screen bg-black text-white p-6 overflow-y-auto">
       {backButton && (
@@ -17,7 +23,9 @@ export function PageLayout({ children, title, backButton }: PageLayoutProps) {
       )}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold mb-2">{title}</h1>
+        {actionButton}
       </div>
+
       {children}
     </div>
   );

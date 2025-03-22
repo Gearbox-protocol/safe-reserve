@@ -23,6 +23,7 @@ import { useTimelock } from "./use-timelock-address";
 
 export function useCurrentTransactions(safeAddress: Address): {
   txs: ParsedSafeTx[];
+  governor?: Address;
   isLoading: boolean;
   error: Error | null;
   refetchSigs: () => Promise<unknown>;
@@ -167,10 +168,12 @@ export function useCurrentTransactions(safeAddress: Address): {
       !!txs && !!statuses && txs.length === statuses.length
         ? txs.map((tx, index) => ({
             ...tx,
-            status: statuses[index].data ?? TimelockTxStatus.NotFound,
+            status: statuses[index].data?.status ?? TimelockTxStatus.NotFound,
+            queueBlock: statuses[index].data?.blockNumber ?? -1,
             fetchStatus: statuses[index].refetch,
           }))
         : [],
+    governor: txs?.[0].calls[0].to,
     isLoading:
       isLoadingTxs ||
       isLoadingTimelock ||

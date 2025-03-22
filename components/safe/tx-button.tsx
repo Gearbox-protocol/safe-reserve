@@ -5,6 +5,7 @@ import { useSignTx } from "@/hooks/use-sign-tx";
 import { useMemo, useState } from "react";
 import { Address, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
+
 import { useTimelockExecuteTx } from "../../hooks/use-timelock-execute-tx";
 import { TimelockTxStatus } from "../../utils/tx-status";
 import { Button } from "../ui/button";
@@ -87,24 +88,26 @@ export function ButtonTx({ tx, safeAddress, activeTab }: ButtonTxProps) {
 
   if (activeTab === "execute") {
     return (
-      <Button
-        variant="outline"
-        onClick={async (e) => {
-          e.stopPropagation();
-          const isExecuted = await timelockExecuteTx();
-          setIsExecuted(!!isExecuted);
-        }}
-        disabled={tx.status !== TimelockTxStatus.Ready || isExecuted}
-        className="px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
-      >
-        {isExecuted
-          ? "Executed"
-          : tx.status !== TimelockTxStatus.Ready
-            ? "ETA not reached"
-            : isTimelockExecutePending
-              ? "Executing..."
-              : "Execute"}
-      </Button>
+      <div className="flex items-center gap-4">
+        <Button
+          variant="outline"
+          onClick={async (e) => {
+            e.stopPropagation();
+            const isExecuted = await timelockExecuteTx();
+            setIsExecuted(!!isExecuted);
+          }}
+          disabled={tx.status !== TimelockTxStatus.Ready || isExecuted}
+          className="px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
+        >
+          {isExecuted
+            ? "Executed"
+            : tx.status !== TimelockTxStatus.Ready
+              ? "ETA not reached"
+              : isTimelockExecutePending
+                ? "Executing..."
+                : "Execute"}
+        </Button>
+      </div>
     );
   }
 
