@@ -1,7 +1,10 @@
 "use client";
 
 // import reserveJson217 from "@/reserve-upload_217.json";
-import reserveJson211 from "@/deploy-state/reserve-upload_211.json";
+import cancelJson211 from "@/deploy-state/reserve-cancel_211.json";
+// import reserveJson211_0 from "@/deploy-state/reserve-upload_211.json";
+import reserveJson211_1 from "@/deploy-state/reserve-upload_211_fixed.json";
+import reserveJson211_permissions from "@/deploy-state/reserve-upload_211_permissions.json";
 
 import { useQueries, useQuery } from "@tanstack/react-query";
 
@@ -43,7 +46,10 @@ export function useCurrentTransactions(safeAddress: Address): {
         throw new Error("Missing required parameters");
       }
       const txs = [
-        ...reserveJson211,
+        // ...reserveJson211_0,
+        ...reserveJson211_1,
+        ...reserveJson211_permissions,
+        ...cancelJson211,
         // ...reserveJson217,
       ].filter((t) => t.safe.toLowerCase() === safeAddress.toLowerCase());
 
@@ -111,7 +117,7 @@ export function useCurrentTransactions(safeAddress: Address): {
     timelock,
     isLoading: isLoadingTimelock,
     error: errorTimelock,
-  } = useTimelock(txs?.[0].calls[0].to);
+  } = useTimelock(txs?.[0]?.calls[0].to);
 
   const statuses = useQueries({
     queries: (txs ?? []).map((tx) => ({
@@ -119,15 +125,15 @@ export function useCurrentTransactions(safeAddress: Address): {
       queryFn: async () => {
         if (!publicClient || !safeAddress || !timelock) return;
 
-        if (tx.calls.length < 2) {
-          throw new Error("Batch does not have enough transactions");
-        }
-
-        if (tx.calls[0].functionName !== "startBatch") {
-          throw new Error("First transaction is not a startBatch");
-        }
-        if (tx.calls[1].functionName !== "queueTransaction") {
-          throw new Error("Second transaction is not a queueTransaction");
+        if (
+          tx.calls.length < 2 ||
+          tx.calls[0].functionName !== "startBatch" ||
+          tx.calls[1].functionName !== "queueTransaction"
+        ) {
+          return {
+            status: TimelockTxStatus.NotFound,
+            blockNumber: -1,
+          };
         }
 
         const eta = Number(tx.calls[0].functionArgs[0]);
