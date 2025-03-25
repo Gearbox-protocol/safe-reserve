@@ -26,6 +26,7 @@ export interface ParsedSafeTx extends SafeTx {
   queueBlock: number;
   status: TimelockTxStatus;
   fetchStatus: () => Promise<unknown>;
+  eta?: number;
 }
 
 export interface Call {

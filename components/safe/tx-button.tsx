@@ -7,6 +7,7 @@ import { Address, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
 
 import { useTimelockExecuteTx } from "../../hooks/use-timelock-execute-tx";
+import { formatTimeRemaining } from "../../utils/format";
 import { TimelockTxStatus } from "../../utils/tx-status";
 import { Button } from "../ui/button";
 import { TabType } from "./view-tx-list";
@@ -102,7 +103,7 @@ export function ButtonTx({ tx, safeAddress, activeTab }: ButtonTxProps) {
           {isExecuted
             ? "Executed"
             : tx.status !== TimelockTxStatus.Ready
-              ? "ETA not reached"
+              ? `ETA is in ${formatTimeRemaining(tx.eta)}`
               : isTimelockExecutePending
                 ? "Executing..."
                 : "Execute"}
