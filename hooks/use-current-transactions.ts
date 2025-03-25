@@ -176,6 +176,7 @@ export function useCurrentTransactions(safeAddress: Address): {
             ...tx,
             status: statuses[index].data?.status ?? TimelockTxStatus.NotFound,
             queueBlock: statuses[index].data?.blockNumber ?? -1,
+            eta: Number(tx.calls[0].functionArgs[0]),
             fetchStatus: statuses[index].refetch,
           }))
         : [],
