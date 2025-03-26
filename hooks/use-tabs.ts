@@ -4,7 +4,8 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-export type TabType = "queue" | "execute" | "history";
+const TABS = ["queue", "execute", "history"] as const;
+export type TabType = (typeof TABS)[number];
 
 function useTabs() {
   const router = useRouter();
@@ -14,9 +15,7 @@ function useTabs() {
   useEffect(() => {
     if (activeTab === undefined) {
       const tab = searchParams.get("tab") as TabType;
-      setActiveTab(
-        tab && ["queue", "execute", "history"].includes(tab) ? tab : "queue"
-      );
+      setActiveTab(TABS.includes(tab as TabType) ? tab : "queue");
     }
   }, [searchParams, activeTab]);
 
