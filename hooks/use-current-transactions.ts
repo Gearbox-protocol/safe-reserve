@@ -2,7 +2,7 @@
 
 // import reserveJson217 from "@/reserve-upload_217.json";
 import cancelJson211 from "@/deploy-state/reserve-cancel_211.json";
-// import reserveJson211_0 from "@/deploy-state/reserve-upload_211.json";
+import reserveJson211_0 from "@/deploy-state/reserve-upload_211.json";
 import reserveJson211_1 from "@/deploy-state/reserve-upload_211_fixed.json";
 import reserveJson211_permissions from "@/deploy-state/reserve-upload_211_permissions.json";
 
@@ -46,7 +46,7 @@ export function useCurrentTransactions(safeAddress: Address): {
         throw new Error("Missing required parameters");
       }
       const txs = [
-        // ...reserveJson211_0,
+        ...reserveJson211_0,
         ...reserveJson211_1,
         ...reserveJson211_permissions,
         ...cancelJson211,
