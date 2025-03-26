@@ -19,8 +19,10 @@ interface SafeViewProps {
   executedProposals: SafeTx[];
 }
 
+export const TABS = ["queue", "execute", "history"] as const;
+
 export function SafeView({ safeAddress }: SafeViewProps) {
-  const { activeTab, handleTabChange } = useTabs();
+  const { activeTab, handleTabChange } = useTabs(TABS);
 
   const { txs, governor, isLoading, error } =
     useCurrentTransactions(safeAddress);
@@ -84,7 +86,9 @@ export function SafeView({ safeAddress }: SafeViewProps) {
         <div className="p-4">
           <Tabs
             value={activeTab}
-            onValueChange={(value) => handleTabChange(value as TabType)}
+            onValueChange={(value) =>
+              handleTabChange(value as TabType<typeof TABS>)
+            }
             className="w-full"
           >
             <TabsList>
