@@ -6,7 +6,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SafeTx } from "@/core/safe-tx";
 import { useCurrentTransactions } from "@/hooks/use-current-transactions";
 import { useSafeParams } from "@/hooks/use-safe-params";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { Address } from "viem";
 import { getReportRef } from "../../utils/get-report";
 import { TimelockTxStatus } from "../../utils/tx-status";
@@ -21,13 +22,26 @@ interface SafeViewProps {
 export type TabType = "queue" | "execute" | "history";
 
 export function SafeView({ safeAddress }: SafeViewProps) {
-  const [activeTab, setActiveTab] = useState<TabType>("queue");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState<TabType>();
+
+  useEffect(() => {
+    if (activeTab === undefined) {
+      const tab = searchParams.get("tab") as TabType;
+      setActiveTab(
+        tab && ["queue", "execute", "history"].includes(tab) ? tab : "queue"
+      );
+    }
+  }, [searchParams, activeTab]);
 
   const { txs, governor, isLoading, error } =
     useCurrentTransactions(safeAddress);
   const { threshold, nonce } = useSafeParams(safeAddress);
 
   const txsToShow = useMemo(() => {
+    if (!activeTab) return [];
+
     return (txs || []).filter((t) => {
       if (activeTab === "queue") {
         return t.nonce >= (nonce ?? 0n);
@@ -47,6 +61,10 @@ export function SafeView({ safeAddress }: SafeViewProps) {
 
   if (error) {
     return <div>Error: {error.message}</div>;
+  }
+
+  if (!activeTab) {
+    return null;
   }
 
   return (
@@ -79,7 +97,10 @@ export function SafeView({ safeAddress }: SafeViewProps) {
         <div className="p-4">
           <Tabs
             value={activeTab}
-            onValueChange={(value) => setActiveTab(value as TabType)}
+            onValueChange={(value) => {
+              setActiveTab(value as TabType);
+              router.replace(`?tab=${value}`);
+            }}
             className="w-full"
           >
             <TabsList>
