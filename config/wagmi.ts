@@ -1,6 +1,7 @@
 import { getDefaultConfig } from "connectkit";
 import { defineChain } from "viem";
-import { createConfig, http } from "wagmi";
+import { createConfig, http, injected } from "wagmi";
+import { walletConnect } from "wagmi/connectors";
 
 export type NetworkType = "Mainnet" | "Arbitrum" | "Optimism" | "Sonic";
 
@@ -50,6 +51,14 @@ export const config = createConfig(
     transports: Object.fromEntries(
       chains.map((ch) => [ch.id, http(getRpc(ch.name), { retryDelay: 1_000 })])
     ),
+
+    connectors: [
+      injected(),
+      walletConnect({
+        projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
+        qrModalOptions: { themeVariables: { "--wcm-z-index": "210" } },
+      }),
+    ],
 
     walletConnectProjectId:
       process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
