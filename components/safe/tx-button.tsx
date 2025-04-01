@@ -6,17 +6,16 @@ import { useMemo, useState } from "react";
 import { Address, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
 
-import { TabType } from "../../hooks/use-tabs";
 import { useTimelockExecuteTx } from "../../hooks/use-timelock-execute-tx";
 import { formatTimeRemaining } from "../../utils/format";
 import { TimelockTxStatus } from "../../utils/tx-status";
 import { Button } from "../ui/button";
-import { TABS } from "./view-tx-list";
+import { TabType } from "./view-tx-list";
 
 interface ButtonTxProps {
   tx: ParsedSafeTx;
   safeAddress: Address;
-  activeTab: TabType<typeof TABS>;
+  activeTab: TabType;
 }
 
 export function ButtonTx({ tx, safeAddress, activeTab }: ButtonTxProps) {

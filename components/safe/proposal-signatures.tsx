@@ -4,12 +4,11 @@ import { Check, Copy, ExternalLink, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { Address } from "viem";
 import { TimelockTxStatus } from "../../utils/tx-status";
-import { TabType } from "../../hooks/use-tabs";
-import { TABS } from "./view-tx-list";
+import { TabType } from "./view-tx-list";
 
 interface ProposalSignaturesProps {
   safeAddress: Address;
-  activeTab: TabType<typeof TABS>;
+  activeTab: TabType;
   signers: Address[];
   status: TimelockTxStatus;
 }
