@@ -3,18 +3,17 @@ import { MULTISEND_ADDRESS } from "@/utils/constant";
 import { ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useState } from "react";
 import { Address } from "viem";
-import { TabType } from "../../hooks/use-tabs";
 import { shortenHash } from "../../utils/format";
 import { Card } from "../ui/card";
 import { ProposalCall } from "./proposal-call";
 import { ProposalSignatures } from "./proposal-signatures";
 import { ButtonTx } from "./tx-button";
-import { TABS } from "./view-tx-list";
+import { TabType } from "./view-tx-list";
 
 interface TransactionCardProps {
   tx: ParsedSafeTx;
   safeAddress: Address;
-  activeTab: TabType<typeof TABS>;
+  activeTab: TabType;
   threshold: number;
 }
 
