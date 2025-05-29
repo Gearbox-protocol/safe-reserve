@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import {SafeTx, SafeTxPointer, SafeTxExtended} from "./interfaces/Types.sol";
+import {SignedTx, SafeTxPointer, SafeTxExtended} from "./interfaces/Types.sol";
 import {Safe} from "@safe-smart-account/Safe.sol";
 import {IGuard} from "./interfaces/IGuard.sol";
 import {NoDelegateCallsGuard} from "./guards/NoDelegateCallsGuard.sol";
@@ -73,7 +73,7 @@ contract SafeStorage {
     /// @param safe The Safe contract address
     /// @param safeTx The transaction to register
     /// @return hash The unique identifier for the registered transaction
-    function registerTx(address payable safe, SafeTx calldata safeTx)
+    function registerTx(address payable safe, SignedTx calldata safeTx)
         external
         onlyTxSubmitter(safe)
         returns (bytes32)
@@ -138,7 +138,7 @@ contract SafeStorage {
             revert("Tx not found");
         }
 
-        SafeTx memory execTx = loadSafeTx(hash);
+        SignedTx memory execTx = loadSafeTx(hash);
 
         if (nonce != execTx.nonce) {
             revert("Invalid nonce");
@@ -184,7 +184,7 @@ contract SafeStorage {
     /// @param safe The Safe contract address
     /// @param safeTx The transaction to execute
     /// @param signaturesData The packed signature data from owners
-    function _executeTx(address payable safe, SafeTx memory safeTx, bytes memory signaturesData) internal {
+    function _executeTx(address payable safe, SignedTx memory safeTx, bytes memory signaturesData) internal {
         Safe(safe).execTransaction(
             safeTx.to,
             safeTx.value,
@@ -246,7 +246,7 @@ contract SafeStorage {
 
     /// @notice Returns all queued transactions for a Safe
     /// @param safe The Safe address to query
-    /// @return result Array of pending SafeTx structs
+    /// @return result Array of pending SignedTx structs
     function getQueuedTxs(address payable safe) public view returns (SafeTxExtended[] memory result) {
         uint256 nonce = Safe(safe).nonce();
         uint256 count;
@@ -261,7 +261,7 @@ contract SafeStorage {
             uint256 length = hashes[safe][i].length();
             for (uint256 j = 0; j < length; ++j) {
                 bytes32 hash = hashes[safe][i].at(j);
-                SafeTx memory transaction = loadSafeTx(hash);
+                SignedTx memory transaction = loadSafeTx(hash);
                 result[count] = SafeTxExtended({
                     hash: hash,
                     signedBy: getSignedBy(safe, hash),
@@ -304,9 +304,9 @@ contract SafeStorage {
         }
     }
 
-    function loadSafeTx(bytes32 hash) public view returns (SafeTx memory result) {
+    function loadSafeTx(bytes32 hash) public view returns (SignedTx memory result) {
         SafeTxPointer storage et = txs[hash];
-        result = SafeTx({
+        result = SignedTx({
             to: et.to,
             value: et.value,
             data: SSTORE2.read(et.dataPointer),

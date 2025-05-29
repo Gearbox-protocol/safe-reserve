@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import {Enum} from "@safe-smart-account/common/Enum.sol";
 
-struct SafeTx {
+struct SignedTx {
     address to;
     uint256 value;
     bytes data;

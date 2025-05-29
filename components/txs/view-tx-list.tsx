@@ -3,29 +3,21 @@
 import { Card } from "@/components/ui/card";
 import { PageLayout } from "@/components/ui/page";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SafeTx } from "@/core/safe-tx";
 import { useCurrentTransactions } from "@/hooks/use-current-transactions";
 import { useSafeParams } from "@/hooks/use-safe-params";
 import { useMemo, useState } from "react";
-import { Address } from "viem";
 import { getReportRef } from "../../utils/get-report";
 import { TimelockTxStatus } from "../../utils/tx-status";
 import { Button } from "../ui/button";
 import { TransactionCard } from "./tx-card";
 
-interface SafeViewProps {
-  safeAddress: Address;
-  executedProposals: SafeTx[];
-}
-
 export type TabType = "queue" | "execute" | "history";
 
-export function SafeView({ safeAddress }: SafeViewProps) {
+export function ViewTxList({ cid }: { cid: string }) {
   const [activeTab, setActiveTab] = useState<TabType>("queue");
 
-  const { txs, governor, isLoading, error } =
-    useCurrentTransactions(safeAddress);
-  const { threshold, nonce } = useSafeParams(safeAddress);
+  const { txs, safe, governor, isLoading, error } = useCurrentTransactions(cid);
+  const { threshold, nonce } = useSafeParams(safe);
 
   const txsToShow = useMemo(() => {
     return (txs || []).filter((t) => {
@@ -75,8 +67,10 @@ export function SafeView({ safeAddress }: SafeViewProps) {
         )
       }
     >
+      <div>{`Safe: ${safe}`}</div>
       <Card className="bg-black border-0 overflow-y-auto">
         <div className="p-4">
+          {/* TODO: remove tabs  */}
           <Tabs
             value={activeTab}
             onValueChange={(value) => setActiveTab(value as TabType)}
@@ -119,7 +113,7 @@ export function SafeView({ safeAddress }: SafeViewProps) {
                   key={tx.hash}
                   tx={tx}
                   activeTab={activeTab}
-                  safeAddress={safeAddress}
+                  safeAddress={safe!}
                   threshold={threshold || 0}
                 />
               ))}

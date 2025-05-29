@@ -1,4 +1,4 @@
-import { ParsedSafeTx } from "@/core/safe-tx";
+import { ParsedSignedTx } from "@/core/safe-tx";
 import { useExecuteTx } from "@/hooks/use-execute-tx";
 import { useSafeParams } from "@/hooks/use-safe-params";
 import { useSignTx } from "@/hooks/use-sign-tx";
@@ -13,7 +13,7 @@ import { Button } from "../ui/button";
 import { TabType } from "./view-tx-list";
 
 interface ButtonTxProps {
-  tx: ParsedSafeTx;
+  tx: ParsedSignedTx;
   safeAddress: Address;
   activeTab: TabType;
 }

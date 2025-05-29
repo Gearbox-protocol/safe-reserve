@@ -1,13 +1,111 @@
-import { Call } from "@/core/safe-tx";
+import { Call, SignedTx } from "@/core/safe-tx";
+import { SafeTx } from "@gearbox-protocol/permissionless";
+import { json_parse } from "@gearbox-protocol/sdk";
 import {
   AbiFunction,
   Address,
   decodeAbiParameters,
   decodeFunctionData,
+  encodeFunctionData,
+  encodePacked,
   Hex,
   parseAbi,
+  PublicClient,
+  zeroAddress,
 } from "viem";
 import { shortenHash } from "./format";
+
+export const MULTISEND: Address = "0x40a2accbd92bca938b02010e17a5b8929b49130d";
+
+export async function getReserveMultisigBatch(args: {
+  client: PublicClient;
+  safeAddress: Address;
+  batch: SafeTx[];
+  nonce: number;
+}): Promise<SignedTx> {
+  const { client, safeAddress, batch, nonce } = args;
+  const multiSendData = batch
+    .map((tx) => {
+      const abi = [{ ...tx.contractMethod, outputs: [], type: "function" }];
+      const functionName = tx.contractMethod.name;
+
+      const args = tx.contractMethod.inputs.map((input) => {
+        const arg = tx.contractInputsValues[input.name];
+
+        try {
+          return json_parse(arg);
+        } catch {
+          return arg;
+        }
+      });
+
+      const data = encodeFunctionData({
+        abi,
+        functionName,
+        args,
+      });
+
+      return encodePacked(
+        ["uint8", "address", "uint256", "uint256", "bytes"],
+        [
+          0,
+          tx.to as Address,
+          BigInt(tx.value),
+          BigInt(data.replace("0x", "").length / 2),
+          data,
+        ]
+      ).replace("0x", "");
+    })
+    .join("");
+
+  const multisendCall = encodeFunctionData({
+    abi: parseAbi(["function multiSend(bytes memory transactions)"]),
+    functionName: "multiSend",
+    args: [`0x${multiSendData}`],
+  });
+
+  const tx = {
+    safe: safeAddress,
+    to: MULTISEND,
+    value: 0n,
+    data: multisendCall,
+    operation: 1,
+    safeTxGas: 0n,
+    baseGas: 0n,
+    gasPrice: 0n,
+    gasToken: zeroAddress,
+    refundReceiver: zeroAddress,
+    nonce: BigInt(nonce),
+    hash: "0x" as Hex,
+    signedBy: [],
+    calls: [],
+  };
+
+  const dataHash = (await client.readContract({
+    address: safeAddress,
+    abi: parseAbi([
+      "function getTransactionHash(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,uint256) returns (bytes32)",
+    ]),
+    functionName: "getTransactionHash",
+    args: [
+      tx.to,
+      tx.value,
+      tx.data,
+      tx.operation,
+      tx.safeTxGas,
+      tx.baseGas,
+      tx.gasPrice,
+      tx.gasToken,
+      tx.refundReceiver,
+      BigInt(tx.nonce),
+    ],
+  })) as Hex;
+
+  tx.hash = dataHash as Hex;
+
+  return tx;
+}
+
 /**
  * Decodes transactions from a single hex string, where each transaction is encoded as:
  *   1) operation (1 byte, must be 0 in this version),
@@ -22,7 +120,6 @@ import { shortenHash } from "./format";
  * @param transactionsHex The hex string containing the packed transactions.
  *                        (Should NOT include a function selector at the front.)
  */
-
 function json_stringify(obj: unknown): string {
   return JSON.stringify(obj, (_, value) => {
     if (typeof value === "bigint") {

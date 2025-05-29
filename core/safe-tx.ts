@@ -6,7 +6,7 @@ export enum Operation {
   DelegateCall = 1,
 }
 
-export interface SafeTx {
+export interface SignedTx {
   to: Address;
   value: bigint;
   data: Hex;
@@ -22,7 +22,7 @@ export interface SafeTx {
   calls: Call[];
 }
 
-export interface ParsedSafeTx extends SafeTx {
+export interface ParsedSignedTx extends SignedTx {
   queueBlock: number;
   status: TimelockTxStatus;
   fetchStatus: () => Promise<unknown>;

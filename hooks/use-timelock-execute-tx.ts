@@ -1,5 +1,5 @@
 import { governorAbi } from "@/bindings/generated";
-import { ParsedSafeTx } from "@/core/safe-tx";
+import { ParsedSignedTx } from "@/core/safe-tx";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Address, Hex } from "viem";
@@ -11,7 +11,7 @@ import {
 } from "wagmi";
 import { defaultChainId } from "../config/wagmi";
 
-export function useTimelockExecuteTx(safeAddress: Address, tx: ParsedSafeTx) {
+export function useTimelockExecuteTx(safeAddress: Address, tx: ParsedSignedTx) {
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();

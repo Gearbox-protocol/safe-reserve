@@ -1,4 +1,4 @@
-import { ParsedSafeTx } from "@/core/safe-tx";
+import { ParsedSignedTx } from "@/core/safe-tx";
 import { MULTISEND_ADDRESS } from "@/utils/constant";
 import { ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useState } from "react";
@@ -11,7 +11,7 @@ import { ButtonTx } from "./tx-button";
 import { TabType } from "./view-tx-list";
 
 interface TransactionCardProps {
-  tx: ParsedSafeTx;
+  tx: ParsedSignedTx;
   safeAddress: Address;
   activeTab: TabType;
   threshold: number;

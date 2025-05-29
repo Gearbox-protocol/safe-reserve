@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import {Test, console2} from "forge-std/Test.sol";
 import {Safe, Enum} from "@safe-smart-account/Safe.sol";
 import {SafeStorage} from "../SafeStorage.sol";
-import {SafeTx} from "../interfaces/Types.sol";
+import {SignedTx} from "../interfaces/Types.sol";
 import {IGuard} from "../interfaces/IGuard.sol";
 import {NoDelegateCallsGuard} from "../guards/NoDelegateCallsGuard.sol";
 import {SafeProxyFactory} from "@safe-smart-account/proxies/SafeProxyFactory.sol";
@@ -14,7 +14,7 @@ import {SafeTxExtended} from "../interfaces/Types.sol";
 contract MockGuard is IGuard {
     bool public shouldRevert;
 
-    function checkTransaction(SafeTx calldata) external view {
+    function checkTransaction(SignedTx calldata) external view {
         require(!shouldRevert, "MockGuard: reverted");
     }
 
@@ -85,7 +85,7 @@ contract SafeStorageTest is Test {
     }
 
     function test_RegisterTx() public {
-        SafeTx memory safeTx = SafeTx({
+        SignedTx memory safeTx = SignedTx({
             to: address(0x123),
             value: 1 ether,
             data: "",
@@ -105,7 +105,7 @@ contract SafeStorageTest is Test {
     }
 
     function test_RevertWhen_NonOwnerRegistersTx() public {
-        SafeTx memory safeTx = SafeTx({
+        SignedTx memory safeTx = SignedTx({
             to: address(0x123),
             value: 1 ether,
             data: "",
@@ -127,7 +127,7 @@ contract SafeStorageTest is Test {
         address recipient = makeAddr("recipient");
         uint256 amount = 1 ether;
 
-        SafeTx memory safeTx = SafeTx({
+        SignedTx memory safeTx = SignedTx({
             to: recipient,
             value: amount,
             data: "",
@@ -160,7 +160,7 @@ contract SafeStorageTest is Test {
     }
 
     function test_RevertWhen_NotEnoughSignatures() public {
-        SafeTx memory safeTx = SafeTx({
+        SignedTx memory safeTx = SignedTx({
             to: address(0x123),
             value: 1 ether,
             data: "",
@@ -209,7 +209,7 @@ contract SafeStorageTest is Test {
         // Make guard reject transactions
         mockGuard.setShouldRevert(true);
 
-        SafeTx memory safeTx = SafeTx({
+        SignedTx memory safeTx = SignedTx({
             to: address(0x123),
             value: 1 ether,
             data: "",
@@ -229,7 +229,7 @@ contract SafeStorageTest is Test {
 
     function test_GetQueuedTxs() public {
         // Register multiple transactions
-        SafeTx memory safeTx1 = SafeTx({
+        SignedTx memory safeTx1 = SignedTx({
             to: address(0x123),
             value: 1 ether,
             data: "",
@@ -242,7 +242,7 @@ contract SafeStorageTest is Test {
             nonce: safe.nonce()
         });
 
-        SafeTx memory safeTx2 = SafeTx({
+        SignedTx memory safeTx2 = SignedTx({
             to: address(0x456),
             value: 2 ether,
             data: "",
@@ -267,7 +267,7 @@ contract SafeStorageTest is Test {
     }
 
     function test_RevertWhen_InvalidNonce() public {
-        SafeTx memory safeTx = SafeTx({
+        SignedTx memory safeTx = SignedTx({
             to: address(0x123),
             value: 1 ether,
             data: "",

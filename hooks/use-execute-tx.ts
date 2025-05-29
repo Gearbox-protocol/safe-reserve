@@ -1,5 +1,5 @@
 import { safeAbi } from "@/bindings/generated";
-import { ParsedSafeTx } from "@/core/safe-tx";
+import { ParsedSignedTx } from "@/core/safe-tx";
 import { useSafeParams } from "@/hooks/use-safe-params";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -12,7 +12,7 @@ import {
 } from "wagmi";
 import { defaultChainId } from "../config/wagmi";
 
-export function useExecuteTx(safeAddress: Address, tx: ParsedSafeTx) {
+export function useExecuteTx(safeAddress: Address, tx: ParsedSignedTx) {
   const { address } = useAccount();
   const { threshold, refetch } = useSafeParams(safeAddress);
   const { data: walletClient } = useWalletClient();

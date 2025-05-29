@@ -1,18 +1,11 @@
 "use client";
 
-// import reserveJson217 from "@/reserve-upload_217.json";
-import cancelJson211 from "@/deploy-state/reserve-cancel_211.json";
-import reserveJson211_0 from "@/deploy-state/reserve-upload_211.json";
-import reserveJson211_1 from "@/deploy-state/reserve-upload_211_fixed.json";
-import reserveJson211_permissions from "@/deploy-state/reserve-upload_211_permissions.json";
-import reserveJson211_unpause from "@/deploy-state/reserve-upload_211_unpause.json";
+import testJson from "@/test-txs.json";
 
 import { useQueries, useQuery } from "@tanstack/react-query";
 
-import { safeAbi } from "@/bindings/generated";
-import { ParsedSafeTx, SafeTx } from "@/core/safe-tx";
-import { useSafeParams } from "@/hooks/use-safe-params";
-import { decodeTransactions } from "@/utils/multisend";
+import { ParsedSignedTx, SignedTx } from "@/core/safe-tx";
+import { SafeTx } from "@gearbox-protocol/permissionless";
 import {
   Address,
   decodeFunctionData,
@@ -22,18 +15,153 @@ import {
   parseAbi,
 } from "viem";
 import { usePublicClient } from "wagmi";
+import { safeAbi } from "../bindings/generated";
+import {
+  decodeTransactions,
+  getReserveMultisigBatch,
+} from "../utils/multisend";
 import { getTxStatus, TimelockTxStatus } from "../utils/tx-status";
-import { useTimelock } from "./use-timelock-address";
+import { useGovernanceAddresses } from "./use-addresses";
+import { useSafeParams } from "./use-safe-params";
 
-export function useCurrentTransactions(safeAddress: Address): {
-  txs: ParsedSafeTx[];
+export function useCurrentTransactions(cid: string): {
+  txs: ParsedSignedTx[];
+  safe?: Address;
   governor?: Address;
   isLoading: boolean;
   error: Error | null;
   refetchSigs: () => Promise<unknown>;
 } {
   const publicClient = usePublicClient();
-  const { signers, nonce } = useSafeParams(safeAddress);
+
+  const {
+    data: ipfsData,
+    isLoading: isLoadingIpfsData,
+    error: errorIpfsData,
+  } = useQuery({
+    queryKey: ["ipfs-transactions", cid],
+    queryFn: async () => {
+      if (!cid || !publicClient) {
+        throw new Error("Missing required parameters");
+      }
+
+      // TODO: fetch txs from ipfs
+      const txs = testJson;
+
+      return txs;
+    },
+    enabled: !!cid && !!publicClient,
+    retry: 3,
+  });
+
+  const {
+    safeAddress,
+    timelockAddress,
+    governorAddress,
+    isLoading: isLoadingAddresses,
+    error: errorAddresses,
+  } = useGovernanceAddresses(
+    ipfsData?.marketConfigurator as Address | undefined
+  );
+
+  const statuses = useQueries({
+    queries: (ipfsData?.queueBatches ?? []).map((batch, index) => ({
+      queryKey: ["batch-status", cid, index],
+      queryFn: async () => {
+        if (!publicClient || !safeAddress || !timelockAddress) return;
+
+        if (
+          batch.length < 2 ||
+          batch[0].contractMethod.name !== "startBatch" ||
+          batch[1].contractMethod.name !== "queueTransaction"
+        ) {
+          return {
+            status: TimelockTxStatus.NotFound,
+            blockNumber: -1,
+          };
+        }
+
+        const eta = Number(batch[0].contractInputsValues.eta);
+        if (ipfsData && ipfsData.eta !== eta) {
+          throw new Error("Invalid ETA");
+        }
+
+        const txHash = keccak256(
+          encodeAbiParameters(
+            [
+              { type: "address", name: "target" },
+              { type: "uint", name: "value" },
+              { type: "string", name: "signature" },
+              { type: "bytes", name: "data" },
+              { type: "uint", name: "eta" },
+            ],
+            [
+              batch[1].contractInputsValues.target as Address,
+              BigInt(Number(batch[1].contractInputsValues.value)),
+              batch[1].contractInputsValues.signature as string,
+              batch[1].contractInputsValues.data as Hex,
+              BigInt(Number(batch[1].contractInputsValues.eta)),
+            ]
+          )
+        );
+
+        return await getTxStatus({
+          publicClient,
+          timelock: timelockAddress,
+          txHash,
+          eta,
+        });
+      },
+
+      enabled:
+        !!ipfsData && !!safeAddress && !!publicClient && !!timelockAddress,
+      retry: 3,
+    })),
+  });
+
+  const { nonce, signers } = useSafeParams(safeAddress);
+
+  const {
+    data: preparedTxs,
+    isLoading: isLoadingPreparedTxs,
+    error: errorPreparedTxs,
+  } = useQuery({
+    queryKey: ["prepared-batches", cid],
+    queryFn: async () => {
+      if (
+        !publicClient ||
+        !safeAddress ||
+        nonce === undefined ||
+        !statuses.every((s) => s.data !== undefined)
+      )
+        return;
+
+      const startIndex = statuses.findIndex(
+        ({ data }) => data?.status === TimelockTxStatus.NotFound
+      );
+
+      return await Promise.all(
+        (ipfsData?.queueBatches ?? []).map((batch, index) =>
+          getReserveMultisigBatch({
+            client: publicClient,
+            safeAddress,
+            batch: batch as SafeTx[],
+            nonce:
+              startIndex === -1
+                ? Number(nonce) + index
+                : Number(nonce) + index - startIndex,
+          })
+        )
+      );
+    },
+    enabled:
+      !!cid &&
+      !!publicClient &&
+      !!safeAddress &&
+      nonce !== undefined &&
+      statuses.every((s) => s.data !== undefined),
+    retry: 3,
+  });
 
   const {
     data: txs,
@@ -41,23 +169,20 @@ export function useCurrentTransactions(safeAddress: Address): {
     error: errorTxs,
     refetch,
   } = useQuery({
-    queryKey: ["current-transactions", safeAddress],
+    queryKey: ["current-transactions", cid],
     queryFn: async () => {
-      if (!safeAddress || !publicClient || !signers || nonce === undefined) {
-        throw new Error("Missing required parameters");
-      }
-      const txs = [
-        ...reserveJson211_0,
-        ...reserveJson211_1,
-        ...reserveJson211_permissions,
-        ...cancelJson211,
-        ...reserveJson211_unpause,
-        // ...reserveJson217,
-      ].filter((t) => t.safe.toLowerCase() === safeAddress.toLowerCase());
+      if (
+        !safeAddress ||
+        !publicClient ||
+        !signers ||
+        !preparedTxs ||
+        nonce === undefined
+      )
+        return;
 
-      const readyTxs: SafeTx[] = [];
+      const readyTxs: SignedTx[] = [];
 
-      for (const tx of txs) {
+      for (const tx of preparedTxs) {
         const signedBy = await Promise.all(
           signers.map((signer) =>
             publicClient.readContract({
@@ -111,69 +236,21 @@ export function useCurrentTransactions(safeAddress: Address): {
       return readyTxs;
     },
     enabled:
-      !!safeAddress && !!publicClient && !!signers && nonce !== undefined,
+      !!cid &&
+      !!publicClient &&
+      !!signers &&
+      !!safeAddress &&
+      !!preparedTxs &&
+      nonce !== undefined,
     retry: 3,
-  });
-
-  const {
-    timelock,
-    isLoading: isLoadingTimelock,
-    error: errorTimelock,
-  } = useTimelock(txs?.[0]?.calls[0].to);
-
-  const statuses = useQueries({
-    queries: (txs ?? []).map((tx) => ({
-      queryKey: ["tx-status", safeAddress, tx.hash],
-      queryFn: async () => {
-        if (!publicClient || !safeAddress || !timelock) return;
-
-        if (
-          tx.calls.length < 2 ||
-          tx.calls[0].functionName !== "startBatch" ||
-          tx.calls[1].functionName !== "queueTransaction"
-        ) {
-          return {
-            status: TimelockTxStatus.NotFound,
-            blockNumber: -1,
-          };
-        }
-
-        const eta = Number(tx.calls[0].functionArgs[0]);
-        const txHash = keccak256(
-          encodeAbiParameters(
-            [
-              { type: "address", name: "target" },
-              { type: "uint", name: "value" },
-              { type: "string", name: "signature" },
-              { type: "bytes", name: "data" },
-              { type: "uint", name: "eta" },
-            ],
-            [
-              tx.calls[1].functionArgs[0] as Address,
-              tx.calls[1].functionArgs[1] as bigint,
-              tx.calls[1].functionArgs[2] as string,
-              tx.calls[1].functionArgs[3] as Hex,
-              tx.calls[1].functionArgs[4] as bigint,
-            ]
-          )
-        );
-
-        return await getTxStatus({
-          publicClient,
-          timelock,
-          txHash,
-          eta,
-        });
-      },
-
-      enabled: !!safeAddress && !!publicClient && !!txs && !!timelock,
-      retry: 3,
-    })),
   });
 
   return {
     txs:
-      !!txs && !!statuses && txs.length === statuses.length
+      !!txs &&
+      !!statuses &&
+      txs.length === statuses.length &&
+      statuses.every((s) => s.data !== undefined)
         ? txs.map((tx, index) => ({
             ...tx,
             status: statuses[index].data?.status ?? TimelockTxStatus.NotFound,
@@ -182,13 +259,18 @@ export function useCurrentTransactions(safeAddress: Address): {
             fetchStatus: statuses[index].refetch,
           }))
         : [],
-    governor: txs?.[0].calls[0].to,
+    safe: safeAddress,
+    governor: governorAddress,
     isLoading:
       isLoadingTxs ||
-      isLoadingTimelock ||
+      isLoadingIpfsData ||
+      isLoadingAddresses ||
+      isLoadingPreparedTxs ||
       !!statuses.find(({ isLoading }) => !!isLoading),
     error: (errorTxs ||
-      errorTimelock ||
+      errorIpfsData ||
+      errorAddresses ||
+      errorPreparedTxs ||
       statuses.find(({ error }) => error)) as Error | null,
     refetchSigs: refetch,
   };

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {IGuard} from "../interfaces/IGuard.sol";
-import {SafeTx} from "../interfaces/Types.sol";
+import {SignedTx} from "../interfaces/Types.sol";
 import {Enum} from "@safe-smart-account/common/Enum.sol";
 
 /// @title NoDelegateCalls - A guard that prevents delegate calls except to whitelisted addresses
@@ -16,7 +16,7 @@ contract NoDelegateCallsGuard is IGuard {
         allowedTarget = _allowedTarget;
     }
 
-    function checkTransaction(SafeTx calldata safeTx) external view override {
+    function checkTransaction(SignedTx calldata safeTx) external view override {
         // Only check delegate calls
         if (safeTx.operation == Enum.Operation.DelegateCall) {
             require(safeTx.to == allowedTarget, "Delegate call to non-whitelisted address");

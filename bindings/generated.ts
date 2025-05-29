@@ -664,7 +664,7 @@ export const safeStorageAbi = [
       { name: "safe", internalType: "address payable", type: "address" },
       {
         name: "safeTx",
-        internalType: "struct SafeTx",
+        internalType: "struct SignedTx",
         type: "tuple",
         components: [
           { name: "to", internalType: "address", type: "address" },

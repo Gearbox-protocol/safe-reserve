@@ -15,7 +15,7 @@ export default function Header() {
             height={24}
             priority
           />
-          <span className="font-bold italic">Reserve Safe</span>
+          <span className="font-bold italic">Permissionless Safe</span>
         </div>
 
         <div className="flex items-center gap-4">

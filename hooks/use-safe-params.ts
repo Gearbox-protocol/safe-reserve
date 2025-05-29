@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 import { usePublicClient } from "wagmi";
 
-export function useSafeParams(safeAddress: Address) {
+export function useSafeParams(safeAddress?: Address) {
   const publicClient = usePublicClient();
 
   const { data, isLoading, error, refetch } = useQuery({
