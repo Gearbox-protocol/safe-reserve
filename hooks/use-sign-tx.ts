@@ -13,6 +13,7 @@ import { defaultChainId } from "../config/wagmi";
 import { useCurrentTransactions } from "./use-current-transactions";
 
 export function useSignTx(
+  cid: string,
   safeAddress: Address,
   onSuccess: (txHash: Hex) => void
 ) {
@@ -21,7 +22,7 @@ export function useSignTx(
   const publicClient = usePublicClient();
   const { switchChainAsync } = useSwitchChain();
 
-  const { refetchSigs } = useCurrentTransactions(safeAddress);
+  const { refetchSigs } = useCurrentTransactions(cid);
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (args: { txHash: Hex }) => {

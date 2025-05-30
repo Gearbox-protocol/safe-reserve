@@ -136,13 +136,23 @@ export function useCurrentTransactions(cid: string): {
       )
         return;
 
-      const startIndex = statuses.findIndex(
-        ({ data }) => data?.status === TimelockTxStatus.NotFound
+      const allBatchesQueued = statuses.every(
+        ({ data }) => data?.status !== TimelockTxStatus.NotFound
       );
 
+      const startIndex = statuses.findIndex(
+        ({ data }) =>
+          data?.status ===
+          (allBatchesQueued
+            ? TimelockTxStatus.NotFound
+            : TimelockTxStatus.Ready)
+      );
+
+      // TODO: check status and pass execute tx if needed
       return await Promise.all(
         (ipfsData?.queueBatches ?? []).map((batch, index) =>
           getReserveMultisigBatch({
+            type: allBatchesQueued ? "execute" : "queue",
             client: publicClient,
             safeAddress,
             batch: batch as SafeTx[],

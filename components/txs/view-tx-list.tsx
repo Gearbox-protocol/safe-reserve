@@ -2,92 +2,62 @@
 
 import { Card } from "@/components/ui/card";
 import { PageLayout } from "@/components/ui/page";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCurrentTransactions } from "@/hooks/use-current-transactions";
 import { useSafeParams } from "@/hooks/use-safe-params";
-import { useMemo, useState } from "react";
-import { getReportRef } from "../../utils/get-report";
-import { TimelockTxStatus } from "../../utils/tx-status";
-import { Button } from "../ui/button";
+import { Copy } from "lucide-react";
+import { useEffect } from "react";
+import { toast } from "sonner";
+import { useAccount, useSwitchChain } from "wagmi";
+import { useMarketConfiguratorInfo } from "../../hooks/use-market-configurator-info";
+import { shortenHash } from "../../utils/format";
 import { TransactionCard } from "./tx-card";
 
 export type TabType = "queue" | "execute" | "history";
 
 export function ViewTxList({ cid }: { cid: string }) {
-  const [activeTab, setActiveTab] = useState<TabType>("queue");
+  const {
+    txs,
+    safe,
+    isLoading: isLoadingTxs,
+    error: errorTxs,
+  } = useCurrentTransactions(cid);
+  const {
+    chainId,
+    marketConfigurator,
+    isLoading: isLoadingInfo,
+    error: errorInfo,
+  } = useMarketConfiguratorInfo(cid);
+  const { threshold } = useSafeParams(safe);
 
-  const { txs, safe, governor, isLoading, error } = useCurrentTransactions(cid);
-  const { threshold, nonce } = useSafeParams(safe);
+  const { switchChain } = useSwitchChain();
+  const { chain } = useAccount();
 
-  const txsToShow = useMemo(() => {
-    return (txs || []).filter((t) => {
-      if (activeTab === "queue") {
-        return t.nonce >= (nonce ?? 0n);
-      } else if (activeTab === "execute") {
-        return (
-          t.nonce < (nonce ?? 0n) &&
-          [TimelockTxStatus.Ready, TimelockTxStatus.Queued].includes(t.status)
-        );
-      } else if (activeTab === "history") {
-        return (
-          t.nonce < (nonce ?? 0n) &&
-          ![TimelockTxStatus.Queued, TimelockTxStatus.Ready].includes(t.status)
-        );
-      }
-    });
-  }, [txs, activeTab, nonce]);
+  useEffect(() => {
+    if (!!chainId && chainId !== chain?.id) {
+      switchChain({ chainId });
+    }
+  }, [chain?.id, chainId, switchChain]);
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
+  if (errorTxs) {
+    return <div>Error: {errorTxs.message}</div>;
+  }
+
+  if (errorInfo) {
+    return <div>Error: {errorInfo.message}</div>;
   }
 
   return (
     <PageLayout
       title={"Transactions"}
-      actionButton={
-        activeTab === "execute" && governor && txsToShow.length > 0 ? (
-          <a
-            href={getReportRef({
-              network: "Mainnet",
-              governor,
-              fromBlock: txsToShow[0].queueBlock,
-              toBlock: txsToShow[txsToShow.length - 1].queueBlock,
-            })}
-            target="_blank"
-          >
-            <Button
-              variant="outline"
-              className="px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
-            >
-              {"View Report"}
-            </Button>
-          </a>
-        ) : (
-          <></>
-        )
-      }
+      // TODO: add cancel button
+      // actionButton={}
     >
-      <div>{`Safe: ${safe}`}</div>
       <Card className="bg-black border-0 overflow-y-auto">
-        <div className="p-4">
-          {/* TODO: remove tabs  */}
-          <Tabs
-            value={activeTab}
-            onValueChange={(value) => setActiveTab(value as TabType)}
-            className="w-full"
-          >
-            <TabsList>
-              <TabsTrigger value="queue">New Txs</TabsTrigger>
-              <TabsTrigger value="execute">Queued Txs</TabsTrigger>
-              <TabsTrigger value="history">History</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-
-        <div className="divide-y divide-gray-800 space-y-6 overflow-y-auto">
-          {isLoading ? (
+        <div className="space-y-6 overflow-y-auto">
+          {isLoadingTxs || isLoadingInfo ? (
             // Skeleton loading state
-            <>
+
+            <div className="divide-y divide-gray-800 space-y-6">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="p-4 animate-pulse">
                   <div className="h-6 w-1/3 bg-gray-800 rounded mb-4" />
@@ -95,29 +65,74 @@ export function ViewTxList({ cid }: { cid: string }) {
                   <div className="h-4 w-1/4 bg-gray-800 rounded" />
                 </div>
               ))}
-            </>
-          ) : txsToShow.length === 0 ? (
+            </div>
+          ) : txs.length === 0 ? (
             <div className="p-4">
               <text className="font-semibold text-white">
-                {activeTab === "queue"
-                  ? "There is no new transactions to queue"
-                  : activeTab === "execute"
-                    ? "There is no new transactions to execute"
-                    : "There is no transactions"}
+                Invalid cid: transactions not found
               </text>
             </div>
           ) : (
-            <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
-              {txsToShow.map((tx) => (
-                <TransactionCard
-                  key={tx.hash}
-                  tx={tx}
-                  activeTab={activeTab}
-                  safeAddress={safe!}
-                  threshold={threshold || 0}
-                />
-              ))}
-            </div>
+            <>
+              <Card className="p-4">
+                <div className="space-y-2">
+                  <div className="flex w-full items-center gap-2">
+                    <span className="min-w-[180px] text-gray-300">Chain:</span>
+                    <code className="flex items-center gap-2 text-gray-100">
+                      {chain?.name}
+                    </code>
+                  </div>
+                  <div className="flex w-full items-center gap-2">
+                    <span className="min-w-[180px] text-gray-300">
+                      Market configurator:
+                    </span>
+                    <code className="flex items-center gap-2 text-gray-100">
+                      {shortenHash(marketConfigurator!)}
+                      <button
+                        className="text-gray-400 hover:text-white"
+                        onClick={() => {
+                          navigator.clipboard.writeText(marketConfigurator!);
+                          toast.success("Address copied to clipboard");
+                        }}
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                      </button>
+                    </code>
+                  </div>
+                  <div className="flex w-full items-center gap-2">
+                    <span className="min-w-[180px] text-gray-300">Safe:</span>
+                    <code className="flex items-center gap-2 text-gray-100">
+                      {shortenHash(safe!)}
+                      <button
+                        className="text-gray-400 hover:text-white"
+                        onClick={() => {
+                          navigator.clipboard.writeText(safe!);
+                        }}
+                      >
+                        <Copy
+                          className="h-3.5 w-3.5"
+                          onClick={() => {
+                            navigator.clipboard.writeText(safe!);
+                            toast.success("Address copied to clipboard");
+                          }}
+                        />
+                      </button>
+                    </code>
+                  </div>
+                </div>
+              </Card>
+              <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
+                {txs.map((tx) => (
+                  <TransactionCard
+                    key={tx.hash}
+                    cid={cid}
+                    tx={tx}
+                    safeAddress={safe!}
+                    threshold={threshold || 0}
+                  />
+                ))}
+              </div>
+            </>
           )}
         </div>
       </Card>

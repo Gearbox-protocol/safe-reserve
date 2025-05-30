@@ -2,24 +2,24 @@ import { ParsedSignedTx } from "@/core/safe-tx";
 import { MULTISEND_ADDRESS } from "@/utils/constant";
 import { ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Address } from "viem";
 import { shortenHash } from "../../utils/format";
 import { Card } from "../ui/card";
 import { ProposalCall } from "./proposal-call";
 import { ProposalSignatures } from "./proposal-signatures";
 import { ButtonTx } from "./tx-button";
-import { TabType } from "./view-tx-list";
 
 interface TransactionCardProps {
+  cid: string;
   tx: ParsedSignedTx;
   safeAddress: Address;
-  activeTab: TabType;
   threshold: number;
 }
 
 export function TransactionCard({
+  cid,
   tx,
-  activeTab,
   safeAddress,
   threshold,
 }: TransactionCardProps) {
@@ -43,13 +43,11 @@ export function TransactionCard({
         </div>
         <div className="flex items-center gap-4">
           <span className="text-gray-400">{tx.calls.length} actions</span>
-          {activeTab === "queue" && (
-            <span className="text-gray-400">
-              {tx.signedBy.length} / {Number(threshold)}
-            </span>
-          )}
+          <span className="text-gray-400">
+            {tx.signedBy.length} / {Number(threshold)}
+          </span>
 
-          <ButtonTx tx={tx} safeAddress={safeAddress} activeTab={activeTab} />
+          <ButtonTx tx={tx} safeAddress={safeAddress} cid={cid} />
 
           <span className="text-gray-400 transform transition-transform">
             {isExpanded ? (
@@ -71,7 +69,16 @@ export function TransactionCard({
                   <span className="min-w-[140px] text-gray-300">Hash:</span>
                   <code className="flex items-center gap-2 text-gray-100">
                     {shortenHash(tx.hash)}
-                    <Copy className="h-3 w-3 cursor-pointer text-gray-400 hover:text-white ml-2" />
+
+                    <button
+                      className="text-gray-400 hover:text-white"
+                      onClick={() => {
+                        navigator.clipboard.writeText(tx.hash);
+                        toast.success("Address copied to clipboard");
+                      }}
+                    >
+                      <Copy className="h-3 w-3" />
+                    </button>
                   </code>
                 </div>
               </div>
@@ -94,7 +101,6 @@ export function TransactionCard({
               <ProposalSignatures
                 signers={tx.signedBy || []}
                 safeAddress={safeAddress}
-                activeTab={activeTab}
                 status={tx.status}
               />
             </div>

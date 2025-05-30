@@ -1,14 +1,13 @@
-import { useSafeParams } from "@/hooks/use-safe-params";
 import { shortenHash } from "@/utils/format";
 import { Check, Copy, ExternalLink, Plus, X } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Address } from "viem";
+import { useSafeParams } from "../../hooks/use-safe-params";
 import { TimelockTxStatus } from "../../utils/tx-status";
-import { TabType } from "./view-tx-list";
 
 interface ProposalSignaturesProps {
   safeAddress: Address;
-  activeTab: TabType;
   signers: Address[];
   status: TimelockTxStatus;
 }
@@ -27,13 +26,10 @@ function Identicon({ address, size = 32 }: { address: string; size?: number }) {
 export function ProposalSignatures({
   safeAddress,
   signers,
-  activeTab,
   status,
 }: ProposalSignaturesProps) {
   const [showAll, setShowAll] = useState(false);
   const { threshold } = useSafeParams(safeAddress);
-
-  const hasConfirmations = signers.length > 0 || activeTab !== "queue";
 
   return (
     <div className="relative w-[400px]">
@@ -49,26 +45,37 @@ export function ProposalSignatures({
           <span className="ml-10 text-white">Created</span>
         </div>
 
-        {/* Confirmations Stage */}
+        {/* Queue confirmations Stage */}
         <div className="space-y-4">
           <div className="relative flex items-center">
             <div
               className={`absolute left-[2px] flex h-5 w-5 items-center justify-center rounded-full ${
-                hasConfirmations
+                status !== TimelockTxStatus.NotFound || signers.length > 0
                   ? "bg-green-500"
                   : "border-2 border-gray-600 bg-transparent"
               }`}
             >
-              {hasConfirmations && <Check className="h-3 w-3 text-black" />}
+              {(status !== TimelockTxStatus.NotFound || signers.length > 0) && (
+                <Check className="h-3 w-3 text-black" />
+              )}
             </div>
             <span className="ml-10 text-white">
               Confirmations (
-              {activeTab === "queue" ? signers.length : threshold} of{" "}
-              {threshold})
+              {[
+                TimelockTxStatus.NotFound,
+                TimelockTxStatus.Ready,
+                TimelockTxStatus.Stale,
+                TimelockTxStatus.Canceled,
+              ].includes(status)
+                ? signers.length
+                : threshold}{" "}
+              of {threshold})
             </span>
           </div>
 
-          {activeTab === "queue" && (
+          {[TimelockTxStatus.NotFound, TimelockTxStatus.Queued].includes(
+            status
+          ) && (
             <div className="space-y-2">
               {signers.length > 0 && (
                 <div className="relative flex items-center">
@@ -92,10 +99,21 @@ export function ProposalSignatures({
                         {shortenHash(confirmation)}
                       </span>
                       <div className="flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-                        <button className="text-gray-400 hover:text-white">
+                        <button
+                          className="text-gray-400 hover:text-white"
+                          onClick={() => {
+                            navigator.clipboard.writeText(confirmation);
+                            toast.success("Address copied to clipboard");
+                          }}
+                        >
                           <Copy className="h-3 w-3" />
                         </button>
-                        <button className="text-gray-400 hover:text-white">
+                        <button
+                          className="text-gray-400 hover:text-white"
+                          onClick={() => {
+                            // TODO:
+                          }}
+                        >
                           <ExternalLink className="h-3 w-3" />
                         </button>
                       </div>
@@ -106,16 +124,16 @@ export function ProposalSignatures({
           )}
         </div>
 
-        {(activeTab === "execute" || hasConfirmations) && (
+        {(status !== TimelockTxStatus.NotFound || signers.length > 0) && (
           <div className="relative flex items-center">
             <div
               className={`absolute left-[2px] flex h-5 w-5 items-center justify-center rounded-full ${
-                activeTab !== "queue"
+                status !== TimelockTxStatus.NotFound
                   ? "bg-green-500"
                   : "border-2 border-gray-600 bg-transparent"
               }`}
             >
-              {activeTab !== "queue" && (
+              {status !== TimelockTxStatus.NotFound && (
                 <Check className="h-3 w-3 text-black" />
               )}
             </div>
@@ -123,7 +141,85 @@ export function ProposalSignatures({
           </div>
         )}
 
-        {activeTab !== "queue" && (
+        {/* Execute confirmations Stage */}
+        {[TimelockTxStatus.Ready, TimelockTxStatus.Executed].includes(
+          status
+        ) && (
+          <div className="space-y-4">
+            <div className="relative flex items-center">
+              <div
+                className={`absolute left-[2px] flex h-5 w-5 items-center justify-center rounded-full ${
+                  status === TimelockTxStatus.Executed || signers.length > 0
+                    ? "bg-green-500"
+                    : "border-2 border-gray-600 bg-transparent"
+                }`}
+              >
+                {(status === TimelockTxStatus.Executed ||
+                  signers.length > 0) && (
+                  <Check className="h-3 w-3 text-black" />
+                )}
+              </div>
+              <span className="ml-10 text-white">
+                Confirmations (
+                {status === TimelockTxStatus.Ready ? signers.length : threshold}{" "}
+                of {threshold})
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {signers.length > 0 && (
+                <div className="relative flex items-center">
+                  <div className="absolute left-[8px] h-2 w-2 rounded-full bg-green-500" />
+                  <button
+                    onClick={() => setShowAll(!showAll)}
+                    className="ml-10 text-green-500 hover:underline"
+                  >
+                    {showAll ? "Hide all" : "Show all"}
+                  </button>
+                </div>
+              )}
+
+              {showAll &&
+                signers.map((confirmation, index) => (
+                  <div key={index} className="group relative flex items-center">
+                    <div className="absolute left-[8px] h-2 w-2 rounded-full bg-green-500" />
+                    <div className="ml-10 flex items-center gap-2">
+                      <Identicon address={confirmation} size={32} />
+                      <span className="text-white">
+                        {shortenHash(confirmation)}
+                      </span>
+                      <div className="flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                        <button
+                          className="text-gray-400 hover:text-white"
+                          onClick={() => {
+                            navigator.clipboard.writeText(confirmation);
+                            toast.success("Address copied to clipboard");
+                          }}
+                        >
+                          <Copy className="h-3 w-3" />
+                        </button>
+                        <button
+                          className="text-gray-400 hover:text-white"
+                          onClick={() => {
+                            // TODO:
+                          }}
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {([
+          TimelockTxStatus.Stale,
+          TimelockTxStatus.Canceled,
+          TimelockTxStatus.Executed,
+        ].includes(status) ||
+          (status === TimelockTxStatus.Ready && signers.length > 0)) && (
           <div className="relative flex items-center">
             <div
               className={`absolute left-[2px] flex h-5 w-5 items-center justify-center rounded-full ${

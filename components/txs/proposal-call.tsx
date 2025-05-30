@@ -29,7 +29,10 @@ export function ProposalCall({ index, call }: ProposalCallProps) {
       </div>
 
       {isExpanded &&
-        call.parsedFunctionArgs.map((arg, i) => (
+        (call.parsedFunctionArgs.length > 0
+          ? call.parsedFunctionArgs
+          : call.functionArgs
+        ).map((arg, i) => (
           <div
             key={i}
             className="border-t border-gray-800 p-4 text-sm text-gray-400"

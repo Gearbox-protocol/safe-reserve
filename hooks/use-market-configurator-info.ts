@@ -10,9 +10,6 @@ import { usePublicClient } from "wagmi";
 export function useMarketConfiguratorInfo(cid: string): {
   chainId?: number;
   marketConfigurator?: Address;
-  safeAddress?: Address;
-  timelockAddress?: Address;
-  governorAddress?: Address;
   isLoading: boolean;
   error: Error | null;
 } {
@@ -39,8 +36,7 @@ export function useMarketConfiguratorInfo(cid: string): {
   });
 
   return {
-    // TODO:
-    chainId: 1,
+    chainId: ipfsData?.chainId,
     marketConfigurator: ipfsData?.marketConfigurator as Address | undefined,
     isLoading,
     error,

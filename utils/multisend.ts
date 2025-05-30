@@ -1,6 +1,10 @@
 import { Call, SignedTx } from "@/core/safe-tx";
-import { SafeTx } from "@gearbox-protocol/permissionless";
-import { json_parse } from "@gearbox-protocol/sdk";
+import {
+  governorAbi,
+  SafeTx,
+  TimelockTxParams,
+} from "@gearbox-protocol/permissionless";
+import { createRawTx, json_parse, RawTx } from "@gearbox-protocol/sdk";
 import {
   AbiFunction,
   Address,
@@ -17,14 +21,59 @@ import { shortenHash } from "./format";
 
 export const MULTISEND: Address = "0x40a2accbd92bca938b02010e17a5b8929b49130d";
 
+export function convertRawTxToSafeMultisigTx(tx: RawTx): SafeTx {
+  const { to, value, contractMethod, contractInputsValues } = tx;
+  return {
+    to,
+    value: `${value}`,
+    data: tx.callData,
+    contractMethod,
+    contractInputsValues: Object.entries(contractInputsValues).reduce(
+      (acc, [key, value]) => {
+        acc[key] =
+          typeof value === "object"
+            ? JSON.stringify(value, (_, v) =>
+                typeof v === "bigint" ? v.toString() : v
+              )
+            : `${value}`;
+        return acc;
+      },
+      {} as Record<string, string>
+    ),
+  };
+}
+
 export async function getReserveMultisigBatch(args: {
   client: PublicClient;
   safeAddress: Address;
   batch: SafeTx[];
   nonce: number;
+  type: "queue" | "execute";
 }): Promise<SignedTx> {
-  const { client, safeAddress, batch, nonce } = args;
-  const multiSendData = batch
+  const { client, safeAddress, batch, nonce, type } = args;
+
+  const executionBatch = batch
+    .filter((tx) => tx.contractMethod.name === "queueTransaction")
+    .map((tx) => ({
+      ...tx.contractInputsValues,
+      value: BigInt(tx.contractInputsValues.value),
+      eta: BigInt(tx.contractInputsValues.eta),
+    })) as unknown as Array<TimelockTxParams>;
+
+  const txs =
+    type === "queue"
+      ? batch
+      : [
+          convertRawTxToSafeMultisigTx(
+            createRawTx(batch[0].to as Address, {
+              functionName: "executeBatch",
+              args: [executionBatch],
+              abi: governorAbi,
+            })
+          ),
+        ];
+
+  const multiSendData = txs
     .map((tx) => {
       const abi = [{ ...tx.contractMethod, outputs: [], type: "function" }];
       const functionName = tx.contractMethod.name;
@@ -227,6 +276,22 @@ export function decodeTransactions(transactionsHex: Hex): Call[] {
       to = data.args[0];
 
       functionName = "queueTransaction";
+      functionArgs = data.args as unknown as unknown[];
+    } else if (callData.toLowerCase().startsWith("0xb2c6ee9e")) {
+      // TODO: show  and parse execute tx differently
+      const data = decodeFunctionData({
+        abi: parseAbi([
+          "function executeBatch((address,uint256,string,bytes,uint256)[])",
+        ]),
+        data: callData as Hex,
+      });
+
+      parsedFunctionArgs = data.args[0].map(
+        (arg) =>
+          `${arg[2].split("(")[0]}(${parseHumanReadable(arg[2], arg[3])[1].join(", ")})`
+      );
+
+      functionName = "executeBatch";
       functionArgs = data.args as unknown as unknown[];
     } else {
       try {

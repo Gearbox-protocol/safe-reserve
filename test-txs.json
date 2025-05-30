@@ -1,6 +1,7 @@
 {
   "eta": 1749141420,
   "marketConfigurator": "0x69affc8af9241cea742ee15db3240ec339f05447",
+  "chainId": 1,
   "queueBatches": [
     [
       {

@@ -1,56 +1,42 @@
 import { getDefaultConfig } from "connectkit";
-import { defineChain } from "viem";
 import { createConfig, http, injected } from "wagmi";
+import {
+  avalanche,
+  base,
+  bsc,
+  mainnet,
+  monadTestnet,
+  worldchain,
+} from "wagmi/chains";
 import { walletConnect } from "wagmi/connectors";
 
 export type NetworkType = "Mainnet" | "Arbitrum" | "Optimism" | "Sonic";
 
-export const getRpc = (chain: NetworkType) => {
-  let rpc;
-  switch (chain) {
-    case "Mainnet":
-      rpc =
-        process.env.NEXT_PUBLIC_MAINNET_NODE_URI ??
-        process.env.NEXT_PUBLIC_RPC_URL;
-      break;
-    default:
-      rpc = process.env.NEXT_PUBLIC_RPC_URL;
-      break;
-  }
-
-  if (!rpc) {
-    throw new Error("Missing rpc");
-  }
-
-  return rpc;
-};
-
-const mainnet = defineChain({
-  id: 1,
-  name: "Mainnet",
-  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-  rpcUrls: {
-    default: {
-      http: [getRpc("Mainnet")],
-    },
-  },
-  blockExplorers: {
-    default: {
-      name: "Etherscan",
-      url: "https://etherscan.io",
-      apiUrl: "https://api.etherscan.io/api",
-    },
-  },
-});
-
-const chains = [mainnet] as const;
+const chains = [
+  mainnet,
+  base,
+  avalanche,
+  monadTestnet,
+  bsc,
+  worldchain,
+] as const;
 
 export const config = createConfig(
   getDefaultConfig({
     chains,
-    transports: Object.fromEntries(
-      chains.map((ch) => [ch.id, http(getRpc(ch.name), { retryDelay: 1_000 })])
-    ),
+    transports: {
+      // [mainnet.id]: http(),
+      [mainnet.id]: http(
+        process.env.NEXT_PUBLIC_MAINNET_NODE_URI ??
+          process.env.NEXT_PUBLIC_RPC_URL,
+        { retryDelay: 1_000 }
+      ),
+      [base.id]: http(),
+      [avalanche.id]: http(),
+      [monadTestnet.id]: http(),
+      [bsc.id]: http(),
+      [worldchain.id]: http(),
+    },
 
     connectors: [
       injected(),
