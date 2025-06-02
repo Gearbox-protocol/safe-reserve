@@ -1,6 +1,5 @@
 "use client";
 
-import testJson from "@/test-txs.json";
 import { SafeTx } from "@gearbox-protocol/permissionless";
 
 import { useQuery } from "@tanstack/react-query";
@@ -30,10 +29,14 @@ export function useIpfsData(cid: string): {
         throw new Error("Missing required parameters");
       }
 
-      // TODO: fetch txs from ipfs
-      const txs = testJson;
+      const response = await fetch(`https://gateway.pinata.cloud/ipfs/${cid}`);
 
-      return txs;
+      if (!response.ok) {
+        throw new Error(`Failed to fetch IPFS data: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
     },
     enabled: !!cid && !!publicClient,
     retry: 3,

@@ -25,12 +25,12 @@ export const config = createConfig(
   getDefaultConfig({
     chains,
     transports: {
-      // [mainnet.id]: http(),
       [mainnet.id]: http(
         process.env.NEXT_PUBLIC_MAINNET_NODE_URI ??
           process.env.NEXT_PUBLIC_RPC_URL,
         { retryDelay: 1_000 }
       ),
+      // [mainnet.id]: http(),
       [base.id]: http(),
       [avalanche.id]: http(),
       [monadTestnet.id]: http(),
