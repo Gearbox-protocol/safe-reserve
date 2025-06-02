@@ -8,7 +8,7 @@ import { Copy } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useAccount, useSwitchChain } from "wagmi";
-import { useMarketConfiguratorInfo } from "../../hooks/use-market-configurator-info";
+import { useIpfsData } from "../../hooks/use-ipfs-data";
 import { shortenHash } from "../../utils/format";
 import { TransactionCard } from "./tx-card";
 
@@ -26,7 +26,7 @@ export function ViewTxList({ cid }: { cid: string }) {
     marketConfigurator,
     isLoading: isLoadingInfo,
     error: errorInfo,
-  } = useMarketConfiguratorInfo(cid);
+  } = useIpfsData(cid);
   const { threshold } = useSafeParams(safe);
 
   const { switchChain } = useSwitchChain();

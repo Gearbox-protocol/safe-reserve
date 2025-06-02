@@ -1,7 +1,5 @@
 "use client";
 
-import testJson from "@/test-txs.json";
-
 import { useQueries, useQuery } from "@tanstack/react-query";
 
 import { ParsedSignedTx, SignedTx } from "@/core/safe-tx";
@@ -22,6 +20,7 @@ import {
 } from "../utils/multisend";
 import { getTxStatus, TimelockTxStatus } from "../utils/tx-status";
 import { useGovernanceAddresses } from "./use-addresses";
+import { useIpfsData } from "./use-ipfs-data";
 import { useSafeParams } from "./use-safe-params";
 
 export function useCurrentTransactions(cid: string): {
@@ -35,24 +34,12 @@ export function useCurrentTransactions(cid: string): {
   const publicClient = usePublicClient();
 
   const {
-    data: ipfsData,
+    marketConfigurator,
+    eta,
+    queueBatches,
     isLoading: isLoadingIpfsData,
     error: errorIpfsData,
-  } = useQuery({
-    queryKey: ["ipfs-transactions", cid],
-    queryFn: async () => {
-      if (!cid || !publicClient) {
-        throw new Error("Missing required parameters");
-      }
-
-      // TODO: fetch txs from ipfs
-      const txs = testJson;
-
-      return txs;
-    },
-    enabled: !!cid && !!publicClient,
-    retry: 3,
-  });
+  } = useIpfsData(cid);
 
   const {
     safeAddress,
@@ -60,12 +47,10 @@ export function useCurrentTransactions(cid: string): {
     governorAddress,
     isLoading: isLoadingAddresses,
     error: errorAddresses,
-  } = useGovernanceAddresses(
-    ipfsData?.marketConfigurator as Address | undefined
-  );
+  } = useGovernanceAddresses(marketConfigurator);
 
   const statuses = useQueries({
-    queries: (ipfsData?.queueBatches ?? []).map((batch, index) => ({
+    queries: (queueBatches ?? []).map((batch, index) => ({
       queryKey: ["batch-status", cid, index],
       queryFn: async () => {
         if (!publicClient || !safeAddress || !timelockAddress) return;
@@ -81,8 +66,8 @@ export function useCurrentTransactions(cid: string): {
           };
         }
 
-        const eta = Number(batch[0].contractInputsValues.eta);
-        if (ipfsData && ipfsData.eta !== eta) {
+        const txEta = Number(batch[0].contractInputsValues.eta);
+        if (eta !== undefined && eta !== txEta) {
           throw new Error("Invalid ETA");
         }
 
@@ -109,12 +94,12 @@ export function useCurrentTransactions(cid: string): {
           publicClient,
           timelock: timelockAddress,
           txHash,
-          eta,
+          eta: txEta,
         });
       },
 
       enabled:
-        !!ipfsData && !!safeAddress && !!publicClient && !!timelockAddress,
+        !!queueBatches && !!safeAddress && !!publicClient && !!timelockAddress,
       retry: 3,
     })),
   });
@@ -148,9 +133,8 @@ export function useCurrentTransactions(cid: string): {
             : TimelockTxStatus.Ready)
       );
 
-      // TODO: check status and pass execute tx if needed
       return await Promise.all(
-        (ipfsData?.queueBatches ?? []).map((batch, index) =>
+        (queueBatches ?? []).map((batch, index) =>
           getReserveMultisigBatch({
             type: allBatchesQueued ? "execute" : "queue",
             client: publicClient,
