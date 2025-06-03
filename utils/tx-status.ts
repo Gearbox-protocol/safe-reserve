@@ -26,10 +26,6 @@ export async function getTxStatus(args: {
 }): Promise<{ status: TimelockTxStatus; blockNumber: number }> {
   const { publicClient, timelock, txHash, eta } = args;
 
-  return {
-    blockNumber: -1,
-    status: TimelockTxStatus.Ready,
-  };
   if (eta > Math.floor(Date.now() / 1000) + 14 * HOUR_24) {
     return {
       blockNumber: -1,
