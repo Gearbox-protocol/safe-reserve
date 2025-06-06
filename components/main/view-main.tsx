@@ -34,7 +34,7 @@ export default function ViewMain() {
         <CardFooter className="justify-end">
           <Button
             onClick={() => {
-              router.push(`/txs/${cid}`);
+              router.push(`/txs?cid=${cid}`);
             }}
             disabled={!cid}
           >
