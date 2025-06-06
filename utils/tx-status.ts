@@ -1,3 +1,4 @@
+import { getBlockNumberByTimestamp } from "@gearbox-protocol/permissionless";
 import {
   Address,
   BlockTag,
@@ -23,8 +24,9 @@ export async function getTxStatus(args: {
   timelock: Address;
   txHash: Hash;
   eta: number;
+  createdAtBlock?: number;
 }): Promise<{ status: TimelockTxStatus; blockNumber: number }> {
-  const { publicClient, timelock, txHash, eta } = args;
+  const { publicClient, timelock, txHash, eta, createdAtBlock = 0 } = args;
 
   if (eta > Math.floor(Date.now() / 1000) + 14 * HOUR_24) {
     return {
@@ -49,10 +51,15 @@ export async function getTxStatus(args: {
       })[0]
   );
 
+  const toBlock = await getBlockNumberByTimestamp(
+    publicClient,
+    eta + 14 * HOUR_24
+  );
+
   const logs = await publicClient.getLogs({
     address: timelock,
-    fromBlock: 0n,
-    toBlock: "latest",
+    fromBlock: BigInt(createdAtBlock),
+    toBlock: BigInt(toBlock),
     topics: [events, [txHash]],
   } as {
     address: `0x${string}`;

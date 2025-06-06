@@ -1,10 +1,9 @@
 import { Call, SignedTx } from "@/core/safe-tx";
 import {
-  governorAbi,
+  convertQueueBatchToExecuteTx,
   SafeTx,
-  TimelockTxParams,
 } from "@gearbox-protocol/permissionless";
-import { createRawTx, json_parse, RawTx } from "@gearbox-protocol/sdk";
+import { json_parse, RawTx } from "@gearbox-protocol/sdk";
 import {
   AbiFunction,
   Address,
@@ -51,27 +50,7 @@ export async function getReserveMultisigBatch(args: {
   type: "queue" | "execute";
 }): Promise<SignedTx> {
   const { client, safeAddress, batch, nonce, type } = args;
-
-  const executionBatch = batch
-    .filter((tx) => tx.contractMethod.name === "queueTransaction")
-    .map((tx) => ({
-      ...tx.contractInputsValues,
-      value: BigInt(tx.contractInputsValues.value),
-      eta: BigInt(tx.contractInputsValues.eta),
-    })) as unknown as Array<TimelockTxParams>;
-
-  const txs =
-    type === "queue"
-      ? batch
-      : [
-          convertRawTxToSafeMultisigTx(
-            createRawTx(batch[0].to as Address, {
-              functionName: "executeBatch",
-              args: [executionBatch],
-              abi: governorAbi,
-            })
-          ),
-        ];
+  const txs = type === "queue" ? batch : [convertQueueBatchToExecuteTx(batch)];
 
   const multiSendData = txs
     .map((tx) => {

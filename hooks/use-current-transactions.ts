@@ -37,6 +37,7 @@ export function useCurrentTransactions(cid: string): {
     marketConfigurator,
     eta,
     queueBatches,
+    createdAtBlock,
     isLoading: isLoadingIpfsData,
     error: errorIpfsData,
   } = useIpfsData(cid);
@@ -95,6 +96,7 @@ export function useCurrentTransactions(cid: string): {
           timelock: timelockAddress,
           txHash,
           eta: txEta,
+          createdAtBlock,
         });
       },
 

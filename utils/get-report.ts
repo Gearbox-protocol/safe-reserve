@@ -1,5 +1,6 @@
 import { Address } from "viem";
-import { NetworkType } from "../config/wagmi";
+
+export type NetworkType = "Mainnet" | "Arbitrum" | "Optimism" | "Sonic";
 
 export function getReportRef({
   network,

@@ -1,16 +1,41 @@
+import { ArchiveTransport } from "@gearbox-protocol/permissionless";
 import { getDefaultConfig } from "connectkit";
-import { createConfig, http, injected } from "wagmi";
+import { Chain, Transport, http } from "viem";
+import { createConfig, injected } from "wagmi";
 import {
   avalanche,
   base,
   bsc,
+  etherlink,
   mainnet,
   monadTestnet,
   worldchain,
 } from "wagmi/chains";
 import { walletConnect } from "wagmi/connectors";
 
-export type NetworkType = "Mainnet" | "Arbitrum" | "Optimism" | "Sonic";
+export const getChainTransport = (chain: Chain): Transport => {
+  const primaryRpcUrl =
+    process.env.NEXT_PUBLIC_MAINNET_NODE_URI ??
+    process.env.NEXT_PUBLIC_RPC_URL ??
+    chain.rpcUrls.default.http[0];
+
+  // Etherlink
+  if (chain.id === 42793) {
+    return new ArchiveTransport({
+      primaryRpcUrl,
+      archiveRpcUrl: "https://explorer.etherlink.com/api/eth-rpc",
+      blockThreshold: 999,
+      enableLogging: true,
+    }).getTransport();
+  }
+
+  // Default
+  return http(primaryRpcUrl, {
+    retryCount: 3,
+    retryDelay: 1000,
+    timeout: 10000,
+  });
+};
 
 const chains = [
   mainnet,
@@ -25,18 +50,14 @@ export const config = createConfig(
   getDefaultConfig({
     chains,
     transports: {
-      [mainnet.id]: http(
-        process.env.NEXT_PUBLIC_MAINNET_NODE_URI ??
-          process.env.NEXT_PUBLIC_RPC_URL,
-        { retryDelay: 1_000 }
-      ),
-      // [mainnet.id]: http(),
-      [base.id]: http(),
-      [avalanche.id]: http(),
-      [monadTestnet.id]: http(),
-      [bsc.id]: http(),
-      [worldchain.id]: http(),
-    },
+      [mainnet.id]: getChainTransport(mainnet),
+      [base.id]: getChainTransport(base),
+      [avalanche.id]: getChainTransport(avalanche),
+      [monadTestnet.id]: getChainTransport(monadTestnet),
+      [bsc.id]: getChainTransport(bsc),
+      [worldchain.id]: getChainTransport(worldchain),
+      [etherlink.id]: getChainTransport(etherlink),
+    } as Record<number, Transport>,
 
     connectors: [
       injected(),

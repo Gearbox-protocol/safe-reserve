@@ -1,16 +1,29 @@
 "use client";
 
 import { SafeTx } from "@gearbox-protocol/permissionless";
-
 import { useQuery } from "@tanstack/react-query";
-
-import { Address } from "viem";
+import { Address, Hex } from "viem";
 import { usePublicClient } from "wagmi";
+import { timelockTxsSchema } from "../utils/validation";
+
+export interface TimelockTxs {
+  chainId: number;
+  eta: number;
+  createdAtBlock: number;
+  queueBatches: SafeTx[][];
+  executeBatches: SafeTx[][];
+  marketConfigurator: Address;
+}
+
+export interface SignedTimelockTxs extends TimelockTxs {
+  signature: Hex;
+}
 
 export function useIpfsData(cid: string): {
   chainId?: number;
   marketConfigurator?: Address;
   eta?: number;
+  createdAtBlock?: number;
   queueBatches?: SafeTx[][];
   signature?: string;
   isLoading: boolean;
@@ -36,7 +49,8 @@ export function useIpfsData(cid: string): {
       }
 
       const data = await response.json();
-      return data;
+      const validatedData = timelockTxsSchema.parse(data);
+      return validatedData as SignedTimelockTxs;
     },
     enabled: !!cid && !!publicClient,
     retry: 3,
