@@ -1,13 +1,8 @@
-import { getBlockNumberByTimestamp } from "@gearbox-protocol/permissionless";
 import {
-  Address,
-  BlockTag,
-  encodeEventTopics,
-  Hash,
-  parseEventLogs,
-  PublicClient,
-} from "viem";
-import { timelockAbi } from "../bindings/generated";
+  getBlockNumberByTimestamp,
+  TimeLockContract,
+} from "@gearbox-protocol/permissionless";
+import { Address, Hash, PublicClient } from "viem";
 import { HOUR_24 } from "./constant";
 
 export enum TimelockTxStatus {
@@ -35,49 +30,75 @@ export async function getTxStatus(args: {
     };
   }
 
-  const events = [
-    "ExecuteTransaction",
-    "CancelTransaction",
-    "QueueTransaction",
-  ].map(
-    (eventName) =>
-      encodeEventTopics({
-        abi: timelockAbi,
-        eventName: eventName as
-          | "CancelTransaction"
-          | "ExecuteTransaction"
-          | "QueueTransaction",
-        args: {},
-      })[0]
-  );
-
+  const timeLockContract = new TimeLockContract(timelock, publicClient);
   const toBlock = await getBlockNumberByTimestamp(
     publicClient,
     eta + 14 * HOUR_24
   );
 
-  const logs = await publicClient.getLogs({
-    address: timelock,
-    fromBlock: BigInt(createdAtBlock),
-    toBlock: BigInt(toBlock),
-    topics: [events, [txHash]],
-  } as {
-    address: `0x${string}`;
-    fromBlock: bigint;
-    toBlock: BlockTag | bigint;
-    topics: (string[] | string | null)[];
-  });
+  // const events = [
+  //   "ExecuteTransaction",
+  //   "CancelTransaction",
+  //   "QueueTransaction",
+  // ].map(
+  //   (eventName) =>
+  //     encodeEventTopics({
+  //       abi: timelockAbi,
+  //       eventName: eventName as
+  //         | "CancelTransaction"
+  //         | "ExecuteTransaction"
+  //         | "QueueTransaction",
+  //       args: {},
+  //     })[0]
+  // );
 
-  const parsedLogs = parseEventLogs({
-    abi: timelockAbi,
-    logs,
-  }).filter(
-    (log) =>
-      (log.eventName === "ExecuteTransaction" ||
-        log.eventName === "CancelTransaction" ||
-        log.eventName === "QueueTransaction") &&
-      (log.args?.txHash ?? "").toLowerCase() === txHash.toLowerCase()
-  );
+  // const logs = await publicClient.getLogs({
+  //   address: timelock,
+  //   fromBlock: BigInt(createdAtBlock),
+  //   toBlock: BigInt(toBlock),
+  //   topics: [events, [txHash]],
+  // } as {
+  //   address: `0x${string}`;
+  //   fromBlock: bigint;
+  //   toBlock: BlockTag | bigint;
+  //   topics: (string[] | string | null)[];
+  // });
+
+  // const parsedLogs = parseEventLogs({
+  //   abi: timelockAbi,
+  //   logs,
+  // }).filter(
+  //   (log) =>
+  //     (log.eventName === "ExecuteTransaction" ||
+  //       log.eventName === "CancelTransaction" ||
+  //       log.eventName === "QueueTransaction") &&
+  //     (log.args?.txHash ?? "").toLowerCase() === txHash.toLowerCase()
+  // );
+
+  const parsedLogs = (
+    await Promise.all([
+      timeLockContract.getEvents(
+        "ExecuteTransaction",
+        BigInt(createdAtBlock),
+        BigInt(toBlock),
+        { txHash }
+      ),
+      timeLockContract.getEvents(
+        "CancelTransaction",
+        BigInt(createdAtBlock),
+        BigInt(toBlock),
+        { txHash }
+      ),
+      timeLockContract.getEvents(
+        "QueueTransaction",
+        BigInt(createdAtBlock),
+        BigInt(toBlock),
+        { txHash }
+      ),
+    ])
+  ).flat();
+
+  console.log(parsedLogs);
 
   let status = TimelockTxStatus.NotFound;
   let blockNumber = -1;

@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@gearbox-protocol/permissionless':
-        specifier: ^0.0.4
-        version: 0.0.4(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)
+        specifier: ^0.0.6
+        version: 0.0.6(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)
       '@gearbox-protocol/sdk':
         specifier: ^7.7.0
         version: 7.7.0(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)
@@ -698,8 +698,8 @@ packages:
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
 
-  '@gearbox-protocol/permissionless@0.0.4':
-    resolution: {integrity: sha512-GuikyFcokFMwMgK+myct4Uf4pnJIOBaNX3PtZedUEk4Nd6PixmKjn7Y5z8uApfXUHCqtf2ofSgECjeFn4qgpBA==}
+  '@gearbox-protocol/permissionless@0.0.6':
+    resolution: {integrity: sha512-p3GaC+vj9nDpsgqXO6NbgBrkLiaRIYiLeg/99SvtiRTko4OFISeO6NXV13SIBh02XzPv1XXWS2M0CS/hqMJY0g==}
 
   '@gearbox-protocol/sdk@7.7.0':
     resolution: {integrity: sha512-VzQpADiP96gedphgUNAv7JVmFiZI8KJjPBgdI27uqR53phFUnSAAY8bVfYLisM2aejbVZwf8TX20WylJX52hNA==}
@@ -5244,7 +5244,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.9': {}
 
-  '@gearbox-protocol/permissionless@0.0.4(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)':
+  '@gearbox-protocol/permissionless@0.0.6(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)':
     dependencies:
       '@gearbox-protocol/sdk': 7.7.0(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)
       abitype: 1.0.8(typescript@5.7.3)(zod@3.24.2)

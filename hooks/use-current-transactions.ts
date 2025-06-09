@@ -42,6 +42,8 @@ export function useCurrentTransactions(cid: string): {
     error: errorIpfsData,
   } = useIpfsData(cid);
 
+  console.log(`createdAtBlock`, createdAtBlock);
+
   const {
     safeAddress,
     timelockAddress,
@@ -267,7 +269,7 @@ export function useCurrentTransactions(cid: string): {
       errorIpfsData ||
       errorAddresses ||
       errorPreparedTxs ||
-      statuses.find(({ error }) => error)) as Error | null,
+      statuses.find(({ error }) => !!error)) as Error | null,
     refetchSigs: refetch,
   };
 }

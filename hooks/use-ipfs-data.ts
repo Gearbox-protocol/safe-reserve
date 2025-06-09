@@ -60,6 +60,7 @@ export function useIpfsData(cid: string): {
     chainId: ipfsData?.chainId,
     marketConfigurator: ipfsData?.marketConfigurator as Address | undefined,
     eta: ipfsData?.eta,
+    createdAtBlock: ipfsData?.createdAtBlock,
     queueBatches: ipfsData?.queueBatches as SafeTx[][] | undefined,
     signature: ipfsData?.signature,
     isLoading,

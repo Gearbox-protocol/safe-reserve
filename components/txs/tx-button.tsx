@@ -113,8 +113,10 @@ export function ButtonTx({ tx, safeAddress, cid }: ButtonTxProps) {
         <Button
           variant="outline"
           onClick={(e) => {
-            e.stopPropagation();
-            signTx({ txHash: tx.hash });
+            if (!isSignPending) {
+              e.stopPropagation();
+              signTx({ txHash: tx.hash });
+            }
           }}
           disabled={!canSign}
           className={`px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 ${
@@ -129,9 +131,11 @@ export function ButtonTx({ tx, safeAddress, cid }: ButtonTxProps) {
         <Button
           variant="outline"
           onClick={async (e) => {
-            e.stopPropagation();
-            const isExecuted = await executeTx();
-            setIsSent(!!isExecuted);
+            if (!isSendPending) {
+              e.stopPropagation();
+              const isExecuted = await executeTx();
+              setIsSent(!!isExecuted);
+            }
           }}
           disabled={!isNonceReady || isSent}
           className="px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
