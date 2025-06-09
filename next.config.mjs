@@ -3,7 +3,8 @@ const nextConfig = {
   output: 'export',
   trailingSlash: true,
   distDir: 'out',
-  assetPrefix: './',
+  basePath: '',
+  assetPrefix: '',
   experimental: {
     serverComponentsExternalPackages: ["sequelize", "pino", "pino-pretty"],
   },
