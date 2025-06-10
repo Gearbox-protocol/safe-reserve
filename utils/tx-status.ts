@@ -99,8 +99,6 @@ export async function getTxStatus(args: {
     ])
   ).flat();
 
-  console.log(parsedLogs);
-
   let status = TimelockTxStatus.NotFound;
   let blockNumber = -1;
 

@@ -1,6 +1,6 @@
 import { ArchiveTransport } from "@gearbox-protocol/permissionless";
 import { getDefaultConfig } from "connectkit";
-import { Chain, Transport, http } from "viem";
+import { Chain, Transport, custom, http } from "viem";
 import { createConfig, injected } from "wagmi";
 import {
   avalanche,
@@ -29,7 +29,12 @@ export const getChainTransport = (chain: Chain): Transport => {
     }).getTransport();
   }
 
-  // Default
+  // Try to use window.ethereum if available
+  if (typeof window !== "undefined" && window.ethereum) {
+    return custom(window.ethereum);
+  }
+
+  // Default fallback
   return http(primaryRpcUrl, {
     retryCount: 3,
     retryDelay: 1000,

@@ -42,8 +42,6 @@ export function useCurrentTransactions(cid: string): {
     error: errorIpfsData,
   } = useIpfsData(cid);
 
-  console.log(`createdAtBlock`, createdAtBlock);
-
   const {
     safeAddress,
     timelockAddress,
