@@ -31,10 +31,11 @@ export async function getTxStatus(args: {
   }
 
   const timeLockContract = new TimeLockContract(timelock, publicClient);
-  const toBlock = await getBlockNumberByTimestamp(
-    publicClient,
-    eta + 14 * HOUR_24
-  );
+
+  const [etaBlock, staleBlock] = await Promise.all([
+    getBlockNumberByTimestamp(publicClient, eta),
+    getBlockNumberByTimestamp(publicClient, eta + 14 * HOUR_24),
+  ]);
 
   // const events = [
   //   "ExecuteTransaction",
@@ -80,19 +81,19 @@ export async function getTxStatus(args: {
       timeLockContract.getEvents(
         "ExecuteTransaction",
         BigInt(createdAtBlock),
-        BigInt(toBlock),
+        BigInt(staleBlock),
         { txHash }
       ),
       timeLockContract.getEvents(
         "CancelTransaction",
         BigInt(createdAtBlock),
-        BigInt(toBlock),
+        BigInt(staleBlock),
         { txHash }
       ),
       timeLockContract.getEvents(
         "QueueTransaction",
         BigInt(createdAtBlock),
-        BigInt(toBlock),
+        BigInt(etaBlock),
         { txHash }
       ),
     ])
