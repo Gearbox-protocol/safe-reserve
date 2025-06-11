@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck:ci": "tsc --noEmit",
-    "clear-db": "ts-node scripts/clear-db.ts"
+    "clear-db": "ts-node scripts/clear-db.ts",
+    "publish-ipfs": "tsx script/publish-to-ipfs.ts"
   },
   "dependencies": {
     "@gearbox-protocol/permissionless": "^0.0.6",
@@ -51,6 +52,7 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.16",
+    "pinata": "^2.4.6",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.19.2",
