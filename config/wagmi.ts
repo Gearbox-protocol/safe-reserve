@@ -1,14 +1,13 @@
 import { ArchiveTransport } from "@gearbox-protocol/permissionless";
 import { getDefaultConfig } from "connectkit";
-import { Chain, Transport, custom, http } from "viem";
-import { createConfig, injected } from "wagmi";
+import { Chain, Transport, custom } from "viem";
+import { createConfig, injected, http } from "wagmi";
 import {
   avalanche,
   base,
   bsc,
   etherlink,
   mainnet,
-  monadTestnet,
   worldchain,
 } from "wagmi/chains";
 import { walletConnect } from "wagmi/connectors";
@@ -30,9 +29,9 @@ export const getChainTransport = (chain: Chain): Transport => {
   }
 
   // Try to use window.ethereum if available
-  if (typeof window !== "undefined" && window.ethereum) {
-    return custom(window.ethereum);
-  }
+  // if (typeof window !== "undefined" && window.ethereum) {
+  //   return custom(window.ethereum);
+  // }
 
   // Default fallback
   return http(primaryRpcUrl, {
@@ -46,9 +45,10 @@ const chains = [
   mainnet,
   base,
   avalanche,
-  monadTestnet,
+  // monadTestnet,
   bsc,
   worldchain,
+  etherlink
 ] as const;
 
 export const config = createConfig(
@@ -58,7 +58,7 @@ export const config = createConfig(
       [mainnet.id]: getChainTransport(mainnet),
       [base.id]: getChainTransport(base),
       [avalanche.id]: getChainTransport(avalanche),
-      [monadTestnet.id]: getChainTransport(monadTestnet),
+      // [monadTestnet.id]: getChainTransport(monadTestnet),
       [bsc.id]: getChainTransport(bsc),
       [worldchain.id]: getChainTransport(worldchain),
       [etherlink.id]: getChainTransport(etherlink),
