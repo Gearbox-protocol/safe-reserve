@@ -46,10 +46,7 @@ export function ButtonTx({ tx, safeAddress, cid }: ButtonTxProps) {
   const { signers, threshold, nonce } = useSafeParams(safeAddress);
   const { address } = useAccount();
 
-  const { sign: executeTx, isPending: isSendPending } = useSendTx(
-    safeAddress,
-    tx
-  );
+  const { send: sendTx, isPending: isSendPending } = useSendTx(safeAddress, tx);
   const { sign: signTx, isPending: isSignPending } = useSignTx(
     cid,
     safeAddress,
@@ -133,8 +130,8 @@ export function ButtonTx({ tx, safeAddress, cid }: ButtonTxProps) {
           onClick={async (e) => {
             if (!isSendPending) {
               e.stopPropagation();
-              const isExecuted = await executeTx();
-              setIsSent(!!isExecuted);
+              const isTxSent = await sendTx();
+              setIsSent(!!isTxSent);
             }
           }}
           disabled={!isNonceReady || isSent}

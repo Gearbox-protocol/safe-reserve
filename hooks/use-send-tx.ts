@@ -11,6 +11,7 @@ import {
   useWalletClient,
 } from "wagmi";
 import { defaultChainId } from "../config/wagmi";
+import { TimelockTxStatus } from "../utils/tx-status";
 
 export function useSendTx(safeAddress: Address, tx: ParsedSignedTx) {
   const { address } = useAccount();
@@ -40,11 +41,14 @@ export function useSendTx(safeAddress: Address, tx: ParsedSignedTx) {
         )
         .join("");
 
+      const isQueueTx = tx.status === TimelockTxStatus.NotFound;
       try {
-        const txHash = await walletClient.writeContract({
+        await publicClient.simulateContract({
+          account: walletClient.account,
           address: safeAddress,
           abi: safeAbi,
           functionName: "execTransaction",
+          // gas: 20_000_000n,
           args: [
             tx.to as Address,
             BigInt(tx.value),
@@ -59,34 +63,61 @@ export function useSendTx(safeAddress: Address, tx: ParsedSignedTx) {
           ],
         });
 
-        console.log("txHash", txHash);
+        try {
+          const txHash = await walletClient.writeContract({
+            address: safeAddress,
+            abi: safeAbi,
+            functionName: "execTransaction",
+            // gas: 20_000_000n,
+            args: [
+              tx.to as Address,
+              BigInt(tx.value),
+              tx.data as Hex,
+              tx.operation,
+              BigInt(tx.safeTxGas),
+              BigInt(tx.baseGas),
+              BigInt(tx.gasPrice),
+              tx.gasToken as Address,
+              tx.refundReceiver as Address,
+              `0x${signatures}`,
+            ],
+          });
 
-        const receipt = await publicClient.waitForTransactionReceipt({
-          hash: txHash,
-        });
+          console.log("txHash", txHash);
 
-        console.log("receipt", receipt);
+          const receipt = await publicClient.waitForTransactionReceipt({
+            hash: txHash,
+          });
 
-        if (receipt.status === "reverted") {
-          throw new Error("Transaction reverted");
+          console.log("receipt", receipt);
+
+          if (receipt.status === "reverted") {
+            throw new Error("Transaction reverted");
+          }
+
+          toast.success(
+            `Transaction ${isQueueTx ? "queued" : "executed"} successfully`
+          );
+
+          refetch();
+          tx.fetchStatus();
+
+          return true;
+        } catch (error) {
+          console.error(error);
+          toast.error(
+            `Transaction ${isQueueTx ? "queue" : "execution"} failed`
+          );
         }
-
-        toast.success("Transaction executed successfully");
-
-        refetch();
-        tx.fetchStatus();
-
-        return true;
       } catch (error) {
         console.error(error);
-        toast.error("Transaction execution failed" + error);
-        throw error;
+        toast.error("Transaction simulation failed");
       }
     },
   });
 
   return {
-    sign: mutateAsync,
+    send: mutateAsync,
     isPending,
     error: null,
   };

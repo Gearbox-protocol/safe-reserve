@@ -50,13 +50,13 @@ export function useSignTx(
           throw new Error("Transaction reverted");
         }
 
-        toast.success("Transaction executed successfully");
+        toast.success("Transaction confirmed successfully");
 
         refetchSigs();
         onSuccess(args.txHash);
       } catch (error) {
         console.error(error);
-        throw error;
+        toast.error("Transaction confirm failed");
       }
     },
   });
