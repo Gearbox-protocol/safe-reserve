@@ -81,8 +81,8 @@ export function ButtonTx({ tx, safeAddress, cid }: ButtonTxProps) {
   }, [nonce, tx.nonce]);
 
   const isSignButton = useMemo(() => {
-    return !isSendPending && !canSend;
-  }, [isSendPending, canSend]);
+    return !isSendPending && !canSend && Number(threshold || 0n) > 1;
+  }, [isSendPending, canSend, threshold]);
 
   const isSendButton = useMemo(() => {
     return canSend || (!isSignPending && canSignaAndSend);
