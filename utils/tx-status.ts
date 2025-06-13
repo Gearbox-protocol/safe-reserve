@@ -23,7 +23,11 @@ export async function getTxStatus(args: {
 }): Promise<{ status: TimelockTxStatus; blockNumber: number }> {
   const { publicClient, timelock, txHash, eta, createdAtBlock = 0 } = args;
 
-  if (eta > Math.floor(Date.now() / 1000) + 14 * HOUR_24) {
+  const lastBlockTimestamp = await publicClient.getBlock().then(
+    (block) => Number(block.timestamp)
+  );
+
+  if (eta > lastBlockTimestamp + 14 * HOUR_24) {
     return {
       blockNumber: -1,
       status: TimelockTxStatus.Stale,
@@ -125,7 +129,7 @@ export async function getTxStatus(args: {
   }
 
   if (status === TimelockTxStatus.Queued) {
-    if (eta <= Math.floor(Date.now() / 1000)) {
+    if (eta <= lastBlockTimestamp) {
       status = TimelockTxStatus.Ready;
     }
   }
