@@ -124,8 +124,8 @@ export function useCurrentTransactions(cid: string): {
         ({ data }) =>
           data?.status ===
           (allBatchesQueued
-            ? TimelockTxStatus.NotFound
-            : TimelockTxStatus.Ready)
+            ? TimelockTxStatus.Ready
+            : TimelockTxStatus.NotFound)
       );
 
       return await Promise.all(
