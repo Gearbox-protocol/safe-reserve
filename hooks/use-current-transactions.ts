@@ -4,14 +4,7 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 
 import { ParsedSignedTx, SignedTx } from "@/core/safe-tx";
 import { SafeTx } from "@gearbox-protocol/permissionless";
-import {
-  Address,
-  decodeFunctionData,
-  encodeAbiParameters,
-  Hex,
-  keccak256,
-  parseAbi,
-} from "viem";
+import { Address, encodeAbiParameters, Hex, keccak256 } from "viem";
 import { usePublicClient } from "wagmi";
 import { safeAbi } from "../bindings/generated";
 import {
@@ -209,26 +202,6 @@ export function useCurrentTransactions(cid: string): {
         });
       }
 
-      const functionSignatures = new Set<string>();
-
-      for (const tx of readyTxs) {
-        for (const call of tx.calls) {
-          const functionSignature = call.data.slice(0, 10);
-          if (functionSignature.toLowerCase() === "0x3a66f901") {
-            const data = decodeFunctionData({
-              abi: parseAbi([
-                "function queueTransaction(address,uint256,string,bytes,uint256)",
-              ]),
-              data: call.data,
-            });
-            const internalTx = data.args[3] as Hex;
-
-            functionSignatures.add(internalTx.slice(0, 10));
-          }
-          functionSignatures.add(functionSignature);
-        }
-      }
-
       return readyTxs;
     },
     enabled:
@@ -251,7 +224,7 @@ export function useCurrentTransactions(cid: string): {
             ...tx,
             status: statuses[index].data?.status ?? TimelockTxStatus.NotFound,
             queueBlock: statuses[index].data?.blockNumber ?? -1,
-            eta: Number(tx.calls[0].functionArgs[0]),
+            eta,
             fetchStatus: statuses[index].refetch,
           }))
         : [],
