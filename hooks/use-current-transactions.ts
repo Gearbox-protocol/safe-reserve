@@ -8,7 +8,7 @@ import { Address, encodeAbiParameters, Hex, keccak256 } from "viem";
 import { usePublicClient } from "wagmi";
 import { safeAbi } from "../bindings/generated";
 import {
-  decodeTransactions,
+  decodeMultisendTransactions,
   getReserveMultisigBatch,
 } from "../utils/multisend";
 import { getTxStatus, TimelockTxStatus } from "../utils/tx-status";
@@ -198,7 +198,7 @@ export function useCurrentTransactions(cid: string): {
           signedBy: [
             ...(signers.filter((_, index) => signedBy[index] > 0) as Address[]),
           ],
-          calls: decodeTransactions(tx.data as Hex),
+          calls: decodeMultisendTransactions(tx.data as Hex),
         });
       }
 

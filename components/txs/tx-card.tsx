@@ -14,6 +14,7 @@ interface TransactionCardProps {
   cid: string;
   tx: ParsedSignedTx;
   safeAddress: Address;
+  governor: Address;
   threshold: number;
 }
 
@@ -21,6 +22,7 @@ export function TransactionCard({
   cid,
   tx,
   safeAddress,
+  governor,
   threshold,
 }: TransactionCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -89,6 +91,7 @@ export function TransactionCard({
                 </div>
                 {tx.calls.map((call, index) => (
                   <ProposalCall
+                    governor={governor}
                     key={`call-${index}`}
                     index={index + 1}
                     call={call}

@@ -18,6 +18,7 @@ export function ViewTxList({ cid }: { cid: string }) {
   const {
     txs,
     safe,
+    governor,
     isLoading: isLoadingTxs,
     error: errorTxs,
   } = useCurrentTransactions(cid);
@@ -128,6 +129,7 @@ export function ViewTxList({ cid }: { cid: string }) {
                     cid={cid}
                     tx={tx}
                     safeAddress={safe!}
+                    governor={governor!}
                     threshold={threshold || 0}
                   />
                 ))}

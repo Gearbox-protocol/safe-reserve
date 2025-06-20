@@ -33,9 +33,4 @@ export interface Call {
   to: Address;
   value: bigint;
   data: Hex;
-  functionName: string;
-  functionArgs: unknown[];
-
-  parsedFunctionName?: string;
-  parsedFunctionArgs: string[];
 }
