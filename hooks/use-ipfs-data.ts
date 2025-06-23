@@ -13,7 +13,6 @@ export interface TimelockTxs {
   marketConfigurator: Address;
   createdAtBlock: number;
   queueBatches: SafeTx[][];
-  batchesEstimatedGas: number[];
 }
 
 export interface SignedTimelockTxs extends TimelockTxs {
@@ -27,7 +26,6 @@ export function useIpfsData(cid: string): {
   author?: Address;
   createdAtBlock?: number;
   queueBatches?: SafeTx[][];
-  batchesEstimatedGas?: number[];
   signature?: string;
   isLoading: boolean;
   error: Error | null;
@@ -66,7 +64,6 @@ export function useIpfsData(cid: string): {
     author: ipfsData?.author,
     createdAtBlock: ipfsData?.createdAtBlock,
     queueBatches: ipfsData?.queueBatches,
-    batchesEstimatedGas: ipfsData?.batchesEstimatedGas,
     signature: ipfsData?.signature,
     isLoading,
     error,

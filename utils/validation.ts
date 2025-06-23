@@ -34,6 +34,5 @@ export const timelockTxsSchema = z.object({
   marketConfigurator: addressSchema,
   createdAtBlock: z.number(),
   queueBatches: z.array(z.array(safeTxSchema)),
-  batchesEstimatedGas: z.array(z.number()),
   signature: z.string().optional(),
 });
