@@ -25,6 +25,7 @@ export function ViewTxList({ cid }: { cid: string }) {
   const {
     chainId,
     marketConfigurator,
+    author,
     isLoading: isLoadingInfo,
     error: errorInfo,
   } = useIpfsData(cid);
@@ -74,13 +75,13 @@ export function ViewTxList({ cid }: { cid: string }) {
               </text>
             </div>
           ) : (
-            <>
+            <div className="space-y-6 min-w-[620px]">
               <Card className="p-4">
                 <div className="space-y-2">
                   <div className="flex w-full items-center gap-2">
                     <span className="min-w-[180px] text-gray-300">Chain:</span>
                     <code className="flex items-center gap-2 text-gray-100">
-                      {chain?.name}
+                      {chain?.name ?? chainId}
                     </code>
                   </div>
                   <div className="flex w-full items-center gap-2">
@@ -108,15 +109,25 @@ export function ViewTxList({ cid }: { cid: string }) {
                         className="text-gray-400 hover:text-white"
                         onClick={() => {
                           navigator.clipboard.writeText(safe!);
+                          toast.success("Address copied to clipboard");
                         }}
                       >
-                        <Copy
-                          className="h-3.5 w-3.5"
-                          onClick={() => {
-                            navigator.clipboard.writeText(safe!);
-                            toast.success("Address copied to clipboard");
-                          }}
-                        />
+                        <Copy className="h-3.5 w-3.5" />
+                      </button>
+                    </code>
+                  </div>
+                  <div className="flex w-full items-center gap-2">
+                    <span className="min-w-[180px] text-gray-300">Author:</span>
+                    <code className="flex items-center gap-2 text-gray-100">
+                      {shortenHash(author!)}
+                      <button
+                        className="text-gray-400 hover:text-white"
+                        onClick={() => {
+                          navigator.clipboard.writeText(author!);
+                          toast.success("Address copied to clipboard");
+                        }}
+                      >
+                        <Copy className="h-3.5 w-3.5" />
                       </button>
                     </code>
                   </div>
@@ -134,7 +145,7 @@ export function ViewTxList({ cid }: { cid: string }) {
                   />
                 ))}
               </div>
-            </>
+            </div>
           )}
         </div>
       </Card>

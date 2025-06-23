@@ -9,10 +9,11 @@ import { timelockTxsSchema } from "../utils/validation";
 export interface TimelockTxs {
   chainId: number;
   eta: number;
+  author: Address;
+  marketConfigurator: Address;
   createdAtBlock: number;
   queueBatches: SafeTx[][];
-  executeBatches: SafeTx[][];
-  marketConfigurator: Address;
+  batchesEstimatedGas: number[];
 }
 
 export interface SignedTimelockTxs extends TimelockTxs {
@@ -21,10 +22,12 @@ export interface SignedTimelockTxs extends TimelockTxs {
 
 export function useIpfsData(cid: string): {
   chainId?: number;
-  marketConfigurator?: Address;
   eta?: number;
+  marketConfigurator?: Address;
+  author?: Address;
   createdAtBlock?: number;
   queueBatches?: SafeTx[][];
+  batchesEstimatedGas?: number[];
   signature?: string;
   isLoading: boolean;
   error: Error | null;
@@ -58,10 +61,12 @@ export function useIpfsData(cid: string): {
 
   return {
     chainId: ipfsData?.chainId,
-    marketConfigurator: ipfsData?.marketConfigurator as Address | undefined,
     eta: ipfsData?.eta,
+    marketConfigurator: ipfsData?.marketConfigurator,
+    author: ipfsData?.author,
     createdAtBlock: ipfsData?.createdAtBlock,
-    queueBatches: ipfsData?.queueBatches as SafeTx[][] | undefined,
+    queueBatches: ipfsData?.queueBatches,
+    batchesEstimatedGas: ipfsData?.batchesEstimatedGas,
     signature: ipfsData?.signature,
     isLoading,
     error,

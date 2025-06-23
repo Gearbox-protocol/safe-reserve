@@ -28,15 +28,17 @@ export function TransactionCard({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <Card className={`flex flex-col cursor-pointer`}>
+    <Card className="flex flex-col">
       <div
         className="flex cursor-pointer items-center justify-between p-4 hover:bg-gray-900/50"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-4">
-          <span className="text-gray-400 w-30">#{tx.nonce.toString()}</span>
+          <span className="text-lg text-gray-400 w-30">
+            #{tx.nonce.toString()}
+          </span>
           <div className="flex items-center">
-            <span className="text-white">
+            <span className="text-lg text-white">
               {tx.to.toLowerCase() === MULTISEND_ADDRESS.toLowerCase()
                 ? "Multisend"
                 : tx.to}
@@ -66,9 +68,9 @@ export function TransactionCard({
         <div className="border-t border-gray-800 bg-gray-900/30 p-4 ">
           <div className="grid grid-cols-[1fr_300px] gap-12">
             <div className="space-y-4">
-              <div className="space-y-2 text-sm">
+              <div className="space-y-2">
                 <div className="flex w-full items-center justify-between gap-2">
-                  <span className="min-w-[140px] text-gray-300">Hash:</span>
+                  <span className="min-w-[140px] text-gray-200">Hash:</span>
                   <code className="flex items-center gap-2 text-gray-100">
                     {shortenHash(tx.hash)}
 
@@ -86,9 +88,7 @@ export function TransactionCard({
               </div>
 
               <div className="mt-6 space-y-2">
-                <div className="mb-4 text-sm font-medium text-gray-200">
-                  Calls:
-                </div>
+                <div className="mb-4 text-gray-200">Calls:</div>
                 {tx.calls.map((call, index) => (
                   <ProposalCall
                     governor={governor}

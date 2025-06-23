@@ -64,8 +64,8 @@ export function ProposalCall({ governor, index, call }: ProposalCallProps) {
           }
         }}
       >
-        <span className="text-gray-400">#{index}</span>
-        <span className="text-gray-400">
+        <span className="text-gray-300">#{index}</span>
+        <span className="text-gray-300">
           {isDecoded ? parsedCall.functionName : "Unknown function"}
         </span>
 
@@ -82,9 +82,10 @@ export function ProposalCall({ governor, index, call }: ProposalCallProps) {
           Object.entries(parsedCall.args).map(([arg, value], i) => (
             <div
               key={i}
-              className="border-t border-gray-800 p-4 text-sm text-gray-400"
+              className="grid grid-cols-[120px_auto] border-t border-gray-800 p-4 text-sm text-gray-400"
             >
-              {arg}: {tryPrettyPrint(value)}
+              <div className="font-semibold">{arg}: </div>
+              <div className="">{tryPrettyPrint(value)}</div>
             </div>
           ))
         ) : (
