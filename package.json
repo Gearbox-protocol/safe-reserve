@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "export": "next export",
+    "start": "serve out --cors",
     "lint": "next lint",
     "typecheck:ci": "tsc --noEmit",
     "clear-db": "ts-node scripts/clear-db.ts",
@@ -23,6 +24,8 @@
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-tabs": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.6",
+    "@safe-global/safe-apps-react-sdk": "^4.7.2",
+    "@safe-global/safe-apps-sdk": "^9.1.0",
     "@tanstack/react-query": "^5.64.1",
     "@wagmi/cli": "^2.2.0",
     "abitype": "^1.0.8",

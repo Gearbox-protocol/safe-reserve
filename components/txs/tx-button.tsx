@@ -1,14 +1,12 @@
+import { Button } from "@/components/ui/button";
 import { ParsedSignedTx } from "@/core/safe-tx";
-import { useSafeParams } from "@/hooks/use-safe-params";
-import { useSendTx } from "@/hooks/use-send-tx";
-import { useSignTx } from "@/hooks/use-sign-tx";
+import { useIsSafeApp, useSafeParams, useSendTx, useSignTx } from "@/hooks";
+import { formatTimeRemaining } from "@/utils/format";
+import { TimelockTxStatus } from "@/utils/tx-status";
+import { useSafeAppsSDK } from "@safe-global/safe-apps-react-sdk";
 import { useMemo, useState } from "react";
 import { Address, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
-
-import { formatTimeRemaining } from "../../utils/format";
-import { TimelockTxStatus } from "../../utils/tx-status";
-import { Button } from "../ui/button";
 
 interface ButtonTxProps {
   tx: ParsedSignedTx;
@@ -46,6 +44,9 @@ export function ButtonTx({ tx, safeAddress, cid }: ButtonTxProps) {
   const { signers, threshold, nonce } = useSafeParams(safeAddress);
   const { address } = useAccount();
 
+  const { sdk } = useSafeAppsSDK();
+  const isSafeApp = useIsSafeApp(safeAddress);
+
   const { send: sendTx, isPending: isSendPending } = useSendTx(safeAddress, tx);
   const { sign: signTx, isPending: isSignPending } = useSignTx(
     cid,
@@ -60,14 +61,16 @@ export function ButtonTx({ tx, safeAddress, cid }: ButtonTxProps) {
   const canSign = useMemo(() => {
     return (
       !alreadySigned &&
-      (signers || [])
-        .map((addr) => addr.toLowerCase())
-        .some((s) => s === address?.toLowerCase()) &&
-      !tx.signedBy
-        .map((s) => s.toLowerCase())
-        .includes(address?.toLowerCase() || zeroAddress)
+      // TODO: check tx was not added
+      (isSafeApp ||
+        ((signers || [])
+          .map((addr) => addr.toLowerCase())
+          .some((s) => s === address?.toLowerCase()) &&
+          !tx.signedBy
+            .map((s) => s.toLowerCase())
+            .includes(address?.toLowerCase() || zeroAddress)))
     );
-  }, [signers, address, tx.signedBy, alreadySigned]);
+  }, [signers, address, tx.signedBy, alreadySigned, isSafeApp]);
 
   const [canSignaAndSend, canSend] = useMemo(() => {
     return [
@@ -81,12 +84,14 @@ export function ButtonTx({ tx, safeAddress, cid }: ButtonTxProps) {
   }, [nonce, tx.nonce]);
 
   const isSignButton = useMemo(() => {
-    return !isSendPending && !canSend && Number(threshold || 0n) > 1;
-  }, [isSendPending, canSend, threshold]);
+    return (
+      isSafeApp || (!isSendPending && !canSend && Number(threshold || 0n) > 1)
+    );
+  }, [isSafeApp, isSendPending, canSend, threshold]);
 
   const isSendButton = useMemo(() => {
-    return canSend || (!isSignPending && canSignaAndSend);
-  }, [canSend, isSignPending, canSignaAndSend]);
+    return !isSafeApp && (canSend || (!isSignPending && canSignaAndSend));
+  }, [isSafeApp, canSend, isSignPending, canSignaAndSend]);
 
   if (
     [
@@ -109,10 +114,19 @@ export function ButtonTx({ tx, safeAddress, cid }: ButtonTxProps) {
       {isSignButton && (
         <Button
           variant="outline"
-          onClick={(e) => {
+          onClick={async (e) => {
             if (!isSignPending) {
               e.stopPropagation();
-              signTx({ txHash: tx.hash });
+              if (isSafeApp) {
+                await sdk.txs.send({
+                  txs: tx.calls.map((tx) => ({
+                    ...tx,
+                    value: tx.value.toString(),
+                  })),
+                });
+              } else {
+                await signTx({ txHash: tx.hash });
+              }
             }
           }}
           disabled={!canSign}

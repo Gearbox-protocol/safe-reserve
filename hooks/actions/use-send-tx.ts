@@ -1,6 +1,8 @@
 import { safeAbi } from "@/bindings/generated";
+import { defaultChainId } from "@/config/wagmi";
 import { ParsedSignedTx } from "@/core/safe-tx";
-import { useSafeParams } from "@/hooks/use-safe-params";
+import { useSafeParams } from "@/hooks";
+import { TimelockTxStatus } from "@/utils/tx-status";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Address, Hex } from "viem";
@@ -10,8 +12,6 @@ import {
   useSwitchChain,
   useWalletClient,
 } from "wagmi";
-import { defaultChainId } from "../config/wagmi";
-import { TimelockTxStatus } from "../utils/tx-status";
 
 export function useSendTx(safeAddress: Address, tx: ParsedSignedTx) {
   const { address } = useAccount();

@@ -1,10 +1,10 @@
+import { useSafeParams } from "@/hooks";
 import { shortenHash } from "@/utils/format";
+import { TimelockTxStatus } from "@/utils/tx-status";
 import { Check, Copy, ExternalLink, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Address } from "viem";
-import { useSafeParams } from "../../hooks/use-safe-params";
-import { TimelockTxStatus } from "../../utils/tx-status";
 
 interface ProposalSignaturesProps {
   safeAddress: Address;

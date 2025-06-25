@@ -1,10 +1,10 @@
 "use client";
 
+import { timelockTxsSchema } from "@/utils/validation";
 import { SafeTx } from "@gearbox-protocol/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { Address, Hex } from "viem";
 import { usePublicClient } from "wagmi";
-import { timelockTxsSchema } from "../utils/validation";
 
 export interface TimelockTxs {
   chainId: number;

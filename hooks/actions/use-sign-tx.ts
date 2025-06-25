@@ -1,16 +1,15 @@
+import { safeAbi } from "@/bindings/generated";
+import { defaultChainId } from "@/config/wagmi";
+import { useCurrentTransactions } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Address, Hex } from "viem";
 import {
   useAccount,
   usePublicClient,
   useSwitchChain,
   useWalletClient,
 } from "wagmi";
-
-import { safeAbi } from "@/bindings/generated";
-import { toast } from "sonner";
-import { Address, Hex } from "viem";
-import { defaultChainId } from "../config/wagmi";
-import { useCurrentTransactions } from "./use-current-transactions";
 
 export function useSignTx(
   cid: string,

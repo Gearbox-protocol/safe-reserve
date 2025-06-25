@@ -1,7 +1,7 @@
 import { ArchiveTransport } from "@gearbox-protocol/permissionless";
 import { getDefaultConfig } from "connectkit";
-import { Chain, Transport, custom } from "viem";
-import { createConfig, injected, http } from "wagmi";
+import { Chain, Transport } from "viem";
+import { createConfig, http, injected } from "wagmi";
 import {
   avalanche,
   base,
@@ -10,7 +10,7 @@ import {
   mainnet,
   worldchain,
 } from "wagmi/chains";
-import { walletConnect } from "wagmi/connectors";
+import { safe, walletConnect } from "wagmi/connectors";
 
 export const getChainTransport = (chain: Chain): Transport => {
   const primaryRpcUrl =
@@ -48,7 +48,7 @@ const chains = [
   // monadTestnet,
   bsc,
   worldchain,
-  etherlink
+  etherlink,
 ] as const;
 
 export const config = createConfig(
@@ -65,11 +65,14 @@ export const config = createConfig(
     } as Record<number, Transport>,
 
     connectors: [
-      injected(),
+      safe({
+        allowedDomains: [/app.safe.global$/],
+      }),
       walletConnect({
         projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
         qrModalOptions: { themeVariables: { "--wcm-z-index": "210" } },
       }),
+      injected(),
     ],
 
     walletConnectProjectId:

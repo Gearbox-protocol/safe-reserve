@@ -1,5 +1,5 @@
+import { TimelockTxStatus } from "@/utils/tx-status";
 import { Address, Hex } from "viem";
-import { TimelockTxStatus } from "../utils/tx-status";
 
 export enum Operation {
   Call = 0,
