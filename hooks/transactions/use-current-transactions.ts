@@ -1,20 +1,17 @@
 "use client";
 
-import { useQueries, useQuery } from "@tanstack/react-query";
-
+import { safeAbi } from "@/bindings/generated";
 import { ParsedSignedTx, SignedTx } from "@/core/safe-tx";
-import { SafeTx } from "@gearbox-protocol/permissionless";
-import { Address, encodeAbiParameters, Hex, keccak256 } from "viem";
-import { usePublicClient } from "wagmi";
-import { safeAbi } from "../bindings/generated";
+import { useGovernanceAddresses, useIpfsData, useSafeParams } from "@/hooks";
 import {
   decodeMultisendTransactions,
   getReserveMultisigBatch,
-} from "../utils/multisend";
-import { getTxStatus, TimelockTxStatus } from "../utils/tx-status";
-import { useGovernanceAddresses } from "./use-addresses";
-import { useIpfsData } from "./use-ipfs-data";
-import { useSafeParams } from "./use-safe-params";
+} from "@/utils/multisend";
+import { getTxStatus, TimelockTxStatus } from "@/utils/tx-status";
+import { SafeTx } from "@gearbox-protocol/permissionless";
+import { useQueries, useQuery } from "@tanstack/react-query";
+import { Address, encodeAbiParameters, Hex, keccak256 } from "viem";
+import { usePublicClient } from "wagmi";
 
 export function useCurrentTransactions(cid: string): {
   txs: ParsedSignedTx[];

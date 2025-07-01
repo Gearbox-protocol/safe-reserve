@@ -1,11 +1,11 @@
+import { Card } from "@/components/ui/card";
 import { ParsedSignedTx } from "@/core/safe-tx";
 import { MULTISEND_ADDRESS } from "@/utils/constant";
+import { shortenHash } from "@/utils/format";
 import { ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Address } from "viem";
-import { shortenHash } from "../../utils/format";
-import { Card } from "../ui/card";
 import { ProposalCall } from "./proposal-call";
 import { ProposalSignatures } from "./proposal-signatures";
 import { ButtonTx } from "./tx-button";

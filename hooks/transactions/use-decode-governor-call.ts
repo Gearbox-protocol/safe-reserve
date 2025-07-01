@@ -1,7 +1,7 @@
+import { Call } from "@/core/safe-tx";
 import { GovernorContract } from "@gearbox-protocol/permissionless";
 import { Address, PublicClient } from "viem";
 import { usePublicClient } from "wagmi";
-import { Call } from "../core/safe-tx";
 
 export function useDecodeGovernorCall(governor: Address, call: Call) {
   const publicClient = usePublicClient();

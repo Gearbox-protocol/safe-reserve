@@ -2,14 +2,12 @@
 
 import { Card } from "@/components/ui/card";
 import { PageLayout } from "@/components/ui/page";
-import { useCurrentTransactions } from "@/hooks/use-current-transactions";
-import { useSafeParams } from "@/hooks/use-safe-params";
+import { useCurrentTransactions, useIpfsData, useSafeParams } from "@/hooks";
+import { shortenHash } from "@/utils/format";
 import { Copy } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useAccount, useSwitchChain } from "wagmi";
-import { useIpfsData } from "../../hooks/use-ipfs-data";
-import { shortenHash } from "../../utils/format";
 import { TransactionCard } from "./tx-card";
 
 export type TabType = "queue" | "execute" | "history";

@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,7 +9,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button } from "../ui/button";
 
 export default function ViewMain() {
   const [cid, setCid] = useState("");

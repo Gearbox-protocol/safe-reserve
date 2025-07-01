@@ -1,9 +1,9 @@
 import { Call } from "@/core/safe-tx";
+import { useDecodeGovernorCall } from "@/hooks";
 import { json_parse, json_stringify } from "@gearbox-protocol/sdk";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { Address } from "viem";
-import { useDecodeGovernorCall } from "../../hooks/use-decode-governor-call";
 
 interface ProposalCallProps {
   governor: Address;

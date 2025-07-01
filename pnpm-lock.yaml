@@ -41,6 +41,12 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.1.6
         version: 1.1.8(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@safe-global/safe-apps-react-sdk':
+        specifier: ^4.7.2
+        version: 4.7.2(bufferutil@4.0.9)(react@18.3.1)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)
+      '@safe-global/safe-apps-sdk':
+        specifier: ^9.1.0
+        version: 9.1.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)
       '@tanstack/react-query':
         specifier: ^5.64.1
         version: 5.66.9(react@18.3.1)
@@ -1373,6 +1379,11 @@ packages:
 
   '@safe-global/safe-apps-provider@0.18.5':
     resolution: {integrity: sha512-9v9wjBi3TwLsEJ3C2ujYoexp3pFJ0omDLH/GX91e2QB+uwCKTBYyhxFSrTQ9qzoyQd+bfsk4gjOGW87QcJhf7g==}
+
+  '@safe-global/safe-apps-react-sdk@4.7.2':
+    resolution: {integrity: sha512-du7Bp3yPT2nQ8HhbfiyGit/ItcYwZ1tLEG5fbajMe8tjgr2D2YQMgNcNFmBpgHFyq+FpoA4a+toEKMEifQCMPg==}
+    peerDependencies:
+      react: 16.x.x || 17.x.x || 18.x.x
 
   '@safe-global/safe-apps-sdk@9.1.0':
     resolution: {integrity: sha512-N5p/ulfnnA2Pi2M3YeWjULeWbjo7ei22JwU/IXnhoHzKq3pYCN6ynL9mJBOlvDVv892EgLPCWCOwQk/uBT2v0Q==}
@@ -6087,6 +6098,16 @@ snapshots:
     dependencies:
       '@safe-global/safe-apps-sdk': 9.1.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)
       events: 3.3.0
+    transitivePeerDependencies:
+      - bufferutil
+      - typescript
+      - utf-8-validate
+      - zod
+
+  '@safe-global/safe-apps-react-sdk@4.7.2(bufferutil@4.0.9)(react@18.3.1)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)':
+    dependencies:
+      '@safe-global/safe-apps-sdk': 9.1.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)
+      react: 18.3.1
     transitivePeerDependencies:
       - bufferutil
       - typescript
