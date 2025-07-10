@@ -1,12 +1,16 @@
 "use client";
 
 import { ViewTxList } from "@/components/txs/view-tx-list";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 function TxsContent() {
-  const searchParams = useSearchParams();
-  const cid = searchParams.get('cid');
+  const [cid, setCid] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Read from URL after component mounts (client-side only)
+    const params = new URLSearchParams(window.location.search);
+    setCid(params.get('cid'));
+  }, []);
 
   if (cid) {
     return <ViewTxList cid={cid} />;
@@ -21,4 +25,4 @@ export default function TxsPage() {
       <TxsContent />
     </Suspense>
   );
-} 
+}
