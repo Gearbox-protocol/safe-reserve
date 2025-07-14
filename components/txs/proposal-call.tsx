@@ -53,6 +53,7 @@ export function ProposalCall({ governor, index, call }: ProposalCallProps) {
 
   const isDecoded = !parsedCall.functionName.startsWith("Unknown function");
   const isExpandable = !isDecoded || Object.keys(parsedCall.args).length > 0;
+  const functionNamePrefix = parsedCall.args.signature ? parsedCall.args.signature.split("(")[0] : null;
 
   return (
     <div className="rounded bg-gray-900/30">
@@ -66,7 +67,7 @@ export function ProposalCall({ governor, index, call }: ProposalCallProps) {
       >
         <span className="text-gray-300">#{index}</span>
         <span className="text-gray-300">
-          {isDecoded ? parsedCall.functionName : "Unknown function"}
+          {isDecoded ? `${parsedCall.functionName} ${functionNamePrefix ? `[${functionNamePrefix}]` : ""}` : "Unknown function"}
         </span>
 
         {isExpandable &&

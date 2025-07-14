@@ -1,7 +1,7 @@
 import { ArchiveTransport } from "@gearbox-protocol/permissionless";
 import { getDefaultConfig } from "connectkit";
 import { Chain, Transport } from "viem";
-import { createConfig, http, injected } from "wagmi";
+import { createConfig, http } from "wagmi";
 import {
   avalanche,
   base,
@@ -10,7 +10,7 @@ import {
   mainnet,
   worldchain,
 } from "wagmi/chains";
-import { safe, walletConnect } from "wagmi/connectors";
+// import { safe, walletConnect } from "wagmi/connectors";
 
 export const getChainTransport = (chain: Chain): Transport => {
   const primaryRpcUrl =
@@ -24,6 +24,15 @@ export const getChainTransport = (chain: Chain): Transport => {
       primaryRpcUrl,
       archiveRpcUrl: "https://explorer.etherlink.com/api/eth-rpc",
       blockThreshold: 999,
+      enableLogging: true,
+    }).getTransport();
+  }
+
+  if (chain.id === 56) {
+    return new ArchiveTransport({
+      primaryRpcUrl: "https://bsc.drpc.org", // tmp solution
+      archiveRpcUrl: "https://bsc.rpc.hypersync.xyz",
+      blockThreshold: 50,
       enableLogging: true,
     }).getTransport();
   }
@@ -64,16 +73,16 @@ export const config = createConfig(
       [etherlink.id]: getChainTransport(etherlink),
     } as Record<number, Transport>,
 
-    connectors: [
-      safe({
-        allowedDomains: [/app.safe.global$/],
-      }),
-      walletConnect({
-        projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
-        qrModalOptions: { themeVariables: { "--wcm-z-index": "210" } },
-      }),
-      injected(),
-    ],
+    // connectors: [
+    //   safe({
+    //     allowedDomains: [/app.safe.global$/],
+    //   }),
+    //   walletConnect({
+    //     projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
+    //     qrModalOptions: { themeVariables: { "--wcm-z-index": "210" } },
+    //   }),
+    //   injected(),
+    // ],
 
     walletConnectProjectId:
       process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
