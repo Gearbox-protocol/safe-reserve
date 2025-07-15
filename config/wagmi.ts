@@ -9,6 +9,8 @@ import {
   etherlink,
   mainnet,
   worldchain,
+  hemi,
+  lisk
 } from "wagmi/chains";
 // import { safe, walletConnect } from "wagmi/connectors";
 
@@ -37,6 +39,15 @@ export const getChainTransport = (chain: Chain): Transport => {
     }).getTransport();
   }
 
+  if (chain.id === hemi.id) {
+    return new ArchiveTransport({
+      primaryRpcUrl,
+      archiveRpcUrl: "https://explorer.hemi.xyz/api/eth-rpc",
+      blockThreshold: 50,
+      enableLogging: true,
+    }).getTransport();
+  }
+
   // Try to use window.ethereum if available
   // if (typeof window !== "undefined" && window.ethereum) {
   //   return custom(window.ethereum);
@@ -58,6 +69,7 @@ const chains = [
   bsc,
   worldchain,
   etherlink,
+  hemi
 ] as const;
 
 export const config = createConfig(
@@ -71,6 +83,7 @@ export const config = createConfig(
       [bsc.id]: getChainTransport(bsc),
       [worldchain.id]: getChainTransport(worldchain),
       [etherlink.id]: getChainTransport(etherlink),
+      [hemi.id]: getChainTransport(hemi),
     } as Record<number, Transport>,
 
     // connectors: [
