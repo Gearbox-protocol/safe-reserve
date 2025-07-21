@@ -48,6 +48,23 @@ export const getChainTransport = (chain: Chain): Transport => {
     }).getTransport();
   }
 
+  if (chain.id === mainnet.id) {
+    return http("https://lb.drpc.org/ethereum/ArgL9xL92k_VqiTUtSp0KHGND7jiYtUR8Ku4EklbR4ac", {
+      retryCount: 3,
+      retryDelay: 1000,
+      timeout: 10000,
+    });
+  }
+
+  if (chain.id === lisk.id) {
+    return new ArchiveTransport({
+      primaryRpcUrl: "https://lb.drpc.org/lisk/ArgL9xL92k_VqiTUtSp0KHGND7jiYtUR8Ku4EklbR4ac", // tmp solution
+      archiveRpcUrl: "https://lisk.rpc.hypersync.xyz",
+      blockThreshold: 200,
+      enableLogging: true,
+    }).getTransport();
+  }
+
   // Try to use window.ethereum if available
   // if (typeof window !== "undefined" && window.ethereum) {
   //   return custom(window.ethereum);
@@ -69,7 +86,8 @@ const chains = [
   bsc,
   worldchain,
   etherlink,
-  hemi
+  hemi,
+  lisk
 ] as const;
 
 export const config = createConfig(
@@ -84,6 +102,7 @@ export const config = createConfig(
       [worldchain.id]: getChainTransport(worldchain),
       [etherlink.id]: getChainTransport(etherlink),
       [hemi.id]: getChainTransport(hemi),
+      [lisk.id]: getChainTransport(lisk),
     } as Record<number, Transport>,
 
     // connectors: [
