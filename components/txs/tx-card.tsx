@@ -51,7 +51,12 @@ export function TransactionCard({
             {tx.signedBy.length} / {Number(threshold)}
           </span>
 
-          <ButtonTx tx={tx} safeAddress={safeAddress} cid={cid} />
+          <ButtonTx
+            tx={tx}
+            safeAddress={safeAddress}
+            cid={cid}
+            governor={governor}
+          />
 
           <span className="text-gray-400 transform transition-transform">
             {isExpanded ? (

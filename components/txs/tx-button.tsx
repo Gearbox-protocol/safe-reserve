@@ -11,6 +11,7 @@ import { useAccount } from "wagmi";
 interface ButtonTxProps {
   tx: ParsedSignedTx;
   safeAddress: Address;
+  governor: Address;
   cid: string;
 }
 
@@ -37,7 +38,7 @@ const getButtonText = (status: TimelockTxStatus, eta: number = 0) => {
   }
 };
 
-export function ButtonTx({ tx, safeAddress, cid }: ButtonTxProps) {
+export function ButtonTx({ tx, safeAddress, governor, cid }: ButtonTxProps) {
   const [isSent, setIsSent] = useState(false);
   const [alreadySigned, setAlreadySigned] = useState(false);
 
@@ -47,7 +48,11 @@ export function ButtonTx({ tx, safeAddress, cid }: ButtonTxProps) {
   const { sdk } = useSafeAppsSDK();
   const isSafeApp = useIsSafeApp(safeAddress);
 
-  const { send: sendTx, isPending: isSendPending } = useSendTx(safeAddress, tx);
+  const { send: sendTx, isPending: isSendPending } = useSendTx(
+    safeAddress,
+    governor,
+    tx
+  );
   const { sign: signTx, isPending: isSignPending } = useSignTx(
     cid,
     safeAddress,

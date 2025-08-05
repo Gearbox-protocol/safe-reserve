@@ -21,3 +21,24 @@ export function useDecodeGovernorCall(governor: Address, call: Call) {
   }
   return governorContract.parseFunctionData(call.data);
 }
+
+export function useDecodeGovernorCalls(governor: Address, calls: Call[]) {
+  const publicClient = usePublicClient();
+  const governorContract = new GovernorContract(
+    governor,
+    publicClient as PublicClient
+  );
+
+  return calls.map((call) => {
+    if (call.to.toLowerCase() !== governor.toLowerCase()) {
+      return {
+        chainId: 0,
+        target: call.to,
+        label: "Unknown contract",
+        functionName: `Unknown function: ${call.data}`,
+        args: {},
+      };
+    }
+    return governorContract.parseFunctionData(call.data);
+  });
+}

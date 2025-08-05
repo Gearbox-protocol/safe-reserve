@@ -1,6 +1,7 @@
 import { Call } from "@/core/safe-tx";
 import { useDecodeGovernorCall } from "@/hooks";
-import { json_parse, json_stringify } from "@gearbox-protocol/sdk";
+import { deepJsonParse } from "@gearbox-protocol/permissionless";
+import { json_stringify } from "@gearbox-protocol/sdk";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { Address } from "viem";
@@ -9,29 +10,6 @@ interface ProposalCallProps {
   governor: Address;
   index: number;
   call: Call;
-}
-
-function deepJsonParse(value: unknown): unknown {
-  if (typeof value === "string") {
-    try {
-      const parsed = json_parse(value);
-      if (parsed === value) return value;
-      return deepJsonParse(parsed);
-    } catch {
-      return value;
-    }
-  }
-  if (Array.isArray(value)) {
-    return value.map(deepJsonParse);
-  }
-  if (typeof value === "object" && value !== null) {
-    const result: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(value)) {
-      result[k] = deepJsonParse(v);
-    }
-    return result;
-  }
-  return value;
 }
 
 function tryPrettyPrint(value: unknown): React.ReactNode {
@@ -53,7 +31,9 @@ export function ProposalCall({ governor, index, call }: ProposalCallProps) {
 
   const isDecoded = !parsedCall.functionName.startsWith("Unknown function");
   const isExpandable = !isDecoded || Object.keys(parsedCall.args).length > 0;
-  const functionNamePrefix = parsedCall.args.signature ? parsedCall.args.signature.split("(")[0] : null;
+  const functionNamePrefix = parsedCall.args.signature
+    ? parsedCall.args.signature.split("(")[0]
+    : null;
 
   return (
     <div className="rounded bg-gray-900/30">
@@ -67,7 +47,9 @@ export function ProposalCall({ governor, index, call }: ProposalCallProps) {
       >
         <span className="text-gray-300">#{index}</span>
         <span className="text-gray-300">
-          {isDecoded ? `${parsedCall.functionName} ${functionNamePrefix ? `[${functionNamePrefix}]` : ""}` : "Unknown function"}
+          {isDecoded
+            ? `${parsedCall.functionName} ${functionNamePrefix ? `[${functionNamePrefix}]` : ""}`
+            : "Unknown function"}
         </span>
 
         {isExpandable &&

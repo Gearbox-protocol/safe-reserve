@@ -1,8 +1,12 @@
 import { safeAbi } from "@/bindings/generated";
 import { defaultChainId } from "@/config/wagmi";
 import { ParsedSignedTx } from "@/core/safe-tx";
-import { useSafeParams } from "@/hooks";
+import { useDecodeGovernorCalls, useSafeParams } from "@/hooks";
 import { TimelockTxStatus } from "@/utils/tx-status";
+import {
+  getCallsTouchedPriceFeeds,
+  getPriceUpdateTx,
+} from "@gearbox-protocol/permissionless";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Address, Hex } from "viem";
@@ -13,12 +17,19 @@ import {
   useWalletClient,
 } from "wagmi";
 
-export function useSendTx(safeAddress: Address, tx: ParsedSignedTx) {
+export function useSendTx(
+  safeAddress: Address,
+  governor: Address,
+  tx: ParsedSignedTx
+) {
   const { address } = useAccount();
   const { threshold, refetch } = useSafeParams(safeAddress);
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
   const publicClient = usePublicClient();
+
+  const parsedCalls = useDecodeGovernorCalls(governor, tx.calls);
+  const priceFeeds = getCallsTouchedPriceFeeds(parsedCalls);
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async () => {
@@ -42,13 +53,50 @@ export function useSendTx(safeAddress: Address, tx: ParsedSignedTx) {
         .join("");
 
       const isQueueTx = tx.status === TimelockTxStatus.NotFound;
+      const updateTx =
+        isQueueTx || priceFeeds.length === 0
+          ? undefined
+          : await getPriceUpdateTx({
+              client: publicClient,
+              priceFeeds,
+            });
+
+      console.log(`updateTx`, isQueueTx, priceFeeds.length, updateTx);
+
+      if (updateTx) {
+        try {
+          const txHash = await walletClient.sendTransaction({
+            account: walletClient.account,
+            to: updateTx.to,
+            value: 0n,
+            data: updateTx.callData,
+          });
+
+          console.log("txHash", txHash);
+
+          const receipt = await publicClient.waitForTransactionReceipt({
+            hash: txHash,
+          });
+
+          console.log("receipt", receipt);
+
+          if (receipt.status === "reverted") {
+            throw new Error("Transaction reverted");
+          }
+
+          toast.success("Successfully updated price feeds");
+        } catch (error) {
+          console.error(error);
+          toast.error("Price feeds update failed");
+        }
+      }
+
       try {
-        await publicClient.simulateContract({
-          account: walletClient.account,
+        const exectxParams = {
           address: safeAddress,
           abi: safeAbi,
           functionName: "execTransaction",
-          // gas: 20_000_000n,
+          gas: 20_000_000n,
           args: [
             tx.to as Address,
             BigInt(tx.value),
@@ -61,27 +109,15 @@ export function useSendTx(safeAddress: Address, tx: ParsedSignedTx) {
             tx.refundReceiver as Address,
             `0x${signatures}`,
           ],
+        } as const;
+
+        await publicClient.simulateContract({
+          account: walletClient.account,
+          ...exectxParams,
         });
 
         try {
-          const txHash = await walletClient.writeContract({
-            address: safeAddress,
-            abi: safeAbi,
-            functionName: "execTransaction",
-            // gas: 20_000_000n,
-            args: [
-              tx.to as Address,
-              BigInt(tx.value),
-              tx.data as Hex,
-              tx.operation,
-              BigInt(tx.safeTxGas),
-              BigInt(tx.baseGas),
-              BigInt(tx.gasPrice),
-              tx.gasToken as Address,
-              tx.refundReceiver as Address,
-              `0x${signatures}`,
-            ],
-          });
+          const txHash = await walletClient.writeContract(exectxParams);
 
           console.log("txHash", txHash);
 
