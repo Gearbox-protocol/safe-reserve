@@ -61,8 +61,6 @@ export function useSendTx(
               priceFeeds,
             });
 
-      console.log(`updateTx`, isQueueTx, priceFeeds.length, updateTx);
-
       if (updateTx) {
         try {
           const txHash = await walletClient.sendTransaction({
@@ -96,7 +94,7 @@ export function useSendTx(
           address: safeAddress,
           abi: safeAbi,
           functionName: "execTransaction",
-          gas: 20_000_000n,
+          // gas: 20_000_000n,
           args: [
             tx.to as Address,
             BigInt(tx.value),
