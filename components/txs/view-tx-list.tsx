@@ -132,7 +132,7 @@ export function ViewTxList({ cid }: { cid: string }) {
                 </div>
               </Card>
               <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
-                {txs.map((tx) => (
+                {txs.map((tx, index) => (
                   <TransactionCard
                     key={tx.hash}
                     cid={cid}
@@ -140,6 +140,7 @@ export function ViewTxList({ cid }: { cid: string }) {
                     safeAddress={safe!}
                     governor={governor!}
                     threshold={threshold || 0}
+                    index={index}
                   />
                 ))}
               </div>

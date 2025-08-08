@@ -3,9 +3,11 @@ import { ParsedSignedTx } from "@/core/safe-tx";
 import { MULTISEND_ADDRESS } from "@/utils/constant";
 import { shortenHash } from "@/utils/format";
 import { ChevronDown, ChevronUp, Copy } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Address } from "viem";
+import { useGetUpdatableFeeds } from "../../hooks/transactions/use-get-updatable-feeds";
+import { TimelockTxStatus } from "../../utils/tx-status";
 import { ProposalCall } from "./proposal-call";
 import { ProposalSignatures } from "./proposal-signatures";
 import { ButtonTx } from "./tx-button";
@@ -16,6 +18,7 @@ interface TransactionCardProps {
   safeAddress: Address;
   governor: Address;
   threshold: number;
+  index: number;
 }
 
 export function TransactionCard({
@@ -24,8 +27,28 @@ export function TransactionCard({
   safeAddress,
   governor,
   threshold,
+  index,
 }: TransactionCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { data: updatableFeeds, isLoading } = useGetUpdatableFeeds({
+    cid,
+    index,
+    governor,
+    tx,
+  });
+
+  const showUpdatableFeeds = useMemo(() => {
+    if (
+      ![
+        TimelockTxStatus.Queued,
+        TimelockTxStatus.Executed,
+        TimelockTxStatus.Ready,
+      ].includes(tx.status)
+    )
+      return false;
+
+    return isLoading || (updatableFeeds && updatableFeeds.length > 0);
+  }, [isLoading, tx.status, updatableFeeds]);
 
   return (
     <Card className="flex flex-col">
@@ -103,6 +126,46 @@ export function TransactionCard({
                   />
                 ))}
               </div>
+
+              {showUpdatableFeeds && (
+                <div className="mt-6 space-y-2">
+                  {isLoading ? (
+                    <>
+                      <div className="h-6 w-full bg-gray-800 rounded" />
+                      <div className="h-4 w-full bg-gray-800 rounded" />
+                    </>
+                  ) : (
+                    <>
+                      <div className="mb-4 text-gray-200">
+                        Price feeds to be updated before execution (
+                        {updatableFeeds?.length}):
+                      </div>
+                      <div className="rounded-xl bg-gray-900/30">
+                        {updatableFeeds?.map((feed, i) => (
+                          <div
+                            key={i}
+                            className={`grid grid-cols-[120px_auto] ${i > 0 ? "border-t" : ""} border-gray-800 p-4 text-sm text-gray-400`}
+                          >
+                            <code className="flex items-center gap-2">
+                              <div>{feed}</div>
+
+                              <button
+                                className="text-gray-400 hover:text-white"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(feed);
+                                  toast.success("Address copied to clipboard");
+                                }}
+                              >
+                                <Copy className="h-3 w-3" />
+                              </button>
+                            </code>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="border-l border-gray-800 pl-8">
