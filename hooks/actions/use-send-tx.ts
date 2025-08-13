@@ -2,6 +2,8 @@ import { safeAbi } from "@/bindings/generated";
 import { defaultChainId } from "@/config/wagmi";
 import { ParsedSignedTx } from "@/core/safe-tx";
 import { useDecodeGovernorCalls, useSafeParams } from "@/hooks";
+import { useSafeSignature } from "@/hooks/actions/use-safe-signature";
+import { getMulticall3Params } from "@/utils/multicall3";
 import { TimelockTxStatus } from "@/utils/tx-status";
 import {
   getCallsTouchedPriceFeeds,
@@ -9,7 +11,7 @@ import {
 } from "@gearbox-protocol/permissionless";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Address, Hex } from "viem";
+import { Address, encodeFunctionData, Hex } from "viem";
 import {
   useAccount,
   usePublicClient,
@@ -17,40 +19,70 @@ import {
   useWalletClient,
 } from "wagmi";
 
+
 export function useSendTx(
   safeAddress: Address,
   governor: Address,
   tx: ParsedSignedTx
 ) {
   const { address } = useAccount();
-  const { threshold, refetch } = useSafeParams(safeAddress);
+  const { threshold, refetch, isLoading: isLoadingThreshold } = useSafeParams(safeAddress);
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
   const publicClient = usePublicClient();
+  
+  // Use the Safe signature hook
+  const {
+    processedSignature: cachedSignature,
+    isAlreadySigned,
+    signTransaction,
+    isSigningPending,
+  } = useSafeSignature(tx.hash);
 
   const parsedCalls = useDecodeGovernorCalls(governor, tx.calls);
   const priceFeeds = getCallsTouchedPriceFeeds(parsedCalls);
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async () => {
-      if (!walletClient || !publicClient || !address || !safeAddress) return;
+      if (!walletClient || !publicClient || !address || !safeAddress || threshold === undefined) return;
 
       await switchChainAsync({
         chainId: defaultChainId,
       });
 
+      let processedSignature: string | null = null;
+      
+      // Check if current user needs to sign and handle signature caching
       if (!tx.signedBy.includes(walletClient.account.address)) {
-        tx.signedBy.push(walletClient.account.address);
+        try {
+          // Use cached signature if available, otherwise sign new
+          if (isAlreadySigned && cachedSignature) {
+            processedSignature = cachedSignature;
+            console.log("Using cached signature", processedSignature);
+          } else {
+            const signatureData = await signTransaction();
+            processedSignature = signatureData.processedSignature;
+            console.log("Created new signature", processedSignature);
+          }
+        } catch (error) {
+          console.error(error);
+          toast.error("Failed to sign message");
+          return;
+        }
       }
 
       const signatures = tx.signedBy
-        .slice(0, threshold)
+        .slice(0, processedSignature != null ? threshold - 1 : threshold)
         .sort((a, b) => a.localeCompare(b))
         .map(
           (signer) =>
             "000000000000000000000000" + signer.slice(2) + "0".repeat(64) + "01"
         )
-        .join("");
+        .join("")
+        + (processedSignature?.slice(2) || "");
+
+      console.log("signatures", signatures.length);
+      console.log("processedSignature", processedSignature?.length);
 
       const isQueueTx = tx.status === TimelockTxStatus.NotFound;
       const updateTx =
@@ -60,34 +92,6 @@ export function useSendTx(
               client: publicClient,
               priceFeeds,
             });
-
-      if (updateTx) {
-        try {
-          const txHash = await walletClient.sendTransaction({
-            account: walletClient.account,
-            to: updateTx.to,
-            value: 0n,
-            data: updateTx.callData,
-          });
-
-          console.log("txHash", txHash);
-
-          const receipt = await publicClient.waitForTransactionReceipt({
-            hash: txHash,
-          });
-
-          console.log("receipt", receipt);
-
-          if (receipt.status === "reverted") {
-            throw new Error("Transaction reverted");
-          }
-
-          toast.success("Successfully updated price feeds");
-        } catch (error) {
-          console.error(error);
-          toast.error("Price feeds update failed");
-        }
-      }
 
       try {
         const exectxParams = {
@@ -109,13 +113,31 @@ export function useSendTx(
           ],
         } as const;
 
-        await publicClient.simulateContract({
-          account: walletClient.account,
-          ...exectxParams,
+        const safeExecCallData = encodeFunctionData({
+          abi: safeAbi,
+          functionName: "execTransaction",
+          args: exectxParams.args,
         });
 
+        const safeExecCall = {
+          to: safeAddress,
+          callData: safeExecCallData,
+        } as const;
+
+        const multicall3 = publicClient.chain.contracts?.multicall3;
+        if (!multicall3) {
+          toast.error("Multicall3 address not found for chain");
+          return;
+        }
+        const multicall3Calls = updateTx ? [updateTx, safeExecCall] : [safeExecCall];
+        const multicall3Params = getMulticall3Params(multicall3.address, multicall3Calls);
+
+        await publicClient.simulateContract({
+          ...multicall3Params
+        })
+
         try {
-          const txHash = await walletClient.writeContract(exectxParams);
+          const txHash = await walletClient.writeContract(multicall3Params);
 
           console.log("txHash", txHash);
 
@@ -152,7 +174,9 @@ export function useSendTx(
 
   return {
     send: mutateAsync,
-    isPending,
+    isPending: isPending || isLoadingThreshold || isSigningPending,
     error: null,
+    // isAlreadySigned,
+    // signTransaction,
   };
 }

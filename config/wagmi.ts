@@ -14,11 +14,17 @@ import {
 } from "wagmi/chains";
 // import { safe, walletConnect } from "wagmi/connectors";
 
+function drpcUrl(chainName: string) {
+  const apiKey = process.env.NEXT_PUBLIC_DRPC_API_KEY;
+  console.log("apiKey", apiKey, !apiKey);
+  if (!apiKey) {
+    throw new Error("NEXT_PUBLIC_DRPC_API_KEY is not set");
+  }
+  return `https://lb.drpc.org/${chainName}/${apiKey}`;
+}
+
 export const getChainTransport = (chain: Chain): Transport => {
-  const primaryRpcUrl =
-    process.env.NEXT_PUBLIC_MAINNET_NODE_URI ??
-    process.env.NEXT_PUBLIC_RPC_URL ??
-    chain.rpcUrls.default.http[0];
+  const primaryRpcUrl = chain.rpcUrls.default.http[0];
 
   // Etherlink
   if (chain.id === 42793) {
@@ -32,7 +38,7 @@ export const getChainTransport = (chain: Chain): Transport => {
 
   if (chain.id === 56) {
     return new ArchiveTransport({
-      primaryRpcUrl: "https://bsc.drpc.org", // tmp solution
+      primaryRpcUrl: drpcUrl("bsc"),
       archiveRpcUrl: "https://bsc.rpc.hypersync.xyz",
       blockThreshold: 50,
       enableLogging: true,
@@ -41,7 +47,7 @@ export const getChainTransport = (chain: Chain): Transport => {
 
   if (chain.id === hemi.id) {
     return new ArchiveTransport({
-      primaryRpcUrl,
+      primaryRpcUrl: drpcUrl("hemi"),
       archiveRpcUrl: "https://explorer.hemi.xyz/api/eth-rpc",
       blockThreshold: 50,
       enableLogging: true,
@@ -49,7 +55,9 @@ export const getChainTransport = (chain: Chain): Transport => {
   }
 
   if (chain.id === mainnet.id) {
-    return http("https://lb.drpc.org/ethereum/ArgL9xL92k_VqiTUtSp0KHGND7jiYtUR8Ku4EklbR4ac", {
+    return http(
+    process.env.NEXT_PUBLIC_RPC_URL || drpcUrl("ethereum"),
+    {
       retryCount: 3,
       retryDelay: 1000,
       timeout: 10000,
@@ -58,7 +66,7 @@ export const getChainTransport = (chain: Chain): Transport => {
 
   if (chain.id === lisk.id) {
     return new ArchiveTransport({
-      primaryRpcUrl: "https://lb.drpc.org/lisk/ArgL9xL92k_VqiTUtSp0KHGND7jiYtUR8Ku4EklbR4ac", // tmp solution
+      primaryRpcUrl: drpcUrl("lisk"),
       archiveRpcUrl: "https://lisk.rpc.hypersync.xyz",
       blockThreshold: 200,
       enableLogging: true,

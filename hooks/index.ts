@@ -1,5 +1,6 @@
 export * from "./actions/use-send-tx";
 export * from "./actions/use-sign-tx";
+export * from "./actions/use-safe-signature";
 export * from "./safe/use-addresses";
 export * from "./safe/use-is-safe-app";
 export * from "./safe/use-safe-params";

@@ -90,7 +90,7 @@ export function ButtonTx({ tx, safeAddress, governor, cid }: ButtonTxProps) {
 
   const isSignButton = useMemo(() => {
     return (
-      isSafeApp || (!isSendPending && !canSend && Number(threshold || 0n) > 1)
+      isSafeApp || (!isSendPending && !canSend)
     );
   }, [isSafeApp, isSendPending, canSend, threshold]);
 
