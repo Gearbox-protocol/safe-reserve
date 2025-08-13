@@ -16,7 +16,6 @@ import {
 
 function drpcUrl(chainName: string) {
   const apiKey = process.env.NEXT_PUBLIC_DRPC_API_KEY;
-  console.log("apiKey", apiKey, !apiKey);
   if (!apiKey) {
     throw new Error("NEXT_PUBLIC_DRPC_API_KEY is not set");
   }
