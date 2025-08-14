@@ -5,7 +5,7 @@ import { useIsSafeApp, useSafeParams, useSendTx, useSignTx } from "@/hooks";
 import { formatTimeRemaining } from "@/utils/format";
 import { TimelockTxStatus } from "@/utils/tx-status";
 import { useSafeAppsSDK } from "@safe-global/safe-apps-react-sdk";
-import { Info, Wallet, RefreshCw, Play } from "lucide-react";
+import { Info, Wallet, Play } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Address, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
