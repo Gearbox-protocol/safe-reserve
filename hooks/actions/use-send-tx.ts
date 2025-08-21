@@ -53,7 +53,7 @@ export function useSendTx(
       let processedSignature: string | null = null;
       
       // Check if current user needs to sign and handle signature caching
-      if (!tx.signedBy.includes(walletClient.account.address)) {
+      if (!tx.signedBy.includes(walletClient.account.address) && tx.signedBy.length < threshold) {
         try {
           // Use cached signature if available, otherwise sign new
           if (isAlreadySigned && cachedSignature) {
@@ -136,8 +136,19 @@ export function useSendTx(
           ...multicall3Params
         })
 
+        const gas = await publicClient.estimateContractGas({
+          ...multicall3Params
+        });
+
+        console.log("Estimated gas", gas);
+        const adjustedGas = gas < 28000000n ? gas * 11n / 10n : gas;
+        console.log("Adjusted gas", adjustedGas);
+
         try {
-          const txHash = await walletClient.writeContract(multicall3Params);
+          const txHash = await walletClient.writeContract({
+            ...multicall3Params,
+            gas: adjustedGas,
+          });
 
           console.log("txHash", txHash);
 
