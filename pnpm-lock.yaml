@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@gearbox-protocol/permissionless':
-        specifier: ^0.1.3
-        version: 0.1.3(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)
+        specifier: ^0.1.6
+        version: 0.1.6(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)
       '@gearbox-protocol/sdk':
         specifier: ^7.7.0
         version: 7.7.0(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)
@@ -707,16 +707,24 @@ packages:
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
 
-  '@gearbox-protocol/permissionless@0.1.3':
-    resolution: {integrity: sha512-KGRcOLBcTEDg611uNtE3jzvpgJoFqaiAufVQ/3pQqIvW3pp/ln3dyyD4v+nrnOvgbjUMxV0QQAx5h8lgUJ1kZw==}
+  '@gearbox-protocol/integrations-v3@1.42.0-abi.4':
+    resolution: {integrity: sha512-bAtHIErStAW4zvEYmcIIwRfM5Zin8oUumSA16YvDpJht9BAKypVPCFzma86bLLmT8OZUn8k+S4vgmbF3KfNflw==}
+
+  '@gearbox-protocol/permissionless@0.1.6':
+    resolution: {integrity: sha512-hFzONQ+kZTY7i3Wk5HkPz25ciSlDgJ3gn6xy5dACC3cUpQlsuv9tjn2cY5wVk1S2re5wUYVaAblNWWkLP4InZw==}
+
+  '@gearbox-protocol/sdk-adapters@1.2.2':
+    resolution: {integrity: sha512-KDE+jEikrrkF6h61v1zfJ7LC89ih2ENEaZMUsfS2WjXaS3VUMEmwRsKzkzzQ0ad/MCWxOKA5aDBVyRdqVG231A==}
+    peerDependencies:
+      '@gearbox-protocol/sdk': '>=8.20.0 <9.0.0'
 
   '@gearbox-protocol/sdk@7.7.0':
     resolution: {integrity: sha512-VzQpADiP96gedphgUNAv7JVmFiZI8KJjPBgdI27uqR53phFUnSAAY8bVfYLisM2aejbVZwf8TX20WylJX52hNA==}
     peerDependencies:
       axios: ^1.0.0
 
-  '@gearbox-protocol/sdk@8.16.0':
-    resolution: {integrity: sha512-1PD/4vXbCJ1n93u0sIUbe6TBF4YB4AYWlSmYXn0YAY/he7yFcrVnVnf8Nprr3sBeZxclVoe+5AIT7zyt/NBZVg==}
+  '@gearbox-protocol/sdk@8.25.3':
+    resolution: {integrity: sha512-f0efsHZjMjPFLpFS1qnya/84O6jgMVHUkME7nspN/QD21jmMlXeUd+vCNi79yTZHqjpDjePcVux9i3yWREVGig==}
     peerDependencies:
       axios: ^1.0.0
 
@@ -1707,6 +1715,17 @@ packages:
 
   abitype@1.0.8:
     resolution: {integrity: sha512-ZeiI6h3GnW06uYDLx0etQtX/p8E24UaHHBj57RSjK7YBFe7iuVn07EDpOeP451D06sF27VOz9JJPlIKJmXgkEg==}
+    peerDependencies:
+      typescript: '>=5.0.4'
+      zod: ^3 >=3.22.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+      zod:
+        optional: true
+
+  abitype@1.0.9:
+    resolution: {integrity: sha512-oN0S++TQmlwWuB+rkA6aiEefLv3SP+2l/tC5mux/TLj6qdA6rF15Vbpex4fHovLsMkwLwTIRj8/Q8vXCS3GfOg==}
     peerDependencies:
       typescript: '>=5.0.4'
       zod: ^3 >=3.22.0
@@ -4591,8 +4610,8 @@ packages:
   zod@3.25.36:
     resolution: {integrity: sha512-eRFS3i8T0IrpGdL8HQyqFAugGOn7jOjyGgGdtv5NY4Wkhi7lJDk732bNZ609YMIGFbLoaj6J69O1Mura23gfIw==}
 
-  zod@4.0.14:
-    resolution: {integrity: sha512-nGFJTnJN6cM2v9kXL+SOBq3AtjQby3Mv5ySGFof5UGRHrRioSJ5iG680cYNjE/yWk671nROcpPj4hAS8nyLhSw==}
+  zod@4.1.3:
+    resolution: {integrity: sha512-1neef4bMce1hNTrxvHVKxWjKfGDn0oAli3Wy1Uwb7TRO1+wEwoZUZNP1NXIEESybOBiFnBOhI6a4m6tCLE8dog==}
 
   zustand@5.0.0:
     resolution: {integrity: sha512-LE+VcmbartOPM+auOjCCLQOsQ05zUTp8RkgwRzefUk+2jISdMMFnxvyTjA4YNWr5ZGXYbVsEMZosttuxUBkojQ==}
@@ -5284,15 +5303,29 @@ snapshots:
 
   '@floating-ui/utils@0.2.9': {}
 
-  '@gearbox-protocol/permissionless@0.1.3(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)':
+  '@gearbox-protocol/integrations-v3@1.42.0-abi.4': {}
+
+  '@gearbox-protocol/permissionless@0.1.6(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)':
     dependencies:
-      '@gearbox-protocol/sdk': 8.16.0(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)
-      abitype: 1.0.8(typescript@5.7.3)(zod@3.24.2)
+      '@gearbox-protocol/sdk': 8.25.3(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)
+      '@gearbox-protocol/sdk-adapters': 1.2.2(@gearbox-protocol/sdk@8.25.3(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)
+      abitype: 1.0.9(typescript@5.7.3)(zod@3.24.2)
       viem: 2.30.5(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)
     transitivePeerDependencies:
       - axios
       - bufferutil
       - debug
+      - typescript
+      - utf-8-validate
+      - zod
+
+  '@gearbox-protocol/sdk-adapters@1.2.2(@gearbox-protocol/sdk@8.25.3(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)':
+    dependencies:
+      '@gearbox-protocol/integrations-v3': 1.42.0-abi.4
+      '@gearbox-protocol/sdk': 8.25.3(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)
+      viem: 2.30.5(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.2)
+    transitivePeerDependencies:
+      - bufferutil
       - typescript
       - utf-8-validate
       - zod
@@ -5314,19 +5347,19 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@gearbox-protocol/sdk@8.16.0(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)':
+  '@gearbox-protocol/sdk@8.25.3(axios@1.9.0)(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@redstone-finance/evm-connector': 0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@redstone-finance/protocol': 0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@types/bn.js': 5.2.0
-      abitype: 1.0.8(typescript@5.7.3)(zod@4.0.14)
+      abitype: 1.0.9(typescript@5.7.3)(zod@4.1.3)
       axios: 1.9.0
       bn.js: 5.2.2
       buffer: 6.0.3
       date-fns: 4.1.0
       decimal.js-light: 2.5.1
-      viem: 2.30.5(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@4.0.14)
-      zod: 4.0.14
+      viem: 2.30.5(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@4.1.3)
+      zod: 4.1.3
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -6834,10 +6867,20 @@ snapshots:
       typescript: 5.7.3
       zod: 3.25.36
 
-  abitype@1.0.8(typescript@5.7.3)(zod@4.0.14):
+  abitype@1.0.8(typescript@5.7.3)(zod@4.1.3):
     optionalDependencies:
       typescript: 5.7.3
-      zod: 4.0.14
+      zod: 4.1.3
+
+  abitype@1.0.9(typescript@5.7.3)(zod@3.24.2):
+    optionalDependencies:
+      typescript: 5.7.3
+      zod: 3.24.2
+
+  abitype@1.0.9(typescript@5.7.3)(zod@4.1.3):
+    optionalDependencies:
+      typescript: 5.7.3
+      zod: 4.1.3
 
   acorn-jsx@5.3.2(acorn@8.14.0):
     dependencies:
@@ -7607,7 +7650,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.24.1(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0)(eslint@8.57.1))(eslint@8.57.1):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.24.1(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3)(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -7629,7 +7672,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.24.1(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0)(eslint@8.57.1))(eslint@8.57.1)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.24.1(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3)(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -9117,7 +9160,7 @@ snapshots:
     transitivePeerDependencies:
       - zod
 
-  ox@0.7.1(typescript@5.7.3)(zod@4.0.14):
+  ox@0.7.1(typescript@5.7.3)(zod@4.1.3):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
       '@noble/ciphers': 1.3.0
@@ -9125,7 +9168,7 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.0.8(typescript@5.7.3)(zod@4.0.14)
+      abitype: 1.0.8(typescript@5.7.3)(zod@4.1.3)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 5.7.3
@@ -10270,15 +10313,15 @@ snapshots:
       - utf-8-validate
       - zod
 
-  viem@2.30.5(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@4.0.14):
+  viem@2.30.5(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@4.1.3):
     dependencies:
       '@noble/curves': 1.9.1
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.0.8(typescript@5.7.3)(zod@4.0.14)
+      abitype: 1.0.8(typescript@5.7.3)(zod@4.1.3)
       isows: 1.0.7(ws@8.18.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))
-      ox: 0.7.1(typescript@5.7.3)(zod@4.0.14)
+      ox: 0.7.1(typescript@5.7.3)(zod@4.1.3)
       ws: 8.18.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     optionalDependencies:
       typescript: 5.7.3
@@ -10461,7 +10504,7 @@ snapshots:
 
   zod@3.25.36: {}
 
-  zod@4.0.14: {}
+  zod@4.1.3: {}
 
   zustand@5.0.0(@types/react@18.3.18)(react@18.3.1)(use-sync-external-store@1.4.0(react@18.3.1)):
     optionalDependencies:
