@@ -107,6 +107,7 @@ export function useSendInstanceTx(
           : await getPriceUpdateTx({
               client: publicClient,
               priceFeeds,
+              useMulticall3: true,
             });
 
       try {
