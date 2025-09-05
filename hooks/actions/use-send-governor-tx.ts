@@ -19,18 +19,21 @@ import {
   useWalletClient,
 } from "wagmi";
 
-
-export function useSendTx(
+export function useSendGovernorTx(
   safeAddress: Address,
   governor: Address,
   tx: ParsedSignedTx
 ) {
   const { address } = useAccount();
-  const { threshold, refetch, isLoading: isLoadingThreshold } = useSafeParams(safeAddress);
+  const {
+    threshold,
+    refetch,
+    isLoading: isLoadingThreshold,
+  } = useSafeParams(safeAddress);
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
   const publicClient = usePublicClient();
-  
+
   // Use the Safe signature hook
   const {
     processedSignature: cachedSignature,
@@ -44,16 +47,26 @@ export function useSendTx(
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async () => {
-      if (!walletClient || !publicClient || !address || !safeAddress || threshold === undefined) return;
+      if (
+        !walletClient ||
+        !publicClient ||
+        !address ||
+        !safeAddress ||
+        threshold === undefined
+      )
+        return;
 
       await switchChainAsync({
         chainId: defaultChainId,
       });
 
       let processedSignature: string | null = null;
-      
+
       // Check if current user needs to sign and handle signature caching
-      if (!tx.signedBy.includes(walletClient.account.address) && tx.signedBy.length < threshold) {
+      if (
+        !tx.signedBy.includes(walletClient.account.address) &&
+        tx.signedBy.length < threshold
+      ) {
         try {
           // Use cached signature if available, otherwise sign new
           if (isAlreadySigned && cachedSignature) {
@@ -71,15 +84,18 @@ export function useSendTx(
         }
       }
 
-      const signatures = tx.signedBy
-        .slice(0, processedSignature != null ? threshold - 1 : threshold)
-        .sort((a, b) => a.localeCompare(b))
-        .map(
-          (signer) =>
-            "000000000000000000000000" + signer.slice(2) + "0".repeat(64) + "01"
-        )
-        .join("")
-        + (processedSignature?.slice(2) || "");
+      const signatures =
+        tx.signedBy
+          .slice(0, processedSignature != null ? threshold - 1 : threshold)
+          .sort((a, b) => a.localeCompare(b))
+          .map(
+            (signer) =>
+              "000000000000000000000000" +
+              signer.slice(2) +
+              "0".repeat(64) +
+              "01"
+          )
+          .join("") + (processedSignature?.slice(2) || "");
 
       console.log("signatures", signatures.length);
       console.log("processedSignature", processedSignature?.length);
@@ -129,19 +145,24 @@ export function useSendTx(
           toast.error("Multicall3 address not found for chain");
           return;
         }
-        const multicall3Calls = updateTx ? [updateTx, safeExecCall] : [safeExecCall];
-        const multicall3Params = getMulticall3Params(multicall3.address, multicall3Calls);
+        const multicall3Calls = updateTx
+          ? [updateTx, safeExecCall]
+          : [safeExecCall];
+        const multicall3Params = getMulticall3Params(
+          multicall3.address,
+          multicall3Calls
+        );
 
         await publicClient.simulateContract({
-          ...multicall3Params
-        })
+          ...multicall3Params,
+        });
 
         const gas = await publicClient.estimateContractGas({
-          ...multicall3Params
+          ...multicall3Params,
         });
 
         console.log("Estimated gas", gas);
-        const adjustedGas = gas < 28000000n ? gas * 11n / 10n : gas;
+        const adjustedGas = gas < 28000000n ? (gas * 11n) / 10n : gas;
         console.log("Adjusted gas", adjustedGas);
 
         try {

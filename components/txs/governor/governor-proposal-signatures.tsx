@@ -23,7 +23,7 @@ function Identicon({ address, size = 32 }: { address: string; size?: number }) {
   );
 }
 
-export function ProposalSignatures({
+export function GovernorProposalSignatures({
   safeAddress,
   signers,
   status,

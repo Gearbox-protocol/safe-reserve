@@ -8,25 +8,31 @@ import { Copy } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useAccount, useSwitchChain } from "wagmi";
-import { TransactionCard } from "./tx-card";
+import { GovernorTransactionCard } from "./governor/governor-tx-card";
+import { InstanceTransactionCard } from "./instance/instance-tx-card";
 
 export type TabType = "queue" | "execute" | "history";
 
 export function ViewTxList({ cid }: { cid: string }) {
+  const currentTransactions = useCurrentTransactions(cid);
+
   const {
+    type,
     txs,
     safe,
-    governor,
     isLoading: isLoadingTxs,
     error: errorTxs,
-  } = useCurrentTransactions(cid);
+  } = currentTransactions;
+
   const {
     chainId,
     marketConfigurator,
+    instanceManager,
     author,
     isLoading: isLoadingInfo,
     error: errorInfo,
   } = useIpfsData(cid);
+
   const { threshold } = useSafeParams(safe);
 
   const { switchChain } = useSwitchChain();
@@ -82,23 +88,44 @@ export function ViewTxList({ cid }: { cid: string }) {
                       {chain?.name ?? chainId}
                     </code>
                   </div>
-                  <div className="flex w-full items-center gap-2">
-                    <span className="min-w-[180px] text-gray-300">
-                      Market configurator:
-                    </span>
-                    <code className="flex items-center gap-2 text-gray-100">
-                      {shortenHash(marketConfigurator!)}
-                      <button
-                        className="text-gray-400 hover:text-white"
-                        onClick={() => {
-                          navigator.clipboard.writeText(marketConfigurator!);
-                          toast.success("Address copied to clipboard");
-                        }}
-                      >
-                        <Copy className="h-3.5 w-3.5" />
-                      </button>
-                    </code>
-                  </div>
+                  {marketConfigurator && (
+                    <div className="flex w-full items-center gap-2">
+                      <span className="min-w-[180px] text-gray-300">
+                        Market configurator:
+                      </span>
+                      <code className="flex items-center gap-2 text-gray-100">
+                        {shortenHash(marketConfigurator)}
+                        <button
+                          className="text-gray-400 hover:text-white"
+                          onClick={() => {
+                            navigator.clipboard.writeText(marketConfigurator);
+                            toast.success("Address copied to clipboard");
+                          }}
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </button>
+                      </code>
+                    </div>
+                  )}
+                  {instanceManager && (
+                    <div className="flex w-full items-center gap-2">
+                      <span className="min-w-[180px] text-gray-300">
+                        Instance manager:
+                      </span>
+                      <code className="flex items-center gap-2 text-gray-100">
+                        {shortenHash(instanceManager)}
+                        <button
+                          className="text-gray-400 hover:text-white"
+                          onClick={() => {
+                            navigator.clipboard.writeText(instanceManager);
+                            toast.success("Address copied to clipboard");
+                          }}
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </button>
+                      </code>
+                    </div>
+                  )}
                   <div className="flex w-full items-center gap-2">
                     <span className="min-w-[180px] text-gray-300">Safe:</span>
                     <code className="flex items-center gap-2 text-gray-100">
@@ -131,19 +158,35 @@ export function ViewTxList({ cid }: { cid: string }) {
                   </div>
                 </div>
               </Card>
-              <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
-                {txs.map((tx, index) => (
-                  <TransactionCard
-                    key={tx.hash}
-                    cid={cid}
-                    tx={tx}
-                    safeAddress={safe!}
-                    governor={governor!}
-                    threshold={threshold || 0}
-                    index={index}
-                  />
-                ))}
-              </div>
+              {type === "timelock" ? (
+                <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
+                  {txs.map((tx, index) => (
+                    <GovernorTransactionCard
+                      key={tx.hash}
+                      cid={cid}
+                      tx={tx}
+                      safeAddress={safe!}
+                      governor={currentTransactions.governor!}
+                      threshold={threshold || 0}
+                      index={index}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
+                  {txs.map((tx, index) => (
+                    <InstanceTransactionCard
+                      key={tx.hash}
+                      cid={cid}
+                      tx={tx}
+                      safeAddress={safe!}
+                      instanceManager={currentTransactions.instanceManager!}
+                      threshold={threshold || 0}
+                      index={index}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

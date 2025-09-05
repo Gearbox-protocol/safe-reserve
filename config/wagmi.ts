@@ -7,10 +7,10 @@ import {
   base,
   bsc,
   etherlink,
+  hemi,
+  lisk,
   mainnet,
   worldchain,
-  hemi,
-  lisk
 } from "wagmi/chains";
 // import { safe, walletConnect } from "wagmi/connectors";
 
@@ -23,7 +23,10 @@ function drpcUrl(chainName: string) {
 }
 
 export const getChainTransport = (chain: Chain): Transport => {
-  const primaryRpcUrl = chain.rpcUrls.default.http[0];
+  const primaryRpcUrl =
+    process.env.NEXT_PUBLIC_MAINNET_NODE_URI ??
+    process.env.NEXT_PUBLIC_RPC_URL ??
+    `https://anvil.gearbox.foundation/rpc/TestMarket`;
 
   // Etherlink
   if (chain.id === 42793) {
@@ -54,9 +57,7 @@ export const getChainTransport = (chain: Chain): Transport => {
   }
 
   if (chain.id === mainnet.id) {
-    return http(
-    process.env.NEXT_PUBLIC_RPC_URL || drpcUrl("ethereum"),
-    {
+    return http(process.env.NEXT_PUBLIC_RPC_URL || drpcUrl("ethereum"), {
       retryCount: 3,
       retryDelay: 1000,
       timeout: 10000,
@@ -65,7 +66,8 @@ export const getChainTransport = (chain: Chain): Transport => {
 
   if (chain.id === lisk.id) {
     return new ArchiveTransport({
-      primaryRpcUrl: drpcUrl("lisk"),
+      primaryRpcUrl:
+        "https://lb.drpc.org/lisk/ArgL9xL92k_VqiTUtSp0KHGND7jiYtUR8Ku4EklbR4ac", // tmp solution
       archiveRpcUrl: "https://lisk.rpc.hypersync.xyz",
       blockThreshold: 200,
       enableLogging: true,
@@ -94,7 +96,7 @@ const chains = [
   worldchain,
   etherlink,
   hemi,
-  lisk
+  lisk,
 ] as const;
 
 export const config = createConfig(

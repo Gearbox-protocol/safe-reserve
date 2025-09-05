@@ -1,29 +1,38 @@
 "use client";
 
-import { timelockTxsSchema } from "@/utils/validation";
+import { instanceTxsSchema, timelockTxsSchema } from "@/utils/validation";
 import { SafeTx } from "@gearbox-protocol/permissionless";
 import { useQuery } from "@tanstack/react-query";
-import { Address, Hex } from "viem";
+import { Address } from "viem";
 import { usePublicClient } from "wagmi";
 
-export interface TimelockTxs {
+interface IpfsTxs {
   chainId: number;
-  eta: number;
   author: Address;
+}
+
+export interface TimelockTxs extends IpfsTxs {
+  type: "timelock";
+
+  eta: number;
   marketConfigurator: Address;
   createdAtBlock: number;
   queueBatches: SafeTx[][];
 }
 
-export interface SignedTimelockTxs extends TimelockTxs {
-  signature: Hex;
+export interface InstanceTxs extends IpfsTxs {
+  type: "instance";
+
+  instanceManager: Address;
+  batches: SafeTx[][];
 }
 
 async function fetchFromIPFS(cid: string): Promise<unknown> {
   // Build gateway URLs with proper path construction
   const gateways = [
-    process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL ? 
-      `${process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL.replace(/\/$/, '')}/ipfs/${cid}` : null,
+    process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL
+      ? `${process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL.replace(/\/$/, "")}/ipfs/${cid}`
+      : null,
     `https://ipfs.io/ipfs/${cid}`,
     `https://gateway.pinata.cloud/ipfs/${cid}`,
     `https://${cid}.ipfs.dweb.link`,
@@ -40,19 +49,21 @@ async function fetchFromIPFS(cid: string): Promise<unknown> {
       const response = await fetch(gateway, {
         signal: controller.signal,
         headers: {
-          'Accept': 'application/json, text/plain, */*',
+          Accept: "application/json, text/plain, */*",
         },
       });
-      
+
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch from ${gateway}: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch from ${gateway}: ${response.status} ${response.statusText}`
+        );
       }
 
       // Check if response is JSON
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
         const data = await response.json();
         return data;
       } else {
@@ -75,13 +86,17 @@ async function fetchFromIPFS(cid: string): Promise<unknown> {
 }
 
 export function useIpfsData(cid: string): {
+  type?: "timelock" | "instance";
   chainId?: number;
+  author?: Address;
+
   eta?: number;
   marketConfigurator?: Address;
-  author?: Address;
   createdAtBlock?: number;
-  queueBatches?: SafeTx[][];
-  signature?: string;
+  batches?: SafeTx[][];
+
+  instanceManager?: Address;
+
   isLoading: boolean;
   error: Error | null;
 } {
@@ -99,22 +114,38 @@ export function useIpfsData(cid: string): {
       }
 
       const data = await fetchFromIPFS(cid);
-      const validatedData = timelockTxsSchema.parse(data);
-      return validatedData as SignedTimelockTxs;
+      try {
+        const validatedData = timelockTxsSchema.parse(data);
+        return { type: "timelock", ...validatedData } as TimelockTxs;
+      } catch {
+        const validatedData = instanceTxsSchema.parse(data);
+        return { type: "instance", ...validatedData } as InstanceTxs;
+      }
     },
     enabled: !!cid && !!publicClient,
     retry: 3,
   });
 
-  return {
-    chainId: ipfsData?.chainId,
-    eta: ipfsData?.eta,
-    marketConfigurator: ipfsData?.marketConfigurator,
-    author: ipfsData?.author,
-    createdAtBlock: ipfsData?.createdAtBlock,
-    queueBatches: ipfsData?.queueBatches,
-    signature: ipfsData?.signature,
-    isLoading,
-    error,
-  };
+  if (ipfsData?.type === "timelock")
+    return {
+      type: ipfsData?.type,
+      chainId: ipfsData?.chainId,
+      author: ipfsData?.author,
+      eta: ipfsData?.eta,
+      marketConfigurator: ipfsData?.marketConfigurator,
+      createdAtBlock: ipfsData?.createdAtBlock,
+      batches: ipfsData?.queueBatches,
+      isLoading,
+      error,
+    };
+  else
+    return {
+      type: ipfsData?.type,
+      chainId: ipfsData?.chainId,
+      author: ipfsData?.author,
+      instanceManager: ipfsData?.instanceManager,
+      batches: ipfsData?.batches,
+      isLoading,
+      error,
+    };
 }

@@ -1,16 +1,16 @@
 import { Card } from "@/components/ui/card";
 import { ParsedSignedTx } from "@/core/safe-tx";
+import { useGetGovernorUpdatableFeeds } from "@/hooks";
 import { MULTISEND_ADDRESS } from "@/utils/constant";
 import { shortenHash } from "@/utils/format";
+import { TimelockTxStatus } from "@/utils/tx-status";
 import { ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Address } from "viem";
-import { useGetUpdatableFeeds } from "../../hooks/transactions/use-get-updatable-feeds";
-import { TimelockTxStatus } from "../../utils/tx-status";
-import { ProposalCall } from "./proposal-call";
-import { ProposalSignatures } from "./proposal-signatures";
-import { ButtonTx } from "./tx-button";
+import { GovernorProposalCall } from "./governor-proposal-call";
+import { GovernorProposalSignatures } from "./governor-proposal-signatures";
+import { GovernorButtonTx } from "./governor-tx-button";
 
 interface TransactionCardProps {
   cid: string;
@@ -21,7 +21,7 @@ interface TransactionCardProps {
   index: number;
 }
 
-export function TransactionCard({
+export function GovernorTransactionCard({
   cid,
   tx,
   safeAddress,
@@ -30,7 +30,7 @@ export function TransactionCard({
   index,
 }: TransactionCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { data: updatableFeeds, isLoading } = useGetUpdatableFeeds({
+  const { data: updatableFeeds, isLoading } = useGetGovernorUpdatableFeeds({
     cid,
     index,
     governor,
@@ -74,7 +74,7 @@ export function TransactionCard({
             {tx.signedBy.length} / {Number(threshold)}
           </span>
 
-          <ButtonTx
+          <GovernorButtonTx
             tx={tx}
             safeAddress={safeAddress}
             cid={cid}
@@ -118,7 +118,7 @@ export function TransactionCard({
               <div className="mt-6 space-y-2">
                 <div className="mb-4 text-gray-200">Calls:</div>
                 {tx.calls.map((call, index) => (
-                  <ProposalCall
+                  <GovernorProposalCall
                     governor={governor}
                     key={`call-${index}`}
                     index={index + 1}
@@ -169,7 +169,7 @@ export function TransactionCard({
             </div>
 
             <div className="border-l border-gray-800 pl-8">
-              <ProposalSignatures
+              <GovernorProposalSignatures
                 signers={tx.signedBy || []}
                 safeAddress={safeAddress}
                 status={tx.status}

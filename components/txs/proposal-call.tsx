@@ -1,15 +1,13 @@
 import { Call } from "@/core/safe-tx";
-import { useDecodeGovernorCall } from "@/hooks";
-import { deepJsonParse } from "@gearbox-protocol/permissionless";
+import { deepJsonParse, ParsedCall } from "@gearbox-protocol/permissionless";
 import { json_stringify } from "@gearbox-protocol/sdk";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
-import { Address } from "viem";
 
 interface ProposalCallProps {
-  governor: Address;
   index: number;
   call: Call;
+  parsedCall: ParsedCall;
 }
 
 function tryPrettyPrint(value: unknown): React.ReactNode {
@@ -21,13 +19,33 @@ function tryPrettyPrint(value: unknown): React.ReactNode {
         {json_stringify(parsed)}
       </pre>
     );
+  } else if (
+    typeof value === "string" &&
+    typeof parsed === "string" &&
+    parsed !== null
+  ) {
+    // parse string "fname(Object)"
+    const match = value.match(/^(\w+)\((\{[\s\S]*\})\)$/);
+    if (match) {
+      const [, fnName, jsonStr] = match;
+      try {
+        console.log(jsonStr);
+
+        return (
+          <div className="">
+            <div>{`${fnName}(`}</div>
+            <div className="pl-4">{tryPrettyPrint(jsonStr)}</div>
+            <div>{")"}</div>
+          </div>
+        );
+      } catch {}
+    }
   }
   return String(parsed);
 }
 
-export function ProposalCall({ governor, index, call }: ProposalCallProps) {
+export function ProposalCall({ parsedCall, call, index }: ProposalCallProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const parsedCall = useDecodeGovernorCall(governor, call);
 
   const isDecoded = !parsedCall.functionName.startsWith("Unknown function");
   const isExpandable = !isDecoded || Object.keys(parsedCall.args).length > 0;
