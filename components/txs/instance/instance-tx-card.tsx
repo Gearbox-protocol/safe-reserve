@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { SignedTx } from "@/core/safe-tx";
-import { useGetInstanceUpdatableFeeds } from "@/hooks";
+import { useGetInstanceUpdatableFeeds, useSDK } from "@/hooks";
 import { MULTISEND_ADDRESS } from "@/utils/constant";
 import { shortenHash } from "@/utils/format";
 import { ChevronDown, ChevronUp, Copy } from "lucide-react";
@@ -28,6 +28,8 @@ export function InstanceTransactionCard({
   threshold,
   index,
 }: TransactionCardProps) {
+  useSDK();
+
   const [isExpanded, setIsExpanded] = useState(false);
   const { data: updatableFeeds, isLoading } = useGetInstanceUpdatableFeeds({
     cid,
