@@ -118,7 +118,7 @@ export function InstanceProposalSignatures({
             >
               {false && <Check className="h-3 w-3 text-black" />}
             </div>
-            <span className="ml-10 text-white">Executet</span>
+            <span className="ml-10 text-white">Executed</span>
           </div>
         )}
       </div>
