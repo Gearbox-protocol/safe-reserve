@@ -1,6 +1,15 @@
 "use client";
 
+import { Button } from "@/components/ui//button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ConnectKitButton } from "connectkit";
+import { Ellipsis } from "lucide-react";
 import Image from "next/image";
 import { useAccount } from "wagmi";
 
@@ -20,19 +29,34 @@ export default function Header() {
           />
           <span className="font-bold italic">Permissionless Safe</span>
         </div>
-
         <div className="flex items-center gap-4">
           {/* Network Display */}
           {isConnected && chain && (
             <div className="flex items-center gap-2 px-3 py-2 bg-gray-800 rounded-lg border border-gray-700">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm text-gray-300">
-                {chain.name}
-              </span>
+              <span className="text-sm text-gray-300">{chain.name}</span>
             </div>
           )}
-          
+
           <ConnectKitButton />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Button variant="outline" className="h-10 w-10">
+                <Ellipsis className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuContent>
+                <a href="/">
+                  <DropdownMenuItem>Execute transactions</DropdownMenuItem>
+                </a>
+                {/* <a href="/emergency">
+                  <DropdownMenuItem>Emergency Admin</DropdownMenuItem>
+                </a> */}
+              </DropdownMenuContent>
+            </DropdownMenuPortal>
+          </DropdownMenu>
         </div>
       </div>
     </header>

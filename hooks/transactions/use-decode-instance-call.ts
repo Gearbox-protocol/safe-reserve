@@ -5,9 +5,10 @@ import {
   ParsedCall,
 } from "@gearbox-protocol/permissionless";
 import { simulateWithPriceUpdates } from "@gearbox-protocol/sdk";
+import { iVersionAbi } from "@gearbox-protocol/sdk/abi";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { Address, erc20Abi, isAddress, PublicClient } from "viem";
+import { Address, erc20Abi, hexToString, isAddress, PublicClient } from "viem";
 import { usePublicClient } from "wagmi";
 import { useSDK } from "../use-sdk";
 
@@ -96,7 +97,7 @@ export function useGetInstanceCallMeta(parsedCall: ParsedCall) {
       const updateTxs =
         await sdk.priceFeeds.generateExternalPriceFeedsUpdateTxs([priceFeed]);
 
-      return await simulateWithPriceUpdates(publicClient, {
+      const price = await simulateWithPriceUpdates(publicClient, {
         priceUpdates: updateTxs.txs,
         contracts: [
           {
@@ -121,6 +122,16 @@ export function useGetInstanceCallMeta(parsedCall: ParsedCall) {
           },
         ],
       });
+
+      const type = await publicClient.readContract({
+        address: priceFeed,
+        abi: iVersionAbi,
+        functionName: "contractType",
+      });
+
+      const splittedType = hexToString(type, { size: 32 }).split("::");
+
+      return { price, type: splittedType[splittedType.length - 1] };
     },
     enabled: !!publicClient && (!priceFeed || !!sdk),
     retry: 3,
@@ -132,7 +143,9 @@ export function useGetInstanceCallMeta(parsedCall: ParsedCall) {
     priceFeed,
     symbol: !!token && !!symbol ? symbol : undefined,
     latestRoundData:
-      !!priceFeed && !!latestRoundData ? latestRoundData[0] : undefined,
+      !!priceFeed && !!latestRoundData ? latestRoundData.price[0] : undefined,
+    priceFeedType:
+      !!priceFeed && !!latestRoundData ? latestRoundData.type : undefined,
     isLoading:
       (!!token && isLoadingSymbol) ||
       (!!priceFeed && isLoadingLatestRoundData) ||

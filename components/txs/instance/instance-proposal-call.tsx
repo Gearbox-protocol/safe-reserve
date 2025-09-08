@@ -14,7 +14,7 @@ interface ProposalCallProps {
 
 const convertToUsd = (value?: bigint) =>
   value !== undefined
-    ? `${Number(formatUnits(value, 8)).toFixed(2)}$`
+    ? `$${Number(formatUnits(value, 8)).toFixed(2)}`
     : undefined;
 
 export function InstanceProposalCall({
@@ -38,7 +38,7 @@ export function InstanceProposalCall({
           parsedWithMeta.token = `${parsedWithMeta.token} [${callMeta.symbol ?? "loading..."}]`;
         }
         if ("priceFeed" in parsedWithMeta && callMeta.priceFeed) {
-          parsedWithMeta.priceFeed = `${parsedWithMeta.priceFeed} [${convertToUsd(callMeta.latestRoundData?.[1]) ?? "loading..."}]`;
+          parsedWithMeta.priceFeed = `${parsedWithMeta.priceFeed} [${callMeta.priceFeedType ?? "unknown"} feed with ${convertToUsd(callMeta.latestRoundData?.[1]) ?? "loading..."} price]`;
         }
 
         return (
@@ -112,7 +112,7 @@ export function InstanceProposalCall({
             </div>
           ) : (
             <span className="text-gray-300">
-              {`[${callMeta.fnName}${callMeta.symbol ? ` for ${callMeta.symbol}` : ""}${callMeta.latestRoundData ? ` with ${convertToUsd(callMeta.latestRoundData[1])} price` : ""}]`}
+              {`[${callMeta.fnName}${callMeta.priceFeedType ? ` ${callMeta.priceFeedType}` : ""}${callMeta.symbol ? ` for ${callMeta.symbol}` : ""}${callMeta.latestRoundData ? ` with ${convertToUsd(callMeta.latestRoundData[1])} price` : ""}]`}
             </span>
           ))}
 
