@@ -15,8 +15,8 @@ export default function ViewMain() {
   const router = useRouter();
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <Card className="w-full max-w-md bg-[rgb(30,30,30)] border-[rgb(60,60,60)] -mt-20">
+    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center">
+      <Card className="w-full max-w-md bg-[rgb(30,30,30)] border-[rgb(60,60,60)]">
         <CardHeader>
           <h1 className="text-center text-2xl font-bold text-white">
             Enter IPFS CID with transactions

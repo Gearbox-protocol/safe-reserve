@@ -58,82 +58,46 @@ export function ViewTxList({ cid }: { cid: string }) {
       // TODO: add cancel button
       // actionButton={}
     >
-      <Card className="bg-black border-0 overflow-y-auto">
-        <div className="space-y-6 overflow-y-auto">
-          {isLoadingTxs || isLoadingInfo ? (
-            // Skeleton loading state
+      <div className="space-y-6 overflow-y-auto">
+        {isLoadingTxs || isLoadingInfo ? (
+          // Skeleton loading state
 
-            <div className="divide-y divide-gray-800 space-y-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="p-4 animate-pulse">
-                  <div className="h-6 w-1/3 bg-gray-800 rounded mb-4" />
-                  <div className="h-4 w-1/2 bg-gray-800 rounded mb-2" />
-                  <div className="h-4 w-1/4 bg-gray-800 rounded" />
+          <div className="divide-y divide-gray-800 space-y-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="p-4 animate-pulse">
+                <div className="h-6 w-1/3 bg-gray-800 rounded mb-4" />
+                <div className="h-4 w-1/2 bg-gray-800 rounded mb-2" />
+                <div className="h-4 w-1/4 bg-gray-800 rounded" />
+              </div>
+            ))}
+          </div>
+        ) : txs.length === 0 ? (
+          <div className="p-4">
+            <text className="font-semibold text-white">
+              Invalid cid: transactions not found
+            </text>
+          </div>
+        ) : (
+          <div className="space-y-6 min-w-[620px]">
+            <Card className="p-4">
+              <div className="space-y-2">
+                <div className="flex w-full items-center gap-2">
+                  <span className="min-w-[180px] text-gray-300">Chain:</span>
+                  <code className="flex items-center gap-2 text-gray-100">
+                    {chain?.name ?? chainId}
+                  </code>
                 </div>
-              ))}
-            </div>
-          ) : txs.length === 0 ? (
-            <div className="p-4">
-              <text className="font-semibold text-white">
-                Invalid cid: transactions not found
-              </text>
-            </div>
-          ) : (
-            <div className="space-y-6 min-w-[620px]">
-              <Card className="p-4">
-                <div className="space-y-2">
+                {marketConfigurator && (
                   <div className="flex w-full items-center gap-2">
-                    <span className="min-w-[180px] text-gray-300">Chain:</span>
+                    <span className="min-w-[180px] text-gray-300">
+                      Market configurator:
+                    </span>
                     <code className="flex items-center gap-2 text-gray-100">
-                      {chain?.name ?? chainId}
-                    </code>
-                  </div>
-                  {marketConfigurator && (
-                    <div className="flex w-full items-center gap-2">
-                      <span className="min-w-[180px] text-gray-300">
-                        Market configurator:
-                      </span>
-                      <code className="flex items-center gap-2 text-gray-100">
-                        {shortenHash(marketConfigurator)}
-                        <button
-                          className="text-gray-400 hover:text-white"
-                          onClick={() => {
-                            navigator.clipboard.writeText(marketConfigurator);
-                            toast.success("Address copied to clipboard");
-                          }}
-                        >
-                          <Copy className="h-3.5 w-3.5" />
-                        </button>
-                      </code>
-                    </div>
-                  )}
-                  {instanceManager && (
-                    <div className="flex w-full items-center gap-2">
-                      <span className="min-w-[180px] text-gray-300">
-                        Instance manager:
-                      </span>
-                      <code className="flex items-center gap-2 text-gray-100">
-                        {shortenHash(instanceManager)}
-                        <button
-                          className="text-gray-400 hover:text-white"
-                          onClick={() => {
-                            navigator.clipboard.writeText(instanceManager);
-                            toast.success("Address copied to clipboard");
-                          }}
-                        >
-                          <Copy className="h-3.5 w-3.5" />
-                        </button>
-                      </code>
-                    </div>
-                  )}
-                  <div className="flex w-full items-center gap-2">
-                    <span className="min-w-[180px] text-gray-300">Safe:</span>
-                    <code className="flex items-center gap-2 text-gray-100">
-                      {shortenHash(safe!)}
+                      {shortenHash(marketConfigurator)}
                       <button
                         className="text-gray-400 hover:text-white"
                         onClick={() => {
-                          navigator.clipboard.writeText(safe!);
+                          navigator.clipboard.writeText(marketConfigurator);
                           toast.success("Address copied to clipboard");
                         }}
                       >
@@ -141,14 +105,18 @@ export function ViewTxList({ cid }: { cid: string }) {
                       </button>
                     </code>
                   </div>
+                )}
+                {instanceManager && (
                   <div className="flex w-full items-center gap-2">
-                    <span className="min-w-[180px] text-gray-300">Author:</span>
+                    <span className="min-w-[180px] text-gray-300">
+                      Instance manager:
+                    </span>
                     <code className="flex items-center gap-2 text-gray-100">
-                      {shortenHash(author!)}
+                      {shortenHash(instanceManager)}
                       <button
                         className="text-gray-400 hover:text-white"
                         onClick={() => {
-                          navigator.clipboard.writeText(author!);
+                          navigator.clipboard.writeText(instanceManager);
                           toast.success("Address copied to clipboard");
                         }}
                       >
@@ -156,41 +124,71 @@ export function ViewTxList({ cid }: { cid: string }) {
                       </button>
                     </code>
                   </div>
+                )}
+                <div className="flex w-full items-center gap-2">
+                  <span className="min-w-[180px] text-gray-300">Safe:</span>
+                  <code className="flex items-center gap-2 text-gray-100">
+                    {shortenHash(safe!)}
+                    <button
+                      className="text-gray-400 hover:text-white"
+                      onClick={() => {
+                        navigator.clipboard.writeText(safe!);
+                        toast.success("Address copied to clipboard");
+                      }}
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
+                  </code>
                 </div>
-              </Card>
-              {type === "timelock" ? (
-                <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
-                  {txs.map((tx, index) => (
-                    <GovernorTransactionCard
-                      key={tx.hash}
-                      cid={cid}
-                      tx={tx}
-                      safeAddress={safe!}
-                      governor={currentTransactions.governor!}
-                      threshold={threshold || 0}
-                      index={index}
-                    />
-                  ))}
+                <div className="flex w-full items-center gap-2">
+                  <span className="min-w-[180px] text-gray-300">Author:</span>
+                  <code className="flex items-center gap-2 text-gray-100">
+                    {shortenHash(author!)}
+                    <button
+                      className="text-gray-400 hover:text-white"
+                      onClick={() => {
+                        navigator.clipboard.writeText(author!);
+                        toast.success("Address copied to clipboard");
+                      }}
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
+                  </code>
                 </div>
-              ) : (
-                <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
-                  {txs.map((tx, index) => (
-                    <InstanceTransactionCard
-                      key={tx.hash}
-                      cid={cid}
-                      tx={tx}
-                      safeAddress={safe!}
-                      instanceManager={currentTransactions.instanceManager!}
-                      threshold={threshold || 0}
-                      index={index}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </Card>
+              </div>
+            </Card>
+            {type === "timelock" ? (
+              <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
+                {txs.map((tx, index) => (
+                  <GovernorTransactionCard
+                    key={tx.hash}
+                    cid={cid}
+                    tx={tx}
+                    safeAddress={safe!}
+                    governor={currentTransactions.governor!}
+                    threshold={threshold || 0}
+                    index={index}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
+                {txs.map((tx, index) => (
+                  <InstanceTransactionCard
+                    key={tx.hash}
+                    cid={cid}
+                    tx={tx}
+                    safeAddress={safe!}
+                    instanceManager={currentTransactions.instanceManager!}
+                    threshold={threshold || 0}
+                    index={index}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </PageLayout>
   );
 }

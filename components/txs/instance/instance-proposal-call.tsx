@@ -56,8 +56,6 @@ export function InstanceProposalCall({
         if (match) {
           const [, fnName, jsonStr] = match;
           try {
-            console.log(jsonStr);
-
             return (
               <div className="">
                 <div>{`${fnName}(`}</div>

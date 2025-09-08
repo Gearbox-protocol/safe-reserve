@@ -2,6 +2,8 @@ export * from "./actions/use-safe-signature";
 export * from "./actions/use-send-governor-tx";
 export * from "./actions/use-send-instance-tx";
 export * from "./actions/use-sign-tx";
+export * from "./emergency/use-get-market-configurator-info";
+export * from "./emergency/use-get-market-configurators";
 export * from "./safe/use-addresses";
 export * from "./safe/use-is-safe-app";
 export * from "./safe/use-safe-params";

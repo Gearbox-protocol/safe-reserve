@@ -14,6 +14,20 @@ import {
 } from "wagmi/chains";
 // import { safe, walletConnect } from "wagmi/connectors";
 
+export const chains = [
+  mainnet,
+  base,
+  avalanche,
+  // monadTestnet,
+  bsc,
+  worldchain,
+  etherlink,
+  hemi,
+  lisk,
+] as const;
+
+export const ADDRESS_PROVIDER = process.env.NEXT_PUBLIC_ADDRESS_PROVIDER;
+
 function drpcUrl(chainName: string) {
   const apiKey = process.env.NEXT_PUBLIC_DRPC_API_KEY;
   if (!apiKey) {
@@ -23,22 +37,16 @@ function drpcUrl(chainName: string) {
 }
 
 export const getChainTransport = (chain: Chain): Transport => {
-  const primaryRpcUrl =
-    process.env.NEXT_PUBLIC_MAINNET_NODE_URI ??
-    process.env.NEXT_PUBLIC_RPC_URL ??
-    `https://anvil.gearbox.foundation/rpc/TestMarket`;
-
-  // Etherlink
-  if (chain.id === 42793) {
+  if (chain.id === etherlink.id) {
     return new ArchiveTransport({
-      primaryRpcUrl,
+      primaryRpcUrl: "https://node.mainnet.etherlink.com",
       archiveRpcUrl: "https://explorer.etherlink.com/api/eth-rpc",
       blockThreshold: 999,
       enableLogging: true,
     }).getTransport();
   }
 
-  if (chain.id === 56) {
+  if (chain.id === bsc.id) {
     return new ArchiveTransport({
       primaryRpcUrl: drpcUrl("bsc"),
       archiveRpcUrl: "https://bsc.rpc.hypersync.xyz",
@@ -66,8 +74,7 @@ export const getChainTransport = (chain: Chain): Transport => {
 
   if (chain.id === lisk.id) {
     return new ArchiveTransport({
-      primaryRpcUrl:
-        "https://lb.drpc.org/lisk/ArgL9xL92k_VqiTUtSp0KHGND7jiYtUR8Ku4EklbR4ac", // tmp solution
+      primaryRpcUrl: drpcUrl("lisk"),
       archiveRpcUrl: "https://lisk.rpc.hypersync.xyz",
       blockThreshold: 200,
       enableLogging: true,
@@ -79,25 +86,13 @@ export const getChainTransport = (chain: Chain): Transport => {
   //   return custom(window.ethereum);
   // }
 
-  // Default fallback
-  return http(primaryRpcUrl, {
+  // Prefer chain-specific default RPC if available to avoid cross-network leakage
+  return http(chain.rpcUrls?.default?.http?.[0], {
     retryCount: 3,
     retryDelay: 1000,
     timeout: 10000,
   });
 };
-
-const chains = [
-  mainnet,
-  base,
-  avalanche,
-  // monadTestnet,
-  bsc,
-  worldchain,
-  etherlink,
-  hemi,
-  lisk,
-] as const;
 
 export const config = createConfig(
   getDefaultConfig({
