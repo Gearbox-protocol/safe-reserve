@@ -1,6 +1,6 @@
-import { createPublicClient, http } from "viem";
-import { safeStorageAbi } from "@/bindings/generated";
+import { safeStorageAbi } from "@/abi";
 import { SAFE_STORAGE_ADDRESS } from "@/utils/constant";
+import { createPublicClient, http } from "viem";
 
 async function main() {
   // Create public client

@@ -1,17 +1,18 @@
 "use client";
 
+import { MarketConfiguratorList } from "@/components/emergency/market-configurator-list";
+import { MarketConfiguratorView } from "@/components/emergency/market-configurator-view";
+import { chains } from "@/config/wagmi";
 import { Suspense, useEffect, useState } from "react";
 import { Address, isAddress } from "viem";
-import { MarketConfiguratorList } from "../../components/emergency/market-configurator-list";
-import { MarketConfiguratorView } from "../../components/emergency/market-configurator-view";
-import { chains } from "../../config/wagmi";
 
 function EmergencyContent() {
   const [chainId, setChainId] = useState<number>();
   const [addr, setAddr] = useState<Address>();
 
+  const [isLoadedParams, setIsLoadedParams] = useState<boolean>(false);
+
   useEffect(() => {
-    // Read from URL after component mounts (client-side only)
     const params = new URLSearchParams(window.location.search);
 
     const chainId = params.get("chainId");
@@ -23,7 +24,11 @@ function EmergencyContent() {
     if (address && isAddress(address)) {
       setAddr(address);
     }
+
+    setIsLoadedParams(true);
   }, []);
+
+  if (!isLoadedParams) return <div>Loading...</div>;
 
   if (!addr || !chainId) {
     return (

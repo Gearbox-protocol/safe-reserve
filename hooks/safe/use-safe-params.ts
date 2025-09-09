@@ -1,4 +1,4 @@
-import { safeAbi } from "@/bindings/generated";
+import { safeAbi } from "@/abi";
 import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 import { usePublicClient } from "wagmi";
