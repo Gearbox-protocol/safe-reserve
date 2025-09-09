@@ -56,9 +56,9 @@ export function useSendGovernorTx(
       )
         return;
 
-      await switchChainAsync({
-        chainId: defaultChainId,
-      });
+      // await switchChainAsync({
+      //   chainId: defaultChainId,
+      // });
 
       let processedSignature: string | null = null;
 

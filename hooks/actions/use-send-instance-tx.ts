@@ -57,9 +57,9 @@ export function useSendInstanceTx(
       )
         return;
 
-      await switchChainAsync({
-        chainId: defaultChainId,
-      });
+      // await switchChainAsync({
+      //   chainId: defaultChainId,
+      // });
 
       let processedSignature: string | null = null;
 

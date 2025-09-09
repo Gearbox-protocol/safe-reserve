@@ -10,6 +10,7 @@ import { Address } from "viem";
 import { InstanceProposalCall } from "./instance-proposal-call";
 import { InstanceProposalSignatures } from "./instance-proposal-signatures";
 import { InstanceButtonTx } from "./instance-tx-button";
+import { SimulateTxButton } from "../simulate-tx-button";
 
 interface TransactionCardProps {
   cid: string;
@@ -65,6 +66,12 @@ export function InstanceTransactionCard({
           <span className="text-gray-400">
             {tx.signedBy.length} / {Number(threshold)}
           </span>
+
+          <SimulateTxButton
+            tx={tx}
+            safeAddress={safeAddress}
+            instanceManager={instanceManager}
+          />
 
           <InstanceButtonTx
             tx={tx}

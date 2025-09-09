@@ -27,9 +27,9 @@ export function useSignTx(
     mutationFn: async (args: { txHash: Hex }) => {
       if (!walletClient || !publicClient || !address || !safeAddress) return;
 
-      await switchChainAsync({
-        chainId: defaultChainId,
-      });
+      // await switchChainAsync({
+      //   chainId: defaultChainId,
+      // });
 
       try {
         const tx = await walletClient.writeContract({
