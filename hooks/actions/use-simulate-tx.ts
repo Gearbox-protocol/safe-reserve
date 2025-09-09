@@ -3,11 +3,12 @@ import { SignedTx } from "@/core/safe-tx";
 import { useMutation } from "@tanstack/react-query";
 import { Address, decodeAbiParameters, encodeFunctionData, Hex } from "viem";
 import { usePublicClient } from "wagmi";
-// import { traceCallServer } from "./viem-tracer";
 import { traceCall } from "@/utils/debug-trace";
 import { formatFullTrace } from "@/utils/fromat-trace";
-
-
+import { useDecodeInstanceCalls } from "@/hooks";
+import { getCallsTouchedPriceFeeds, getPriceUpdateTx } from "@gearbox-protocol/permissionless";
+import { getMulticall3Params } from "@/utils/multicall3";
+import { toast } from "sonner";
 
 const SIMULATE_TX_ACCESSOR = "0x3d4BA2E0884aa488718476ca2FB8Efc291A46199";
 
@@ -75,23 +76,14 @@ export function decodeSafeSimulation(revertData: Hex): DecodedSafeSimulation {
 
   // 1. Decode the outer `simulateAndRevert` structure manually.
   const delegateCallSuccess = BigInt("0x" + revertData.slice(2, 66)) === 1n;
-  const innerDataSize = BigInt("0x" + revertData.slice(66, 130));
+  // const innerDataSize = BigInt("0x" + revertData.slice(66, 130));
   const innerData = "0x" + revertData.slice(130) as `0x${string}`;
-
-  console.log("delegateCallSuccess", delegateCallSuccess);
-  console.log("innerDataSize", innerDataSize);
-  console.log("innerData", innerData);
 
   // 2. Decode the inner `SimulateTxAccessor.simulate` return data.
   const [estimate, success, returnData] = decodeAbiParameters(
     simulateResultAbi,
     innerData
   );
-  
-
-  console.log("estimate", estimate);
-  console.log("success", success);
-  console.log("returnData", returnData);
 
   return {
     delegateCallSuccess,
@@ -109,6 +101,10 @@ export function useSimulateTx(
   tx: SignedTx
 ) {
   const publicClient = usePublicClient();
+  const parsedCalls = useDecodeInstanceCalls(instanceManager, tx.calls);
+  const priceFeeds = getCallsTouchedPriceFeeds(
+    parsedCalls.filter(({ args }) => args.data.startsWith("addPriceFeed"))
+  );
 
   const mutation = useMutation({
     mutationKey: ["simulate-tx", safeAddress, instanceManager, tx.hash],
@@ -116,6 +112,20 @@ export function useSimulateTx(
       if (!publicClient || !safeAddress || !tx) {
         throw new Error("Missing required parameters for simulation");
       }
+
+      const multicall3 = publicClient.chain.contracts?.multicall3;
+      if (!multicall3) {
+        toast.error("Multicall3 address not found for chain");
+        return;
+      }
+
+      const updateTx =
+        priceFeeds.length === 0
+          ? undefined
+          : await getPriceUpdateTx({
+              client: publicClient,
+              priceFeeds,
+            });
 
       const callData = encodeFunctionData({
         abi: simulateTxAccessorAbi,
@@ -130,49 +140,57 @@ export function useSimulateTx(
         args: [SIMULATE_TX_ACCESSOR, callData],
       });
 
-      try {
-        // try {
-        //   const trace = await traceCall(publicClient, {
-        //     to: safeAddress,
-        //     data: simulateAndRevertData,
-        //   });
-        //   console.log("trace", await formatFullTrace(trace, { gas: true }));
-        // } catch (error) {
-        //   console.error("failed to trace", error);
-        // }
+      const safeSimulateCall = {
+        to: safeAddress,
+        callData: simulateAndRevertData,
+      } as const;
+  
+      const multicall3Calls = updateTx
+        ? [updateTx, safeSimulateCall]
+        : [safeSimulateCall];
 
-        const result = await publicClient.transport.request({
-          method: "eth_call",
-          params: [{
-            to: safeAddress,
-            data: simulateAndRevertData,
-            gas: 20_000_000n,
-          }],
+      const multicall3Params = getMulticall3Params(
+        multicall3.address,
+        multicall3Calls,
+        true
+      );
+      const multicall3Data = encodeFunctionData(multicall3Params);
+
+      try {
+        const { result } = await publicClient.simulateContract({
+          ...multicall3Params,
+          gas: 20_000_000n,
         });
 
-        // If we get here, something went wrong as simulateAndRevert should always revert
-        console.warn("simulateAndRevert did not revert as expected");
-        return { success: true, result };
+
+        const simulationResult = updateTx ? result[1] : result[0] as { success: boolean, returnData: Hex };
+        const decoded = decodeSafeSimulation(simulationResult.returnData);
+
+        if (!decoded.delegateCallSuccess) {
+          throw new Error("Simulation delegate call failed");
+        }
+
+        let fromatTrace: string | undefined = undefined;
+        if (!decoded.simulation.success) {
+          const trace = await traceCall(publicClient, {
+            to: multicall3.address,
+            data: multicall3Data,
+            gas: 20_000_000n,
+          });
+          fromatTrace = await formatFullTrace(trace, { gas: true });
+        }
+
+        // Return the simulation result - success indicates if the transaction would succeed
+        return { 
+          success: decoded.simulation.success, 
+          result: decoded.simulation.returnData,
+          gasEstimate: decoded.simulation.estimate,
+          fromatTrace,
+        };
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
-        if (err?.data) {
-          const errorData = err.data as Hex;
-          const decoded = decodeSafeSimulation(errorData);
-          
-          // If the simulation itself failed (delegateCall failed), throw an error
-          if (!decoded.delegateCallSuccess) {
-            throw new Error("Simulation delegate call failed");
-          }
-          
-          // Return the simulation result - success indicates if the transaction would succeed
-          return { 
-            success: decoded.simulation.success, 
-            result: decoded.simulation.returnData,
-            gasEstimate: decoded.simulation.estimate
-          };
-        } else {
-          throw err;
-        }
+        throw err;
       }
     },
     retry: 1,
