@@ -35,7 +35,7 @@ export function ViewTxList({ cid }: { cid: string }) {
 
   const { threshold } = useSafeParams(safe);
 
-  const { switchChain } = useSwitchChain();
+  const { switchChain, chains } = useSwitchChain();
   const { chain } = useAccount();
 
   useEffect(() => {
@@ -84,7 +84,11 @@ export function ViewTxList({ cid }: { cid: string }) {
                 <div className="flex w-full items-center gap-2">
                   <span className="min-w-[180px] text-gray-300">Chain:</span>
                   <code className="flex items-center gap-2 text-gray-100">
-                    {chain?.name ?? chainId}
+                    {chainId !== chain?.id
+                      ? chains.map(({ id }) => id).includes(chainId ?? 0)
+                        ? chainId
+                        : `Unknown chain (${chainId})`
+                      : (chain?.name ?? chainId)}
                   </code>
                 </div>
                 {marketConfigurator && (
@@ -157,35 +161,36 @@ export function ViewTxList({ cid }: { cid: string }) {
                 </div>
               </div>
             </Card>
-            {type === "timelock" ? (
-              <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
-                {txs.map((tx, index) => (
-                  <GovernorTransactionCard
-                    key={tx.hash}
-                    cid={cid}
-                    tx={tx}
-                    safeAddress={safe!}
-                    governor={currentTransactions.governor!}
-                    threshold={threshold || 0}
-                    index={index}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
-                {txs.map((tx, index) => (
-                  <InstanceTransactionCard
-                    key={tx.hash}
-                    cid={cid}
-                    tx={tx}
-                    safeAddress={safe!}
-                    instanceManager={currentTransactions.instanceManager!}
-                    threshold={threshold || 0}
-                    index={index}
-                  />
-                ))}
-              </div>
-            )}
+            {chainId === chain?.id &&
+              (type === "timelock" ? (
+                <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
+                  {txs.map((tx, index) => (
+                    <GovernorTransactionCard
+                      key={tx.hash}
+                      cid={cid}
+                      tx={tx}
+                      safeAddress={safe!}
+                      governor={currentTransactions.governor!}
+                      threshold={threshold || 0}
+                      index={index}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
+                  {txs.map((tx, index) => (
+                    <InstanceTransactionCard
+                      key={tx.hash}
+                      cid={cid}
+                      tx={tx}
+                      safeAddress={safe!}
+                      instanceManager={currentTransactions.instanceManager!}
+                      threshold={threshold || 0}
+                      index={index}
+                    />
+                  ))}
+                </div>
+              ))}
           </div>
         )}
       </div>
