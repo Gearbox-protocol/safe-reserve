@@ -4,8 +4,8 @@ import { SignedTx } from "@/core/safe-tx";
 import { useDecodeInstanceCalls, useSafeParams } from "@/hooks";
 import { useSafeSignature } from "@/hooks/actions/use-safe-signature";
 import { getMulticall3Params } from "@/utils/multicall3";
+import { getPriceFeedFromInstanceParsedCall } from "@/utils/parsed-call-utils";
 import {
-  getCallsTouchedPriceFeeds,
   getPriceUpdateTx,
 } from "@gearbox-protocol/permissionless";
 import { useMutation } from "@tanstack/react-query";
@@ -42,9 +42,9 @@ export function useSendInstanceTx(
   } = useSafeSignature(tx.hash);
 
   const parsedCalls = useDecodeInstanceCalls(instanceManager, tx.calls);
-  const priceFeeds = getCallsTouchedPriceFeeds(
-    parsedCalls.filter(({ args }) => args.data.startsWith("addPriceFeed"))
-  );
+  const priceFeeds = parsedCalls
+  .map(getPriceFeedFromInstanceParsedCall)
+  .filter((priceFeed) => priceFeed !== undefined) as Address[];
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async () => {

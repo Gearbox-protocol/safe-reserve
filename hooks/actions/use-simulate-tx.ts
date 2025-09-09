@@ -9,6 +9,7 @@ import { useDecodeInstanceCalls } from "@/hooks";
 import { getCallsTouchedPriceFeeds, getPriceUpdateTx } from "@gearbox-protocol/permissionless";
 import { getMulticall3Params } from "@/utils/multicall3";
 import { toast } from "sonner";
+import { getPriceFeedFromInstanceParsedCall } from "@/utils/parsed-call-utils";
 
 const SIMULATE_TX_ACCESSOR = "0x3d4BA2E0884aa488718476ca2FB8Efc291A46199";
 
@@ -102,9 +103,9 @@ export function useSimulateTx(
 ) {
   const publicClient = usePublicClient();
   const parsedCalls = useDecodeInstanceCalls(instanceManager, tx.calls);
-  const priceFeeds = getCallsTouchedPriceFeeds(
-    parsedCalls.filter(({ args }) => args.data.startsWith("addPriceFeed"))
-  );
+  const priceFeeds = parsedCalls
+    .map(getPriceFeedFromInstanceParsedCall)
+    .filter((priceFeed) => priceFeed !== undefined) as Address[];
 
   const mutation = useMutation({
     mutationKey: ["simulate-tx", safeAddress, instanceManager, tx.hash],
@@ -119,7 +120,7 @@ export function useSimulateTx(
         return;
       }
 
-      const updateTx =
+      let updateTx =
         priceFeeds.length === 0
           ? undefined
           : await getPriceUpdateTx({
@@ -172,12 +173,16 @@ export function useSimulateTx(
 
         let fromatTrace: string | undefined = undefined;
         if (!decoded.simulation.success) {
-          const trace = await traceCall(publicClient, {
-            to: multicall3.address,
-            data: multicall3Data,
-            gas: 20_000_000n,
-          });
-          fromatTrace = await formatFullTrace(trace, { gas: true });
+          try {
+            const trace = await traceCall(publicClient, {
+              to: multicall3.address,
+              data: multicall3Data,
+              gas: 20_000_000n,
+            });
+            fromatTrace = await formatFullTrace(trace, { gas: true });
+          } catch (error) {
+            toast.warning("Failed to trace transaction");
+          }
         }
 
         // Return the simulation result - success indicates if the transaction would succeed
