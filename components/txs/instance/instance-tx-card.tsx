@@ -28,7 +28,7 @@ export function InstanceTransactionCard({
   threshold,
   index,
 }: TransactionCardProps) {
-  useSDK();
+  useSDK({});
 
   const [isExpanded, setIsExpanded] = useState(false);
   const { data: updatableFeeds, isLoading } = useGetInstanceUpdatableFeeds({

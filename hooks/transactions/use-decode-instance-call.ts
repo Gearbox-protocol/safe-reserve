@@ -64,7 +64,7 @@ export function useGetInstanceCallMeta(parsedCall: ParsedCall) {
     ];
   }, [parsedCall]);
 
-  const { data: sdk, isLoading, error } = useSDK();
+  const { data: sdk, isLoading, error } = useSDK({});
 
   const {
     data: symbol,
@@ -123,15 +123,19 @@ export function useGetInstanceCallMeta(parsedCall: ParsedCall) {
         ],
       });
 
-      const type = await publicClient.readContract({
-        address: priceFeed,
-        abi: iVersionAbi,
-        functionName: "contractType",
-      });
+      try {
+        const type = await publicClient.readContract({
+          address: priceFeed,
+          abi: iVersionAbi,
+          functionName: "contractType",
+        });
 
-      const splittedType = hexToString(type, { size: 32 }).split("::");
+        const splittedType = hexToString(type, { size: 32 }).split("::");
 
-      return { price, type: splittedType[splittedType.length - 1] };
+        return { price, type: splittedType[splittedType.length - 1] };
+      } catch {
+        return { price, type: "EXTERNAL" };
+      }
     },
     enabled: !!publicClient && (!priceFeed || !!sdk),
     retry: 3,
