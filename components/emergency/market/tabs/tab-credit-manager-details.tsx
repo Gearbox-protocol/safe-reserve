@@ -90,7 +90,7 @@ export function CreditManagerDetails({
                       isEditable={!collateralToken.forbidden}
                       customButton={
                         <Link
-                          key={`${chainId}-${marketConfigurator}-forbid-token`}
+                          key={`${chainId}-${marketConfigurator}-forbidToken`}
                           href={{
                             pathname: "/emergency/tx",
                             query: {
@@ -220,7 +220,7 @@ export function CreditManagerDetails({
                     </TableCell>
                     <TableCell className="text-right pr-6">
                       <Link
-                        key={`${chainId}-${marketConfigurator}-forbid-adapter`}
+                        key={`${chainId}-${marketConfigurator}-forbidAdapter`}
                         href={{
                           pathname: "/emergency/tx",
                           query: {
@@ -253,7 +253,7 @@ export function CreditManagerDetails({
                 </Button>
               ) : (
                 <Link
-                  key={`${chainId}-${marketConfigurator}-pause`}
+                  key={`${chainId}-${marketConfigurator}-creditPause`}
                   href={{
                     pathname: "/emergency/tx",
                     query: {

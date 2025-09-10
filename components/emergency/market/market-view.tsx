@@ -107,7 +107,7 @@ export function MarketView({
           </Button>
         ) : (
           <Link
-            key={`${chainId}-${marketConfigurator}-pool-pause`}
+            key={`${chainId}-${marketConfigurator}-poolPause`}
             href={{
               pathname: "/emergency/tx",
               query: {

@@ -7,6 +7,7 @@ export * from "./emergency/use-get-collateral-statuses";
 export * from "./emergency/use-get-emergency-tx";
 export * from "./emergency/use-get-market-configurator-info";
 export * from "./emergency/use-get-market-configurators";
+export * from "./emergency/use-get-price-feeds";
 
 export * from "./safe/use-addresses";
 export * from "./safe/use-is-safe-app";

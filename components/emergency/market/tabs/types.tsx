@@ -16,5 +16,4 @@ export interface CollateralToken {
 export interface MarketAsset extends CollateralToken {
   quotaLimit: number;
   mainPriceFeed: Address;
-  reservePriceFeed: Address;
 }

@@ -22,6 +22,10 @@ import {
   SetChecksEnabledAction,
   setChecksEnabledActionData,
 } from "./loss-policy/loss-policy-set-checks-enabled";
+import {
+  SetPriceFeedAction,
+  setPriceFeedActionData,
+} from "./oracle/oracle-set-price-feed";
 import { PoolPauseAction, poolPauseActionData } from "./pool/pool-pause";
 import {
   SetCreditManagerDebtLimitToZeroAction,
@@ -43,6 +47,8 @@ export type EmergencyActions =
   | ForbidAdapterAction
   | ForbidBorrowingAction
   | CreditPauseAction
+  // Oracle domain
+  | SetPriceFeedAction
   // Loss Policy domain
   | SetAccessModeAction
   | SetChecksEnabledAction;
@@ -59,6 +65,8 @@ export const emergencyActionsData = [
   forbidAdapterActionData,
   forbidBorrowingActionData,
   creditPauseActionData,
+  // Oracle domain
+  setPriceFeedActionData,
   // Loss Policy domain
   setAccessModeActionData,
   setChecksEnabledActionData,
