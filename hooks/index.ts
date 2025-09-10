@@ -2,8 +2,15 @@ export * from "./actions/use-safe-signature";
 export * from "./actions/use-send-governor-tx";
 export * from "./actions/use-send-instance-tx";
 export * from "./actions/use-sign-tx";
+export * from "./actions/use-transaction-download";
 
+export * from "./emergency/actions/use-send-eoa-emergency-tx";
+export * from "./emergency/actions/use-send-safe-emergency-tx";
+export * from "./emergency/actions/use-sign-emergency-tx";
+
+export * from "./emergency/use-build-emergency-safe-tx";
 export * from "./emergency/use-get-collateral-statuses";
+export * from "./emergency/use-get-emergency-admin-info";
 export * from "./emergency/use-get-emergency-tx";
 export * from "./emergency/use-get-market-configurator-info";
 export * from "./emergency/use-get-market-configurators";

@@ -6,28 +6,18 @@ import {
   emergencyActionsMap,
 } from "@/core/emergency-actions";
 import {
+  useGetEmergencyAdminInfo,
   useGetEmergencyTx,
   useGetMarketConfiguratorInfo,
-  useSDK,
 } from "@/hooks";
 import { shortenHash } from "@gearbox-protocol/permissionless";
 import { Copy, ExternalLink } from "lucide-react";
-import { useMemo } from "react";
 import { toast } from "sonner";
 import { Address } from "viem";
 import { Button } from "../../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
 import { PageLayout } from "../../ui/page";
-import { ForbidAdapterParamsView } from "./actions/credit-forbid-adapter-params";
-import { ForbidBorrowingParamsView } from "./actions/credit-forbid-borrowing-params";
-import { ForbidTokenParamsView } from "./actions/credit-forbid-token-params";
-import { CreditPauseParamsView } from "./actions/credit-pause-params";
-import { SetAccessModeParamsView } from "./actions/loss-policy-set-access-mode-params";
-import { SetChecksEnabledParamsView } from "./actions/loss-policy-set-checks-enabled-params";
-import { SetPriceFeedParamsView } from "./actions/oracle-set-price-feed-params";
-import { PoolPauseParams } from "./actions/pool-pause-params";
-import { SetCreditManagerDebtLimitToZeroParamsView } from "./actions/pool-set-credit-manager-debt-limit-to-zero-params";
-import { SetTokenLimitToZeroParamsView } from "./actions/pool-set-token-limit-to-zero-params";
+import { EmergencyEoaTx } from "./tx-params/emergency-eoa-tx";
+import { EmergencySafeTx } from "./tx-params/emergency-safe-tx";
 
 export function EmergencyActionView({
   chainId,
@@ -38,33 +28,24 @@ export function EmergencyActionView({
   marketConfigurator: Address;
   action: EmergencyActions;
 }) {
+  const chain = chains.find(({ id }) => id === chainId);
+
   const {
     data: mcInfo,
-    isLoading: isLoadingInfo,
-    error: infoError,
+    isLoading: isLoadingMcInfo,
+    error: mcInfoError,
   } = useGetMarketConfiguratorInfo({
     chainId,
     address: marketConfigurator,
   });
-
   const {
-    data: sdk,
-    isLoading: isLoadingSdk,
-    error: sdkError,
-  } = useSDK({
+    data: adminInfo,
+    isLoading: isLoadingAdminInfo,
+    error: adminInfoError,
+  } = useGetEmergencyAdminInfo({
     chainId,
-    configurators: [marketConfigurator],
+    marketConfigurator,
   });
-
-  const chain = chains.find(({ id }) => id === chainId);
-
-  const marketConfiguratorContract = useMemo(
-    () =>
-      (sdk?.marketRegister.marketConfigurators ?? []).find(
-        (mc) => mc.address.toLowerCase() === marketConfigurator.toLowerCase()
-      ),
-    [marketConfigurator, sdk?.marketRegister.marketConfigurators]
-  );
 
   const actionMeta = emergencyActionsMap[action.type];
   const emergencyTx = useGetEmergencyTx({
@@ -73,7 +54,7 @@ export function EmergencyActionView({
     action,
   });
 
-  if (isLoadingSdk || isLoadingInfo) {
+  if (isLoadingMcInfo || isLoadingAdminInfo) {
     return (
       <div className="divide-y divide-gray-800 space-y-6">
         {[1, 2, 3].map((i) => (
@@ -87,53 +68,18 @@ export function EmergencyActionView({
     );
   }
 
-  if (
-    sdkError ||
-    infoError ||
-    !marketConfiguratorContract ||
-    !mcInfo?.curatorName
-  ) {
+  if (adminInfoError || mcInfoError || !mcInfo?.curatorName || !adminInfo) {
     return (
       <div className="p-4">
         <text className="font-semibold text-white">
           Invalid market cofigurator:{" "}
-          {sdkError?.message || infoError?.message || "Unknown address"}
+          {adminInfoError?.message || mcInfoError?.message || "Unknown address"}
         </text>
       </div>
     );
   }
 
   if (!emergencyTx) return null;
-
-  function renderParams(a: EmergencyActions) {
-    switch (a.type) {
-      case "POOL::pause":
-        return <PoolPauseParams action={a} />;
-      case "POOL::setTokenLimitToZero":
-        return <SetTokenLimitToZeroParamsView action={a} />;
-      case "POOL::setCreditManagerDebtLimitToZero":
-        return <SetCreditManagerDebtLimitToZeroParamsView action={a} />;
-
-      case "CREDIT::forbidToken":
-        return <ForbidTokenParamsView action={a} />;
-      case "CREDIT::forbidAdapter":
-        return <ForbidAdapterParamsView action={a} />;
-      case "CREDIT::forbidBorrowing":
-        return <ForbidBorrowingParamsView action={a} />;
-      case "CREDIT::pause":
-        return <CreditPauseParamsView action={a} />;
-
-      case "ORACLE::setPriceFeed":
-        return <SetPriceFeedParamsView action={a} />;
-
-      case "LOSS_POLICY::setAccessMode":
-        return <SetAccessModeParamsView action={a} />;
-      case "LOSS_POLICY::setChecksEnabled":
-        return <SetChecksEnabledParamsView action={a} />;
-      default:
-        return null;
-    }
-  }
 
   return (
     <PageLayout
@@ -175,21 +121,22 @@ export function EmergencyActionView({
       }
     >
       <div className="space-y-4">
-        <Card>
-          <CardHeader className="p-4">
-            <CardTitle className="text-xl">{action.type}</CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 pt-0 space-y-3 text-sm">
-            <div className="text-gray-300">{actionMeta?.description}</div>
+        {adminInfo.type === "safe" ? (
+          <EmergencySafeTx
+            chainId={chainId}
+            emergencyTx={emergencyTx}
+            emergencyAdminInfo={adminInfo}
+          />
+        ) : (
+          <EmergencyEoaTx
+            chainId={chainId}
+            emergencyTx={emergencyTx}
+            emergencyAdminInfo={adminInfo}
+          />
+        )}
 
-            <div className="border-t border-gray-800 pt-3">
-              <div className="font-semibold text-gray-200 mb-2">Params</div>
-              {renderParams(action)}
-            </div>
-          </CardContent>
-        </Card>
-
-        {!!emergencyTx && (
+        {/* TODO: */}
+        {/* {!!emergencyTx && (
           <Card>
             <CardHeader className="p-4">
               <CardTitle className="text-xl">MarketTx</CardTitle>
@@ -203,7 +150,7 @@ export function EmergencyActionView({
               </div>
             </CardContent>
           </Card>
-        )}
+        )} */}
       </div>
     </PageLayout>
   );

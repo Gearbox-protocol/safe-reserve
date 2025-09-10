@@ -102,7 +102,7 @@ export function AssetsTab(props: MarketProps) {
                     newValue={
                       priceFeeds.priceFeedsInfo[
                         underlyingPriceFeed.toLowerCase() as Address
-                      ].name ?? shortenHash(underlyingPriceFeed)
+                      ]?.name ?? shortenHash(underlyingPriceFeed)
                     }
                     onEdit={() =>
                       setEditingPricefeed({
@@ -151,7 +151,7 @@ export function AssetsTab(props: MarketProps) {
                       newValue={
                         priceFeeds.priceFeedsInfo[
                           asset.mainPriceFeed.toLowerCase() as Address
-                        ].name ?? shortenHash(asset.mainPriceFeed)
+                        ]?.name ?? shortenHash(asset.mainPriceFeed)
                       }
                       onEdit={() =>
                         setEditingPricefeed({
