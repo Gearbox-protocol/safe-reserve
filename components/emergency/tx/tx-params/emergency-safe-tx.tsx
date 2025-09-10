@@ -21,6 +21,7 @@ export function EmergencySafeTx({
   const actionMeta = emergencyActionsMap[emergencyTx.action.type];
 
   const [nonce, setNonce] = useState<number>();
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
 
@@ -31,7 +32,7 @@ export function EmergencySafeTx({
     } else if (emergencyAdminInfo.type === "safe") {
       setNonce(emergencyAdminInfo.info.nonce);
     }
-  }, []);
+  }, [emergencyAdminInfo]);
 
   const {
     tx,

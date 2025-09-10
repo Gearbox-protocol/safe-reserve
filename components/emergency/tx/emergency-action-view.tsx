@@ -1,10 +1,7 @@
 "use client";
 
 import { chains } from "@/config/wagmi";
-import {
-  EmergencyActions,
-  emergencyActionsMap,
-} from "@/core/emergency-actions";
+import { EmergencyActions } from "@/core/emergency-actions";
 import {
   useGetEmergencyAdminInfo,
   useGetEmergencyTx,
