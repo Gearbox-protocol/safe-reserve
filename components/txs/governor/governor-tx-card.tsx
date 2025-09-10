@@ -11,7 +11,7 @@ import { Address } from "viem";
 import { GovernorProposalCall } from "./governor-proposal-call";
 import { GovernorProposalSignatures } from "./governor-proposal-signatures";
 import { GovernorButtonTx } from "./governor-tx-button";
-import { SimulateTxButton } from "../simulate-tx-button";
+// import { SimulateTxButton } from "../simulate-tx-button";
 
 interface TransactionCardProps {
   cid: string;
@@ -75,11 +75,11 @@ export function GovernorTransactionCard({
             {tx.signedBy.length} / {Number(threshold)}
           </span>
 
-          <SimulateTxButton
+          {/* <SimulateTxButton
             tx={tx}
             safeAddress={safeAddress}
             instanceManager={governor}
-          />
+          /> */}
 
           <GovernorButtonTx
             tx={tx}
