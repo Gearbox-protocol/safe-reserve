@@ -1,4 +1,4 @@
-import { safeAbi } from "@/bindings/generated";
+import { safeAbi } from "@/abi";
 import { defaultChainId } from "@/config/wagmi";
 import { SignedTx } from "@/core/safe-tx";
 import { useDecodeInstanceCalls, useSafeParams } from "@/hooks";

@@ -60,8 +60,6 @@ export function ViewTxList({ cid }: { cid: string }) {
     >
       <div className="space-y-6 overflow-y-auto">
         {isLoadingTxs || isLoadingInfo ? (
-          // Skeleton loading state
-
           <div className="divide-y divide-gray-800 space-y-6">
             {[1, 2, 3].map((i) => (
               <div key={i} className="p-4 animate-pulse">

@@ -1,4 +1,4 @@
-import { safeAbi } from "@/bindings/generated";
+import { safeAbi } from "@/abi";
 import { defaultChainId } from "@/config/wagmi";
 import { useCurrentTransactions } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";

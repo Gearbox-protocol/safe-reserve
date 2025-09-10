@@ -1,6 +1,6 @@
 "use client";
 
-import { safeAbi } from "@/bindings/generated";
+import { safeAbi } from "@/abi";
 import { ParsedSignedTx, SignedTx } from "@/core/safe-tx";
 import { useGovernanceAddresses, useSafeParams } from "@/hooks";
 import {

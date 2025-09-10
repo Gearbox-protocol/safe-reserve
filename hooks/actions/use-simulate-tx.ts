@@ -1,15 +1,15 @@
-import { safeAbi, simulateTxAccessorAbi } from "@/bindings/generated";
+import { safeAbi, simulateTxAccessorAbi } from "@/abi";
 import { SignedTx } from "@/core/safe-tx";
-import { useMutation } from "@tanstack/react-query";
-import { Address, decodeAbiParameters, encodeFunctionData, Hex } from "viem";
-import { usePublicClient } from "wagmi";
+import { useDecodeInstanceCalls } from "@/hooks";
 import { traceCall } from "@/utils/debug-trace";
 import { formatFullTrace } from "@/utils/fromat-trace";
-import { useDecodeInstanceCalls } from "@/hooks";
-import { getCallsTouchedPriceFeeds, getPriceUpdateTx } from "@gearbox-protocol/permissionless";
 import { getMulticall3Params } from "@/utils/multicall3";
-import { toast } from "sonner";
 import { getPriceFeedFromInstanceParsedCall } from "@/utils/parsed-call-utils";
+import { getPriceUpdateTx } from "@gearbox-protocol/permissionless";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Address, decodeAbiParameters, encodeFunctionData, Hex } from "viem";
+import { usePublicClient } from "wagmi";
 
 const SIMULATE_TX_ACCESSOR = "0x3d4BA2E0884aa488718476ca2FB8Efc291A46199";
 
@@ -78,7 +78,7 @@ export function decodeSafeSimulation(revertData: Hex): DecodedSafeSimulation {
   // 1. Decode the outer `simulateAndRevert` structure manually.
   const delegateCallSuccess = BigInt("0x" + revertData.slice(2, 66)) === 1n;
   // const innerDataSize = BigInt("0x" + revertData.slice(66, 130));
-  const innerData = "0x" + revertData.slice(130) as `0x${string}`;
+  const innerData = ("0x" + revertData.slice(130)) as `0x${string}`;
 
   // 2. Decode the inner `SimulateTxAccessor.simulate` return data.
   const [estimate, success, returnData] = decodeAbiParameters(
@@ -147,9 +147,9 @@ export function useSimulateTx(
         callData: simulateAndRevertData,
         allowFailure: true,
       } as const;
-  
+
       const multicall3Calls = updateTx
-        ? [{...updateTx, allowFailure: true}, safeSimulateCall]
+        ? [{ ...updateTx, allowFailure: true }, safeSimulateCall]
         : [safeSimulateCall];
 
       const multicall3Params = getMulticall3Params(
@@ -164,7 +164,9 @@ export function useSimulateTx(
           gas: 20_000_000n,
         });
 
-        const simulationResult = updateTx ? result[1] : result[0] as { success: boolean, returnData: Hex };
+        const simulationResult = updateTx
+          ? result[1]
+          : (result[0] as { success: boolean; returnData: Hex });
         const decoded = decodeSafeSimulation(simulationResult.returnData);
 
         if (!decoded.delegateCallSuccess) {
@@ -186,14 +188,14 @@ export function useSimulateTx(
         }
 
         // Return the simulation result - success indicates if the transaction would succeed
-        return { 
-          success: decoded.simulation.success, 
+        return {
+          success: decoded.simulation.success,
           result: decoded.simulation.returnData,
           gasEstimate: decoded.simulation.estimate,
           fromatTrace,
         };
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         throw err;
       }

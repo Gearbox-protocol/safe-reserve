@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@gearbox-protocol/permissionless':
-        specifier: ^0.1.8
-        version: 0.1.8(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
+        specifier: ^0.1.9
+        version: 0.1.9(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
       '@gearbox-protocol/sdk':
         specifier: ^8.26.2
         version: 8.27.10(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
@@ -593,8 +593,8 @@ packages:
   '@gearbox-protocol/integrations-v3@1.42.0-abi.4':
     resolution: {integrity: sha512-bAtHIErStAW4zvEYmcIIwRfM5Zin8oUumSA16YvDpJht9BAKypVPCFzma86bLLmT8OZUn8k+S4vgmbF3KfNflw==}
 
-  '@gearbox-protocol/permissionless@0.1.8':
-    resolution: {integrity: sha512-F0XtICQOpRMXuLzMliej4SleJybl+cP6PpDtVH1ddBS3soxBgGZOysNYjHh/LTJe2WVlFvv4c4tnOnLFYqjXlA==}
+  '@gearbox-protocol/permissionless@0.1.9':
+    resolution: {integrity: sha512-kl23BzseEfa16vrmgPyYlTRAWugXbyCSUAp8LQKYt9NULPOH4ON0iKlHWIimNiRL0J5KvdSMFMH840xDBiIUiw==}
 
   '@gearbox-protocol/sdk-adapters@1.2.2':
     resolution: {integrity: sha512-KDE+jEikrrkF6h61v1zfJ7LC89ih2ENEaZMUsfS2WjXaS3VUMEmwRsKzkzzQ0ad/MCWxOKA5aDBVyRdqVG231A==}
@@ -5378,7 +5378,7 @@ snapshots:
 
   '@gearbox-protocol/integrations-v3@1.42.0-abi.4': {}
 
-  '@gearbox-protocol/permissionless@0.1.8(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)':
+  '@gearbox-protocol/permissionless@0.1.9(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)':
     dependencies:
       '@gearbox-protocol/sdk': 8.27.10(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@gearbox-protocol/sdk-adapters': 1.2.2(@gearbox-protocol/sdk@8.27.10(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
@@ -8199,7 +8199,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.43.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1))(eslint@8.57.1):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.43.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -8221,7 +8221,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.43.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1))(eslint@8.57.1)
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.43.0(eslint@8.57.1)(typescript@5.9.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3

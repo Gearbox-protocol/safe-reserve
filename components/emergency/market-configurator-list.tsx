@@ -17,7 +17,11 @@ export function MarketConfiguratorList({
   return (
     <PageLayout
       title={"Market Configurators"}
-      description="Select market configurator to manage emergency actions"
+      description={
+        <p className="text-sm text-muted-foreground">
+          Select market configurator to manage emergency actions
+        </p>
+      }
     >
       <div className="flex flex-col gap-4">
         {[...queries]
@@ -68,7 +72,7 @@ export function MarketConfiguratorList({
                 }}
               >
                 <Card
-                  className="p-4 cursor-pointer"
+                  className="p-4 cursor-pointer hover:bg-gray-900/50"
                   onClick={() => onSelect(chain.id, marketConfigurator)}
                 >
                   <div>
@@ -76,7 +80,7 @@ export function MarketConfiguratorList({
                       {name || ""}
                     </CardTitle>
                     <div className="text-sm text-muted-foreground break-all">
-                      {chain.name} • {shortenHash(marketConfigurator)}
+                      {chain.name} · {shortenHash(marketConfigurator)}
                     </div>
                   </div>
                 </Card>
