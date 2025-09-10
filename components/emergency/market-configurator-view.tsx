@@ -108,7 +108,7 @@ export function MarketConfiguratorView({
         description={
           <div className="flex items-center gap-2 text-gray-100">
             <div className="text-sm text-muted-foreground break-all">
-              {chain?.name ?? chainId} • {shortenHash(address)}
+              {chain?.name ?? chainId} · {shortenHash(address)}
             </div>
 
             <Button

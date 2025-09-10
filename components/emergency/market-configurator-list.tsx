@@ -80,7 +80,7 @@ export function MarketConfiguratorList({
                       {name || ""}
                     </CardTitle>
                     <div className="text-sm text-muted-foreground break-all">
-                      {chain.name} • {shortenHash(marketConfigurator)}
+                      {chain.name} · {shortenHash(marketConfigurator)}
                     </div>
                   </div>
                 </Card>

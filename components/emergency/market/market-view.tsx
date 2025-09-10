@@ -62,8 +62,7 @@ export function MarketView({
       description={
         <div className="flex items-center gap-2 text-gray-100">
           <div className="text-sm text-muted-foreground break-all">
-            {chain?.name ?? chainId} • {mcInfo.curatorName} •{" "}
-            {shortenHash(marketSuite.pool.pool.address)}
+            {chain?.name ?? chainId} · {mcInfo.curatorName} · {shortenHash(marketSuite.pool.pool.address)}
           </div>
 
           <Button
