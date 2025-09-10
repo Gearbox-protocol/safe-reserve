@@ -1,19 +1,51 @@
-import { PoolPauseAction, poolPauseActionData } from "./pool-pause";
+import {
+  ForbidAdapterAction,
+  forbidAdapterActionData,
+} from "./credit/credit-forbid-adapter";
+import {
+  ForbidBorrowingAction,
+  forbidBorrowingActionData,
+} from "./credit/credit-forbid-borrowing";
+import {
+  ForbidTokenAction,
+  forbidTokenActionData,
+} from "./credit/credit-forbid-token";
+import {
+  CreditPauseAction,
+  creditPauseActionData,
+} from "./credit/credit-pause";
+import {
+  SetAccessModeAction,
+  setAccessModeActionData,
+} from "./loss-policy/loss-policy-set-access-mode";
+import {
+  SetChecksEnabledAction,
+  setChecksEnabledActionData,
+} from "./loss-policy/loss-policy-set-checks-enabled";
+import { PoolPauseAction, poolPauseActionData } from "./pool/pool-pause";
 import {
   SetCreditManagerDebtLimitToZeroAction,
   setCreditManagerDebtLimitToZeroActionData,
-} from "./pool-set-credit-manager-debt-limit-to-zero";
+} from "./pool/pool-set-credit-manager-debt-limit-to-zero";
 import {
   SetTokenLimitToZeroAction,
   setTokenLimitToZeroActionData,
-} from "./pool-set-token-limit-to-zero";
+} from "./pool/pool-set-token-limit-to-zero";
 import { EmergencyActionData } from "./types";
 
 export type EmergencyActions =
   // Pool domain
   | SetTokenLimitToZeroAction
   | PoolPauseAction
-  | SetCreditManagerDebtLimitToZeroAction;
+  | SetCreditManagerDebtLimitToZeroAction
+  // Credit domain
+  | ForbidTokenAction
+  | ForbidAdapterAction
+  | ForbidBorrowingAction
+  | CreditPauseAction
+  // Loss Policy domain
+  | SetAccessModeAction
+  | SetChecksEnabledAction;
 
 export type EmergencyActionsType = EmergencyActions["type"];
 
@@ -22,6 +54,14 @@ export const emergencyActionsData = [
   setTokenLimitToZeroActionData,
   poolPauseActionData,
   setCreditManagerDebtLimitToZeroActionData,
+  // Credit domain
+  forbidTokenActionData,
+  forbidAdapterActionData,
+  forbidBorrowingActionData,
+  creditPauseActionData,
+  // Loss Policy domain
+  setAccessModeActionData,
+  setChecksEnabledActionData,
 ];
 
 export const emergencyActionsMap = emergencyActionsData.reduce(

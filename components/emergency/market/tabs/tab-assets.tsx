@@ -1,32 +1,32 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { chains } from "@/config/wagmi";
 import { shortenHash } from "@gearbox-protocol/permissionless";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Address, formatUnits, zeroAddress } from "viem";
-import { chains } from "../../../../config/wagmi";
-import { Button } from "../../../ui/button";
-import { Card, CardContent } from "../../../ui/card";
 
 import {
   TableCellAsset,
   TableCellUpdatable,
   TableEditable,
-} from "../../../ui/editable-table";
+} from "@/components/ui/editable-table";
 import {
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "../../../ui/table";
+} from "@/components/ui/table";
 import { MarketAsset, MarketProps } from "./types";
 
 export function AssetsTab({
+  sdk,
   chainId,
   marketConfigurator,
   market,
-  sdk,
 }: MarketProps) {
   const chain = chains.find(({ id }) => id === chainId);
 

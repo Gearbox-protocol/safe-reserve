@@ -1,4 +1,4 @@
-import { SetCreditManagerDebtLimitToZeroAction } from "@/core/emergency-actions/pool-set-credit-manager-debt-limit-to-zero";
+import { SetCreditManagerDebtLimitToZeroAction } from "@/core/emergency-actions/pool/pool-set-credit-manager-debt-limit-to-zero";
 
 export function SetCreditManagerDebtLimitToZeroParamsView({
   action,

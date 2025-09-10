@@ -3,13 +3,16 @@ import { addressSchema } from "@/utils/validation";
 import { createCallData } from "@gearbox-protocol/permissionless";
 import { Address } from "viem";
 import { z } from "zod";
-import { BaseEmergencyAction, EmergencyActionData } from "./types";
+import { BaseEmergencyAction, EmergencyActionData } from "../types";
 
-export interface PauseParams {
+export interface PoolPauseParams {
   pool: Address;
 }
 
-export type PoolPauseAction = BaseEmergencyAction<"POOL::pause", PauseParams>;
+export type PoolPauseAction = BaseEmergencyAction<
+  "POOL::pause",
+  PoolPauseParams
+>;
 
 export const poolPauseActionData: EmergencyActionData<PoolPauseAction> = {
   type: "POOL::pause",

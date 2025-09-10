@@ -8,9 +8,12 @@ export interface MarketProps {
   sdk: GearboxSDK;
 }
 
-export interface MarketAsset {
+export interface CollateralToken {
   address: Address;
   symbol: string;
+}
+
+export interface MarketAsset extends CollateralToken {
   quotaLimit: number;
   mainPriceFeed: Address;
   reservePriceFeed: Address;

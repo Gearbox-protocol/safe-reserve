@@ -18,6 +18,12 @@ import { Address } from "viem";
 import { Button } from "../../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
 import { PageLayout } from "../../ui/page";
+import { ForbidAdapterParamsView } from "./actions/credit-forbid-adapter-params";
+import { ForbidBorrowingParamsView } from "./actions/credit-forbid-borrowing-params";
+import { ForbidTokenParamsView } from "./actions/credit-forbid-token-params";
+import { CreditPauseParamsView } from "./actions/credit-pause-params";
+import { SetAccessModeParamsView } from "./actions/loss-policy-set-access-mode-params";
+import { SetChecksEnabledParamsView } from "./actions/loss-policy-set-checks-enabled-params";
 import { PoolPauseParams } from "./actions/pool-pause-params";
 import { SetCreditManagerDebtLimitToZeroParamsView } from "./actions/pool-set-credit-manager-debt-limit-to-zero-params";
 import { SetTokenLimitToZeroParamsView } from "./actions/pool-set-token-limit-to-zero-params";
@@ -106,6 +112,20 @@ export function EmergencyActionView({
         return <SetTokenLimitToZeroParamsView action={a} />;
       case "POOL::setCreditManagerDebtLimitToZero":
         return <SetCreditManagerDebtLimitToZeroParamsView action={a} />;
+
+      case "CREDIT::forbidToken":
+        return <ForbidTokenParamsView action={a} />;
+      case "CREDIT::forbidAdapter":
+        return <ForbidAdapterParamsView action={a} />;
+      case "CREDIT::forbidBorrowing":
+        return <ForbidBorrowingParamsView action={a} />;
+      case "CREDIT::pause":
+        return <CreditPauseParamsView action={a} />;
+
+      case "LOSS_POLICY::setAccessMode":
+        return <SetAccessModeParamsView action={a} />;
+      case "LOSS_POLICY::setChecksEnabled":
+        return <SetChecksEnabledParamsView action={a} />;
       default:
         return null;
     }

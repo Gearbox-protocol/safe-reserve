@@ -3,7 +3,7 @@ import { addressSchema } from "@/utils/validation";
 import { createCallData } from "@gearbox-protocol/permissionless";
 import { Address } from "viem";
 import { z } from "zod";
-import { BaseEmergencyAction, EmergencyActionData } from "./types";
+import { BaseEmergencyAction, EmergencyActionData } from "../types";
 
 export interface SetCreditManagerDebtLimitToZeroParams {
   pool: Address;

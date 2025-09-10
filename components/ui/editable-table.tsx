@@ -103,11 +103,13 @@ interface TableEditableProps {
   buttonLoadingText?: string;
   children: React.ReactNode;
   disabled?: boolean;
+  customButton?: React.ReactNode;
 }
 
 export function TableEditable({
   title,
   onNew,
+  customButton,
   newButtonText = "New",
   buttonLoadingText = "Adding...",
   isLoading,
@@ -118,11 +120,14 @@ export function TableEditable({
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">{title}</h2>
-        {onNew && (
-          <TabButton onClick={onNew} disabled={isLoading || disabled}>
-            {isLoading ? buttonLoadingText : newButtonText}
-          </TabButton>
-        )}
+        {customButton ??
+          (onNew ? (
+            <TabButton onClick={onNew} disabled={isLoading || disabled}>
+              {customButton ?? (isLoading ? buttonLoadingText : newButtonText)}
+            </TabButton>
+          ) : (
+            <></>
+          ))}
       </div>
       <div className="rounded-lg border">
         <Table>{children}</Table>

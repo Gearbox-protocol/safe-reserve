@@ -13,6 +13,8 @@ import { Button } from "../../ui/button";
 import { PageLayout } from "../../ui/page";
 import { TokenIcon } from "../../ui/token-icon";
 import { AssetsTab } from "./tabs/tab-assets";
+import { CreditManagerDetails } from "./tabs/tab-credit-manager-details";
+import { LossPolicyTab } from "./tabs/tab-loss-policy";
 
 export function MarketView({
   chainId,
@@ -83,7 +85,7 @@ export function MarketView({
               className="text-muted-foreground hover:text-white p-0 h-auto"
               onClick={() =>
                 window.open(
-                  `${chain?.blockExplorers.default.url}//address/${marketSuite.pool.pool.address}`,
+                  `${chain?.blockExplorers.default.url}/address/${marketSuite.pool.pool.address}`,
                   "_blank"
                 )
               }
@@ -99,22 +101,28 @@ export function MarketView({
         onClick: onClickBack,
       }}
       actionButton={
-        <Link
-          key={`${chainId}-${marketConfigurator}-pool-pause`}
-          href={{
-            pathname: "/emergency/tx",
-            query: {
-              chainId: chainId,
-              mc: marketConfigurator,
-              action: "POOL::pause",
-              params: JSON.stringify({
-                pool: marketSuite.pool.pool.address,
-              }),
-            },
-          }}
-        >
-          <Button variant={"pink"}>Pause pool</Button>
-        </Link>
+        marketSuite.pool.pool.isPaused ? (
+          <Button variant={"pink"} disabled>
+            Pool paused
+          </Button>
+        ) : (
+          <Link
+            key={`${chainId}-${marketConfigurator}-pool-pause`}
+            href={{
+              pathname: "/emergency/tx",
+              query: {
+                chainId: chainId,
+                mc: marketConfigurator,
+                action: "POOL::pause",
+                params: JSON.stringify({
+                  pool: marketSuite.pool.pool.address,
+                }),
+              },
+            }}
+          >
+            <Button variant={"pink"}>Pause pool</Button>
+          </Link>
+        )
       }
     >
       <div className="space-y-6 overflow-y-auto">
@@ -151,7 +159,12 @@ export function MarketView({
                 </TabsContent>
 
                 <TabsContent value="lossPolicy" className="mt-0">
-                  {/* <LossPolicyTab {...marketChangesProps} /> */}
+                  <LossPolicyTab
+                    sdk={sdk}
+                    chainId={chainId}
+                    marketConfigurator={marketConfigurator}
+                    market={marketSuite}
+                  />
                 </TabsContent>
 
                 {marketSuite.creditManagers.map((cm) => (
@@ -160,11 +173,13 @@ export function MarketView({
                     value={`creditManagers-${cm.creditManager.address}`}
                     className="mt-0"
                   >
-                    {/* <CreditManagerDetails
-                    switchTab={setActiveTab}
-                    creditManagerAddress={key as Address}
-                    {...marketChangesProps}
-                  /> */}
+                    <CreditManagerDetails
+                      sdk={sdk}
+                      chainId={chainId}
+                      marketConfigurator={marketConfigurator}
+                      market={marketSuite}
+                      creditSuite={cm}
+                    />
                   </TabsContent>
                 ))}
               </div>
