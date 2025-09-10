@@ -1,6 +1,5 @@
 "use client";
 
-import { chains } from "@/config/wagmi";
 import { emergencyActionsMap } from "@/core/emergency-actions";
 import { EmergencyTx } from "@/core/emergency-actions/types";
 import { EmergencyAdminInfo } from "@/hooks";
@@ -17,7 +16,6 @@ export function EmergencyEoaTx({
   emergencyTx: EmergencyTx;
   emergencyAdminInfo: EmergencyAdminInfo;
 }) {
-  const chain = chains.find(({ id }) => id === chainId);
   const actionMeta = emergencyActionsMap[emergencyTx.action.type];
 
   if (emergencyAdminInfo.type === "safe") return <></>;

@@ -30,7 +30,7 @@ export function DownloadTxButton({
 
         const splittedType = emergencyTx.action.type.split("::");
         const name = splittedType?.[0].toLowerCase() + "-" + splittedType?.[1];
-        const success = await downloadTransaction({
+        await downloadTransaction({
           chainId,
           safeAddress: admin,
           txs: [emergencyTx.tx],

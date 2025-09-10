@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/tooltip";
 import { EmergencyTx } from "@/core/emergency-actions/types";
 import { EmergencyAdminInfo, useSendEoaEmergencyTx } from "@/hooks";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useAccount } from "wagmi";
 import { DownloadTxButton } from "./download-tx-button";
 
@@ -24,10 +24,6 @@ export function EoaEmergencyTxButton({
 }: ButtonTxProps) {
   const [isSent, setIsSent] = useState(false);
   const { address } = useAccount();
-
-  const canSend = useMemo(() => {
-    return address?.toLowerCase() === admin.emergencyAdmin.toLowerCase();
-  }, [address, admin]);
 
   const { send: sendTx, isPending: isSendPending } = useSendEoaEmergencyTx({
     chainId,

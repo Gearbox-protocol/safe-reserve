@@ -47,7 +47,6 @@ export function EmergencyActionView({
     marketConfigurator,
   });
 
-  const actionMeta = emergencyActionsMap[action.type];
   const emergencyTx = useGetEmergencyTx({
     chainId,
     marketConfigurator,

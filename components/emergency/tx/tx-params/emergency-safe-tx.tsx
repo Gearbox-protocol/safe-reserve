@@ -1,6 +1,5 @@
 "use client";
 
-import { chains } from "@/config/wagmi";
 import { emergencyActionsMap } from "@/core/emergency-actions";
 import { EmergencyTx } from "@/core/emergency-actions/types";
 import { EmergencyAdminInfo, useBuildEmergencySafeTx } from "@/hooks";
@@ -19,7 +18,6 @@ export function EmergencySafeTx({
   emergencyTx: EmergencyTx;
   emergencyAdminInfo: EmergencyAdminInfo;
 }) {
-  const chain = chains.find(({ id }) => id === chainId);
   const actionMeta = emergencyActionsMap[emergencyTx.action.type];
 
   const [nonce, setNonce] = useState<number>();
