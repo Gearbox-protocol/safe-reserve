@@ -28,7 +28,7 @@ export const setPriceFeedActionData: EmergencyActionData<SetPriceFeedAction> = {
   getRawTx: ({ mc, action }) => {
     const { params } = action;
 
-    const tx = mc.emergencyConfigureLossPolicy(
+    const tx = mc.emergencyConfigurePriceOracle(
       params.priceOracle,
       createCallData(iPriceOracleEmergencyConfigureActionsAbi, {
         functionName: "setPriceFeed",

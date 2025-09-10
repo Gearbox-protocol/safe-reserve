@@ -94,6 +94,7 @@ export function EmergencySafeTx({
               <InstanceProposalSignatures
                 signers={tx.signedBy || []}
                 safeAddress={emergencyAdminInfo.emergencyAdmin}
+                nonce={nonce}
               />
             </div>
           </div>

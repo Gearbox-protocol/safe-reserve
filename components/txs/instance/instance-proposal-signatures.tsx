@@ -8,6 +8,7 @@ import { Address } from "viem";
 interface ProposalSignaturesProps {
   safeAddress: Address;
   signers: Address[];
+  nonce?: number;
 }
 
 function Identicon({ address, size = 32 }: { address: string; size?: number }) {
@@ -24,6 +25,7 @@ function Identicon({ address, size = 32 }: { address: string; size?: number }) {
 export function InstanceProposalSignatures({
   safeAddress,
   signers,
+  nonce,
 }: ProposalSignaturesProps) {
   const [showAll, setShowAll] = useState(false);
   const { threshold } = useSafeParams(safeAddress);
@@ -39,7 +41,9 @@ export function InstanceProposalSignatures({
           <div className="absolute left-[2px] flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
             <Plus className="h-3 w-3 text-black" />
           </div>
-          <span className="ml-10 text-white">Created</span>
+          <span className="ml-10 text-white">
+            Created {nonce ? `(nonce: ${nonce})` : ""}
+          </span>
         </div>
 
         {/* Queue confirmations Stage */}

@@ -8,7 +8,8 @@ import {
   useSignEmergencyTx,
 } from "@/hooks";
 import { useSafeAppsSDK } from "@safe-global/safe-apps-react-sdk";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { Address, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
 import { TransactionInfoDialog } from "../../../txs/transaction-info-dialog";
@@ -27,8 +28,22 @@ export function SafeEmergencyTxButton({
   emergencyTx,
   safeAddress,
 }: ButtonTxProps) {
+  const router = useRouter();
+
   const [isSent, setIsSent] = useState(false);
   const [alreadySigned, setAlreadySigned] = useState(false);
+
+  const [urlNonce, setUrlNonce] = useState<number>();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    const nonce = params.get("nonce");
+
+    if (!!nonce) {
+      setUrlNonce(+nonce);
+    }
+  }, []);
 
   const { signers, threshold, nonce } = useSafeParams(safeAddress);
   const { address } = useAccount();
@@ -109,6 +124,11 @@ export function SafeEmergencyTxButton({
                     })),
                   });
                 } else {
+                  if (urlNonce === undefined) {
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set("nonce", tx.nonce.toString());
+                    router.push(currentUrl.pathname + currentUrl.search);
+                  }
                   await signTx({ txHash: tx.hash });
                 }
               }

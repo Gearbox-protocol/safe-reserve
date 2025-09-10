@@ -148,8 +148,8 @@ export function CreditManagerDetails({
             <TableBody>
               {creditSuite.creditManager.adapters
                 .entries()
-                .map(([address, adapter]) => (
-                  <TableRow key={address}>
+                .map(([target, adapter]) => (
+                  <TableRow key={target}>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {shortenHash(adapter.targetContract, 6)}
@@ -189,13 +189,13 @@ export function CreditManagerDetails({
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-2">
-                        {shortenHash(address, 6)}
+                        {shortenHash(adapter.address, 6)}
                         <Button
                           variant="ghost"
                           size="sm"
                           className="text-muted-foreground hover:text-white p-0 h-auto"
                           onClick={() => {
-                            navigator.clipboard.writeText(address);
+                            navigator.clipboard.writeText(adapter.address);
                             toast.success("Address copied to clipboard");
                           }}
                         >
@@ -208,7 +208,7 @@ export function CreditManagerDetails({
                             className="text-muted-foreground hover:text-white p-0 h-auto"
                             onClick={() =>
                               window.open(
-                                `${chain?.blockExplorers.default.url}/address/${address}`,
+                                `${chain?.blockExplorers.default.url}/address/${adapter.address}`,
                                 "_blank"
                               )
                             }
@@ -229,7 +229,7 @@ export function CreditManagerDetails({
                             action: "CREDIT::forbidAdapter",
                             params: JSON.stringify({
                               creditManager: creditSuite.creditManager.address,
-                              adapter: address,
+                              adapter: adapter.address,
                             }),
                           },
                         }}
