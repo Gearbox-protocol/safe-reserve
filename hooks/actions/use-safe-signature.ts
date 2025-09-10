@@ -71,9 +71,9 @@ export function useSafeSignature(txHash: Hex) {
         return cachedSignature;
       }
 
-      await switchChainAsync({
-        chainId: defaultChainId,
-      });
+      // await switchChainAsync({
+      //   chainId: defaultChainId,
+      // });
 
       console.log("Signing new message for tx:", txHash);
       const signature = await walletClient.signMessage({
