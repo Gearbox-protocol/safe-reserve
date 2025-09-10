@@ -3,10 +3,11 @@ import { Address, encodeFunctionData, Hex, multicall3Abi } from "viem";
 export function getMulticall3Params(multicall3Address: Address, calls: {
   to: Address;
   callData: Hex;
-}[], allowFailure: boolean = false) {
+  allowFailure?: boolean;
+}[]) {
   const multicallCalls = calls.map((tx) => ({
     target: tx.to as `0x${string}`,
-    allowFailure: allowFailure,
+    allowFailure: tx.allowFailure ?? false,
     callData: tx.callData,
   }));
 

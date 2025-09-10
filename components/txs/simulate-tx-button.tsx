@@ -5,6 +5,7 @@ import {
   DialogHeader, 
   DialogTitle, 
 } from "@/components/ui/dialog";
+import { FormattedTrace } from "@/components/ui/formatted-trace";
 import { SignedTx, ParsedSignedTx } from "@/core/safe-tx";
 import { useSimulateTx } from "@/hooks/actions/use-simulate-tx";
 import { Play, Loader2, CheckCircle, XCircle, Eye } from "lucide-react";
@@ -153,9 +154,10 @@ export function SimulateTxButton({
           <DialogTitle>Transaction Trace</DialogTitle>
         </DialogHeader>
         <div className="overflow-auto max-h-[60vh] bg-gray-900 p-4 rounded-lg">
-          <pre className="text-xs text-gray-100 whitespace-pre-wrap font-mono">
-            {data?.fromatTrace}
-          </pre>
+          <FormattedTrace 
+            content={data?.fromatTrace || ''} 
+            className="text-xs text-gray-100"
+          />
         </div>
       </DialogContent>
     </Dialog>

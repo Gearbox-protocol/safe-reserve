@@ -126,6 +126,7 @@ export function useSimulateTx(
           : await getPriceUpdateTx({
               client: publicClient,
               priceFeeds,
+              useMulticall3: true,
             });
 
       const callData = encodeFunctionData({
@@ -144,16 +145,16 @@ export function useSimulateTx(
       const safeSimulateCall = {
         to: safeAddress,
         callData: simulateAndRevertData,
+        allowFailure: true,
       } as const;
   
       const multicall3Calls = updateTx
-        ? [updateTx, safeSimulateCall]
+        ? [{...updateTx, allowFailure: true}, safeSimulateCall]
         : [safeSimulateCall];
 
       const multicall3Params = getMulticall3Params(
         multicall3.address,
-        multicall3Calls,
-        true
+        multicall3Calls
       );
       const multicall3Data = encodeFunctionData(multicall3Params);
 
@@ -162,7 +163,6 @@ export function useSimulateTx(
           ...multicall3Params,
           gas: 20_000_000n,
         });
-
 
         const simulationResult = updateTx ? result[1] : result[0] as { success: boolean, returnData: Hex };
         const decoded = decodeSafeSimulation(simulationResult.returnData);

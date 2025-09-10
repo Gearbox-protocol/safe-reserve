@@ -1,3 +1,6 @@
+// modeified from 
+// https://github.com/Rubilmax/viem-tracer/blob/main/src/format.ts
+
 import {
   type Abi,
   type AbiFunction,
@@ -22,17 +25,17 @@ import {
 } from "viem";
 import type { RpcCallTrace, RpcLogTrace } from "./debug-trace";
 
-// Text formatting utilities
+// Text formatting utilities with token-based styling (safe alternative)
 const formatText = {
-  bold: (text: string) => text,
-  dim: (text: string) => text,
-  grey: (text: string) => text,
-  red: (text: string) => text,
-  green: (text: string) => text,
-  yellow: (text: string) => text,
-  cyan: (text: string) => text,
-  white: (text: string) => text,
-  magenta: (text: string) => text,
+  bold: (text: string) => `[BOLD]${text}[/BOLD]`,
+  dim: (text: string) => `[DIM]${text}[/DIM]`,
+  grey: (text: string) => `[GREY]${text}[/GREY]`,
+  red: (text: string) => `[RED]${text}[/RED]`,
+  green: (text: string) => `[GREEN]${text}[/GREEN]`,
+  yellow: (text: string) => `[YELLOW]${text}[/YELLOW]`,
+  cyan: (text: string) => `[CYAN]${text}[/CYAN]`,
+  white: (text: string) => `[WHITE]${text}[/WHITE]`,
+  magenta: (text: string) => `[MAGENTA]${text}[/MAGENTA]`,
 };
 
 export interface TraceFormatConfig {
@@ -176,7 +179,7 @@ export const formatCallSignature = (
         .concat(erc1155Abi)
         .concat(erc4626Abi)
         .concat(multicall3Abi)
-        .find((abi: AbiFunction): abi is AbiFunction => abi.type === "function" && abi.name === functionName);
+        .find((abi): abi is AbiFunction => abi.type === "function" && abi.name === functionName);
 
       if (functionAbi != null) {
         const decodedOutputs = decodeAbiParameters(functionAbi.outputs, trace.output);
