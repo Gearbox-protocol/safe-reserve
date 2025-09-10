@@ -51,9 +51,9 @@ export default function Header() {
                 <a href="/">
                   <DropdownMenuItem>Execute transactions</DropdownMenuItem>
                 </a>
-                {/* <a href="/emergency">
+                <a href="/emergency">
                   <DropdownMenuItem>Emergency Admin</DropdownMenuItem>
-                </a> */}
+                </a>
               </DropdownMenuContent>
             </DropdownMenuPortal>
           </DropdownMenu>
