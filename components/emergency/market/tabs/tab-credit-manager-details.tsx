@@ -249,7 +249,7 @@ export function CreditManagerDetails({
             customButton={
               creditSuite.creditFacade.isPaused ? (
                 <Button variant={"pink"} size={`sm`} disabled>
-                  Сredit manager paused
+                  Credit manager paused
                 </Button>
               ) : (
                 <Link
