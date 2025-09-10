@@ -5,6 +5,7 @@ import { createConfig, http } from "wagmi";
 import {
   avalanche,
   base,
+  berachain,
   bsc,
   etherlink,
   hemi,
@@ -24,6 +25,7 @@ export const chains = [
   etherlink,
   hemi,
   lisk,
+  berachain,
 ] as const;
 
 export const ADDRESS_PROVIDER = process.env.NEXT_PUBLIC_ADDRESS_PROVIDER;
@@ -35,6 +37,10 @@ function drpcUrl(chainName: string) {
   }
   return `https://lb.drpc.org/${chainName}/${apiKey}`;
 }
+
+const getHyperRpcUrl = (chainId: number) => {
+  return `https://${chainId}.rpc.hypersync.xyz`;
+};
 
 export const getChainTransport = (chain: Chain): Transport => {
   if (chain.id === etherlink.id) {
@@ -81,13 +87,22 @@ export const getChainTransport = (chain: Chain): Transport => {
     }).getTransport();
   }
 
+  if (chain.id === berachain.id) {
+    return new ArchiveTransport({
+      primaryRpcUrl: drpcUrl("berachain"), // "https://rpc.berachain-apis.com",
+      archiveRpcUrl: getHyperRpcUrl(chain.id),
+      blockThreshold: 999,
+      enableLogging: true,
+    }).getTransport();
+  }
+
   // Try to use window.ethereum if available
   // if (typeof window !== "undefined" && window.ethereum) {
   //   return custom(window.ethereum);
   // }
 
   // Prefer chain-specific default RPC if available to avoid cross-network leakage
-  return http(chain.rpcUrls?.default?.http?.[0], {
+  return http(chain.rpcUrls.default.http[0], {
     retryCount: 3,
     retryDelay: 1000,
     timeout: 10000,
@@ -107,6 +122,7 @@ export const config = createConfig(
       [etherlink.id]: getChainTransport(etherlink),
       [hemi.id]: getChainTransport(hemi),
       [lisk.id]: getChainTransport(lisk),
+      [berachain.id]: getChainTransport(berachain),
     } as Record<number, Transport>,
 
     // connectors: [
