@@ -130,23 +130,6 @@ export function EmergencyActionView({
             emergencyAdminInfo={adminInfo}
           />
         )}
-
-        {/* TODO: */}
-        {/* {!!emergencyTx && (
-          <Card>
-            <CardHeader className="p-4">
-              <CardTitle className="text-xl">MarketTx</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0 space-y-2 text-sm">
-              <div className="grid grid-cols-[140px_auto] gap-2">
-                <div className="text-gray-400">calldata</div>
-                <div className="text-gray-300 break-all font-mono">
-                  {emergencyTx.tx.callData}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )} */}
       </div>
     </PageLayout>
   );

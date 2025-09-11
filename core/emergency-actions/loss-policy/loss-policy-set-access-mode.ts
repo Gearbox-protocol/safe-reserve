@@ -12,7 +12,7 @@ export enum AccessMode {
 }
 
 export interface SetAccessModeParams {
-  lossPolicy: Address;
+  pool: Address;
   mode: AccessMode;
 }
 
@@ -26,7 +26,7 @@ export const setAccessModeActionData: EmergencyActionData<SetAccessModeAction> =
     type: "LOSS_POLICY::setAccessMode",
     description: "Set loss policy access mode for liquidations",
     schema: z.object({
-      lossPolicy: addressSchema,
+      pool: addressSchema,
       mode: z.nativeEnum(AccessMode),
     }),
 
@@ -34,7 +34,7 @@ export const setAccessModeActionData: EmergencyActionData<SetAccessModeAction> =
       const { params } = action;
 
       const tx = mc.emergencyConfigureLossPolicy(
-        params.lossPolicy,
+        params.pool,
         createCallData(iLossPolicyV310Abi, {
           functionName: "setAccessMode",
           args: [params.mode],

@@ -99,7 +99,7 @@ export const PricefeedSelector = ({
                       mc: marketConfigurator,
                       action: "ORACLE::setPriceFeed",
                       params: JSON.stringify({
-                        priceOracle: market.priceOracle.address,
+                        pool: market.pool.pool.address,
                         priceFeed: selectedPriceFeed,
                         token: asset,
                       }),

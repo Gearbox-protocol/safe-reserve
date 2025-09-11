@@ -155,7 +155,7 @@ export function LossPolicyTab({
                                       mc: marketConfigurator,
                                       action: "LOSS_POLICY::setAccessMode",
                                       params: JSON.stringify({
-                                        lossPolicy: lossPolicyState.lossPolicy,
+                                        pool: market.pool.pool.address,
                                         mode: m,
                                       }),
                                     },
@@ -189,7 +189,7 @@ export function LossPolicyTab({
                             mc: marketConfigurator,
                             action: "LOSS_POLICY::setChecksEnabled",
                             params: JSON.stringify({
-                              lossPolicy: lossPolicyState.lossPolicy,
+                              pool: market.pool.pool.address,
                               enabled: !lossPolicyState.state.checksEnabled,
                             }),
                           },

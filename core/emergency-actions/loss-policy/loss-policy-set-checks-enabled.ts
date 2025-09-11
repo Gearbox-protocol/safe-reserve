@@ -6,7 +6,7 @@ import { z } from "zod";
 import { BaseEmergencyAction, EmergencyActionData } from "../types";
 
 export interface SetChecksEnabledParams {
-  lossPolicy: Address;
+  pool: Address;
   enabled: boolean;
 }
 
@@ -20,7 +20,7 @@ export const setChecksEnabledActionData: EmergencyActionData<SetChecksEnabledAct
     type: "LOSS_POLICY::setChecksEnabled",
     description: "Enables or disables loss policy checks",
     schema: z.object({
-      lossPolicy: addressSchema,
+      pool: addressSchema,
       enabled: z.boolean(),
     }),
 
@@ -28,7 +28,7 @@ export const setChecksEnabledActionData: EmergencyActionData<SetChecksEnabledAct
       const { params } = action;
 
       const tx = mc.emergencyConfigureLossPolicy(
-        params.lossPolicy,
+        params.pool,
         createCallData(iLossPolicyV310Abi, {
           functionName: "setChecksEnabled",
           args: [params.enabled],

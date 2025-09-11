@@ -28,7 +28,9 @@ export function DownloadTxButton({
         e.preventDefault();
         setIsLoading(true);
 
-        const splittedType = emergencyTx.action.type.split("::");
+        const splittedType = emergencyTx.action.type
+          .replace("_", "-")
+          .split("::");
         const name = splittedType?.[0].toLowerCase() + "-" + splittedType?.[1];
         await downloadTransaction({
           chainId,

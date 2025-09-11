@@ -77,7 +77,9 @@ export function AssetsTab(props: MarketProps) {
               <TableHeader>
                 <TableRow>
                   <TableHead>Asset</TableHead>
-                  <TableHead className="text-right pr-6">Quota Limit</TableHead>
+                  <TableHead className="text-right pr-28">
+                    Quota Limit
+                  </TableHead>
                   <TableHead className="text-right pr-6">
                     Main PriceFeed
                   </TableHead>
@@ -93,7 +95,7 @@ export function AssetsTab(props: MarketProps) {
                   />
 
                   <TableCell>
-                    <div className={"flex justify-end w-full text-right pr-6"}>
+                    <div className={"flex justify-end w-full text-right pr-28"}>
                       ---
                     </div>
                   </TableCell>
@@ -113,55 +115,65 @@ export function AssetsTab(props: MarketProps) {
                   />
                 </TableRow>
 
-                {assets.map((asset) => (
-                  <TableRow key={asset.address}>
-                    <TableCellAsset
-                      assetAddress={asset.address}
-                      symbol={asset.symbol}
-                      explorerUrl={chain?.blockExplorers.default.url}
-                    />
+                {assets
+                  .sort((a, b) => b.quotaLimit - a.quotaLimit)
+                  .map((asset) => (
+                    <TableRow key={asset.address}>
+                      <TableCellAsset
+                        assetAddress={asset.address}
+                        symbol={asset.symbol}
+                        explorerUrl={chain?.blockExplorers.default.url}
+                      />
 
-                    <TableCellUpdatable
-                      newValue={asset.quotaLimit.toString()}
-                      postfix={sdk.tokensMeta.symbol(underlying)}
-                      nowrap
-                      customButton={
-                        <Link
-                          key={`${chainId}-${marketConfigurator}-setTokenLimitToZero`}
-                          href={{
-                            pathname: "/emergency/tx",
-                            query: {
-                              chainId: chainId,
-                              mc: marketConfigurator,
-                              action: "POOL::setTokenLimitToZero",
-                              params: JSON.stringify({
-                                pool: market.pool.pool.address,
-                                token: asset.address,
-                              }),
-                            },
-                          }}
-                        >
-                          <Button variant={"pink"} size={"xs"}>
-                            Set to 0
-                          </Button>
-                        </Link>
-                      }
-                    />
-                    <TableCellUpdatable
-                      newValue={
-                        priceFeeds.priceFeedsInfo[
-                          asset.mainPriceFeed.toLowerCase() as Address
-                        ]?.name ?? shortenHash(asset.mainPriceFeed)
-                      }
-                      onEdit={() =>
-                        setEditingPricefeed({
-                          asset: asset.address,
-                          oldPriceFeed: asset.mainPriceFeed,
-                        })
-                      }
-                    />
-                  </TableRow>
-                ))}
+                      <TableCellUpdatable
+                        className={asset.quotaLimit === 0 ? "pr-28" : ""}
+                        newValue={asset.quotaLimit.toString()}
+                        postfix={sdk.tokensMeta.symbol(underlying)}
+                        isEditable={asset.quotaLimit !== 0}
+                        nowrap
+                        customButton={
+                          asset.quotaLimit === 0 ? (
+                            <Button variant={"pink"} size={"xs"} disabled>
+                              Set to 0
+                            </Button>
+                          ) : (
+                            <Link
+                              key={`${chainId}-${marketConfigurator}-setTokenLimitToZero`}
+                              href={{
+                                pathname: "/emergency/tx",
+                                query: {
+                                  chainId: chainId,
+                                  mc: marketConfigurator,
+                                  action: "POOL::setTokenLimitToZero",
+                                  params: JSON.stringify({
+                                    pool: market.pool.pool.address,
+                                    token: asset.address,
+                                  }),
+                                },
+                              }}
+                            >
+                              <Button variant={"pink"} size={"xs"}>
+                                Set to 0
+                              </Button>
+                            </Link>
+                          )
+                        }
+                      />
+                      <TableCellUpdatable
+                        newValue={
+                          priceFeeds.priceFeedsInfo[
+                            asset.mainPriceFeed.toLowerCase() as Address
+                          ]?.name ?? shortenHash(asset.mainPriceFeed)
+                        }
+                        onEdit={() =>
+                          setEditingPricefeed({
+                            asset: asset.address,
+                            oldPriceFeed: asset.mainPriceFeed,
+                          })
+                        }
+                      />
+                    </TableRow>
+                  ))}
               </TableBody>
             </TableEditable>
 

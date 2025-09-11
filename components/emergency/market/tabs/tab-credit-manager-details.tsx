@@ -53,7 +53,9 @@ export function CreditManagerDetails({
       creditSuite.creditManager.address
     )?.limit;
 
-    return limit ? Number(formatUnits(limit, underlyingDecimals)) : undefined;
+    return limit !== undefined
+      ? Number(formatUnits(limit, underlyingDecimals))
+      : undefined;
   }, [sdk, market, creditSuite]);
 
   return (
