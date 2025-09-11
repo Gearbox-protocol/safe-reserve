@@ -1,6 +1,6 @@
 import { ArchiveTransport } from "@gearbox-protocol/permissionless";
 import { getDefaultConfig } from "connectkit";
-import { Chain, Transport } from "viem";
+import { Chain, defineChain, Transport } from "viem";
 import { createConfig, http } from "wagmi";
 import {
   avalanche,
@@ -15,6 +15,16 @@ import {
 } from "wagmi/chains";
 // import { safe, walletConnect } from "wagmi/connectors";
 
+const hemiWithMulticall3 = defineChain({
+  ...hemi,
+  contracts: {
+    ...hemi.contracts,
+    multicall3: {
+      address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+    },
+  },
+});
+
 export const chains = [
   mainnet,
   base,
@@ -22,7 +32,7 @@ export const chains = [
   bsc,
   worldchain,
   etherlink,
-  hemi,
+  hemiWithMulticall3,
   lisk,
   berachain,
 ] as const;
