@@ -28,22 +28,22 @@ import { MarketProps } from "./types";
 const MODE_METADATA: Record<AccessMode, { title: string; color: string }> = {
   [AccessMode.Forbidden]: {
     title: "Forbidden",
-    color: "red-500",
+    color: "bg-red-500",
   },
   [AccessMode.Permissioned]: {
     title: "Permissioned",
-    color: "blue-700",
+    color: "bg-blue-500",
   },
   [AccessMode.Permissionless]: {
     title: "Permissionless",
-    color: "green-500",
+    color: "bg-green-500",
   },
 };
 
 const getStatusComponent = (s: AccessMode) => (
   <div className="flex items-center gap-2">
     <span
-      className={`inline-flex items-center justify-center rounded-full bg-${MODE_METADATA[s].color} w-2 h-2`}
+      className={`inline-flex items-center justify-center rounded-full ${MODE_METADATA[s].color} w-2 h-2`}
     />
     {MODE_METADATA[s].title}
   </div>

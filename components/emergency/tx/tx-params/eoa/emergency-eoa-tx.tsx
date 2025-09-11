@@ -7,6 +7,7 @@ import { EmergencyTxProps } from "../types";
 import { EoaEmergencyTxButton } from "./eoa-emergency-tx-button";
 
 export function EmergencyEoaTx({
+  sdk,
   chainId,
   emergencyTx,
   emergencyAdminInfo,
@@ -34,8 +35,8 @@ export function EmergencyEoaTx({
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-3 text-sm">
         <div className="border-t border-gray-800 pt-3">
-          <div className="font-semibold text-gray-200 mb-2">Params</div>
-          <RenderedParams action={emergencyTx.action} />
+          <div className="font-semibold text-gray-200 mb-2 text-lg">Params</div>
+          <RenderedParams sdk={sdk} action={emergencyTx.action} />
         </div>
       </CardContent>
     </Card>

@@ -71,10 +71,10 @@ export function GovernorProposalCall({
           Object.entries(parsedCall.args).map(([arg, value], i) => (
             <div
               key={i}
-              className="grid grid-cols-[120px_auto] border-t border-gray-800 p-4 text-sm text-gray-400"
+              className="grid grid-cols-[120px_auto] border-t border-gray-800 p-4 text-sm text-gray-400 font-mono"
             >
               <div className="font-semibold">{arg}: </div>
-              <div className="">{tryPrettyPrint(value)}</div>
+              <div>{tryPrettyPrint(value)}</div>
             </div>
           ))
         ) : (

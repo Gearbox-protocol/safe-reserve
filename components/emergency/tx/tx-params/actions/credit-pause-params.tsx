@@ -1,16 +1,28 @@
 import { CreditPauseAction } from "@/core/emergency-actions";
+import { GearboxSDK } from "@gearbox-protocol/sdk";
+import { useMemo } from "react";
+import { AddressParamsView } from "./address-param";
 
 export function CreditPauseParamsView({
+  sdk,
   action,
 }: {
+  sdk: GearboxSDK;
   action: CreditPauseAction;
 }) {
+  const creditSuite = useMemo(
+    () => sdk.marketRegister.findCreditManager(action.params.creditManager),
+    [sdk, action]
+  );
+  
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-[140px_auto] gap-2 text-gray-300">
-        <div className="text-gray-400">creditManager</div>
-        <div className="break-all font-mono">{action.params.creditManager}</div>
-      </div>
+      <AddressParamsView
+        sdk={sdk}
+        address={action.params.creditManager}
+        title="creditManager"
+        description={creditSuite.name}
+      />
     </div>
   );
 }

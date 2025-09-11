@@ -1,20 +1,34 @@
 import { SetTokenLimitToZeroAction } from "@/core/emergency-actions";
+import { GearboxSDK } from "@gearbox-protocol/sdk";
+import { useMemo } from "react";
+import { AddressParamsView } from "./address-param";
 
 export function SetTokenLimitToZeroParamsView({
+  sdk,
   action,
 }: {
+  sdk: GearboxSDK;
   action: SetTokenLimitToZeroAction;
 }) {
+  const marketSuite = useMemo(
+    () => sdk.marketRegister.findByPool(action.params.pool),
+    [sdk, action]
+  );
+
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-[140px_auto] gap-2 text-gray-300">
-        <div className="text-gray-400">pool</div>
-        <div className="break-all font-mono">{action.params.pool}</div>
-      </div>
-      <div className="grid grid-cols-[140px_auto] gap-2 text-gray-300">
-        <div className="text-gray-400">token</div>
-        <div className="break-all font-mono">{action.params.token}</div>
-      </div>
+      <AddressParamsView
+        sdk={sdk}
+        address={action.params.pool}
+        title="pool"
+        description={`${marketSuite.pool.pool.symbol} market`}
+      />
+      <AddressParamsView
+        sdk={sdk}
+        address={action.params.token}
+        title="token"
+        description={sdk.tokensMeta.symbol(action.params.token)}
+      />
     </div>
   );
 }

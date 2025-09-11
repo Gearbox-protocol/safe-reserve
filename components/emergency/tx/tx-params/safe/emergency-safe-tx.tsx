@@ -10,6 +10,7 @@ import { EmergencyTxProps } from "../types";
 import { SafeEmergencyTxButton } from "./safe-emergency-tx-button";
 
 export function EmergencySafeTx({
+  sdk,
   chainId,
   emergencyTx,
   emergencyAdminInfo,
@@ -82,8 +83,10 @@ export function EmergencySafeTx({
         ) : (
           <div className="grid grid-cols-[1fr_minmax(300px,max-content)] gap-12">
             <div className="border-t border-gray-800 pt-3">
-              <div className="font-semibold text-gray-200 mb-2">Params</div>
-              <RenderedParams action={emergencyTx.action} />
+              <div className="font-semibold text-gray-200 mb-2 text-lg">
+                Params
+              </div>
+              <RenderedParams sdk={sdk} action={emergencyTx.action} />
             </div>
 
             <div className="border-l border-gray-800 pl-8">

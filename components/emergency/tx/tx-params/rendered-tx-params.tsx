@@ -11,32 +11,39 @@ import { SetPriceFeedParamsView } from "./actions/oracle-set-price-feed-params";
 import { PoolPauseParams } from "./actions/pool-pause-params";
 import { SetCreditManagerDebtLimitToZeroParamsView } from "./actions/pool-set-credit-manager-debt-limit-to-zero-params";
 import { SetTokenLimitToZeroParamsView } from "./actions/pool-set-token-limit-to-zero-params";
+import { GearboxSDK } from "@gearbox-protocol/sdk";
 
-export function RenderedParams({ action }: { action: EmergencyActions }) {
+export function RenderedParams({
+  sdk,
+  action,
+}: {
+  sdk: GearboxSDK;
+  action: EmergencyActions;
+}) {
   switch (action.type) {
     case "POOL::pause":
-      return <PoolPauseParams action={action} />;
+      return <PoolPauseParams action={action} sdk={sdk}/>;
     case "POOL::setTokenLimitToZero":
-      return <SetTokenLimitToZeroParamsView action={action} />;
+      return <SetTokenLimitToZeroParamsView action={action} sdk={sdk}/>;
     case "POOL::setCreditManagerDebtLimitToZero":
-      return <SetCreditManagerDebtLimitToZeroParamsView action={action} />;
+      return <SetCreditManagerDebtLimitToZeroParamsView action={action} sdk={sdk}/>;
 
     case "CREDIT::forbidToken":
-      return <ForbidTokenParamsView action={action} />;
+      return <ForbidTokenParamsView action={action} sdk={sdk}/>;
     case "CREDIT::forbidAdapter":
-      return <ForbidAdapterParamsView action={action} />;
+      return <ForbidAdapterParamsView action={action} sdk={sdk}/>;
     case "CREDIT::forbidBorrowing":
-      return <ForbidBorrowingParamsView action={action} />;
+      return <ForbidBorrowingParamsView action={action} sdk={sdk}/>;
     case "CREDIT::pause":
-      return <CreditPauseParamsView action={action} />;
+      return <CreditPauseParamsView action={action} sdk={sdk}/>;
 
     case "ORACLE::setPriceFeed":
-      return <SetPriceFeedParamsView action={action} />;
+      return <SetPriceFeedParamsView action={action} sdk={sdk}/>;
 
     case "LOSS_POLICY::setAccessMode":
-      return <SetAccessModeParamsView action={action} />;
+      return <SetAccessModeParamsView action={action} sdk={sdk}/>;
     case "LOSS_POLICY::setChecksEnabled":
-      return <SetChecksEnabledParamsView action={action} />;
+      return <SetChecksEnabledParamsView action={action} sdk={sdk}/>;
     default:
       return null;
   }
