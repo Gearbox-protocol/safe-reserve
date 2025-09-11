@@ -25,7 +25,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 Ensure the following environment variables are properly configured:
 
-- `NEXT_PUBLIC_MAINNET_NODE_URI` – Mainnet RPC URL
+- `NEXT_PUBLIC_ADDRESS_PROVIDER` – Address provider address
+- `NEXT_PUBLIC_RPC_URL` – Mainnet RPC URL
+- `NEXT_PUBLIC_DRPC_API_KEY` – DRPC RPC access key
 - `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` – WalletConnect Project ID
   - You can get this from [WalletConnect Cloud](https://cloud.walletconnect.com/)
 
