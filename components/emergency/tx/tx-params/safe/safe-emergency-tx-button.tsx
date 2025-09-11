@@ -1,5 +1,6 @@
+import { TransactionInfoDialog } from "@/components/txs/transaction-info-dialog";
 import { Button } from "@/components/ui/button";
-import { EmergencyTx } from "@/core/emergency-actions/types";
+import { EmergencyTx } from "@/core/emergency-actions";
 import { SignedTx } from "@/core/safe-tx";
 import {
   useIsSafeApp,
@@ -12,8 +13,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Address, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
-import { TransactionInfoDialog } from "../../../txs/transaction-info-dialog";
-import { DownloadTxButton } from "./download-tx-button";
+import { DownloadTxButton } from "../download-tx-button";
 
 interface ButtonTxProps {
   chainId: number;

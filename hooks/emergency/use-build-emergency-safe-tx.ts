@@ -1,7 +1,7 @@
 "use client";
 
 import { safeAbi } from "@/abi";
-import { EmergencyTx } from "@/core/emergency-actions/types";
+import { EmergencyTx } from "@/core/emergency-actions";
 import { SignedTx } from "@/core/safe-tx";
 import { useSafeParams } from "@/hooks";
 import {
@@ -59,8 +59,6 @@ export function useBuildEmergencySafeTx({
     queryKey: ["prepare-tx", chainId, safe, emergencyTx.tx.callData],
     queryFn: async () => {
       if (!publicClient || usingNonce === undefined) return;
-
-      const startIndex = -1;
 
       return await getReserveMultisigBatch({
         type: "queue",

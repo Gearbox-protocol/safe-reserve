@@ -15,6 +15,7 @@ import {
   creditPauseActionData,
 } from "./credit/credit-pause";
 import {
+  AccessMode,
   SetAccessModeAction,
   setAccessModeActionData,
 } from "./loss-policy/loss-policy-set-access-mode";
@@ -35,7 +36,7 @@ import {
   SetTokenLimitToZeroAction,
   setTokenLimitToZeroActionData,
 } from "./pool/pool-set-token-limit-to-zero";
-import { EmergencyActionData } from "./types";
+import { EmergencyActionData, EmergencyTx } from "./types";
 
 export type EmergencyActions =
   // Pool domain
@@ -100,3 +101,19 @@ export function validateEmergencyAction(action: {
     params,
   } as EmergencyActions;
 }
+
+export { AccessMode };
+
+export type {
+  CreditPauseAction,
+  EmergencyTx,
+  ForbidAdapterAction,
+  ForbidBorrowingAction,
+  ForbidTokenAction,
+  PoolPauseAction,
+  SetAccessModeAction,
+  SetChecksEnabledAction,
+  SetCreditManagerDebtLimitToZeroAction,
+  SetPriceFeedAction,
+  SetTokenLimitToZeroAction,
+};

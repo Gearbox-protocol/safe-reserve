@@ -1,5 +1,5 @@
 import { safeAbi } from "@/abi";
-import { EmergencyTx } from "@/core/emergency-actions/types";
+import { EmergencyTx } from "@/core/emergency-actions";
 import { useBuildEmergencySafeTx } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";

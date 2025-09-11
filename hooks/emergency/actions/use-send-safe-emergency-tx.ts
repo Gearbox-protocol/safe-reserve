@@ -1,5 +1,5 @@
 import { safeAbi } from "@/abi";
-import { EmergencyTx } from "@/core/emergency-actions/types";
+import { EmergencyTx } from "@/core/emergency-actions";
 import { SignedTx } from "@/core/safe-tx";
 import { useSafeParams } from "@/hooks";
 import { useSafeSignature } from "@/hooks/actions/use-safe-signature";

@@ -1,20 +1,22 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { PageLayout } from "@/components/ui/page";
 import { chains } from "@/config/wagmi";
 import { EmergencyActions } from "@/core/emergency-actions";
 import {
   useGetEmergencyAdminInfo,
   useGetEmergencyTx,
   useGetMarketConfiguratorInfo,
+  useSDK,
 } from "@/hooks";
 import { shortenHash } from "@gearbox-protocol/permissionless";
 import { Copy, ExternalLink } from "lucide-react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import { Address } from "viem";
-import { Button } from "../../ui/button";
-import { PageLayout } from "../../ui/page";
-import { EmergencyEoaTx } from "./tx-params/emergency-eoa-tx";
-import { EmergencySafeTx } from "./tx-params/emergency-safe-tx";
+import { EmergencyEoaTx } from "./tx-params/eoa/emergency-eoa-tx";
+import { EmergencySafeTx } from "./tx-params/safe/emergency-safe-tx";
 
 export function EmergencyActionView({
   chainId,
@@ -35,6 +37,7 @@ export function EmergencyActionView({
     chainId,
     address: marketConfigurator,
   });
+
   const {
     data: adminInfo,
     isLoading: isLoadingAdminInfo,
@@ -50,7 +53,24 @@ export function EmergencyActionView({
     action,
   });
 
-  if (isLoadingMcInfo || isLoadingAdminInfo) {
+  const {
+    data: sdk,
+    isLoading: isLoadingSdk,
+    error: sdkError,
+  } = useSDK({
+    chainId,
+    configurators: [marketConfigurator],
+  });
+
+  const marketConfiguratorContract = useMemo(
+    () =>
+      (sdk?.marketRegister.marketConfigurators ?? []).find(
+        (mc) => mc.address.toLowerCase() === marketConfigurator.toLowerCase()
+      ),
+    [marketConfigurator, sdk?.marketRegister.marketConfigurators]
+  );
+
+  if (isLoadingMcInfo || isLoadingAdminInfo || isLoadingSdk) {
     return (
       <div className="divide-y divide-gray-800 space-y-6">
         {[1, 2, 3].map((i) => (
@@ -64,18 +84,28 @@ export function EmergencyActionView({
     );
   }
 
-  if (adminInfoError || mcInfoError || !mcInfo?.curatorName || !adminInfo) {
+  if (
+    adminInfoError ||
+    mcInfoError ||
+    sdkError ||
+    !mcInfo?.curatorName ||
+    !adminInfo ||
+    !marketConfiguratorContract
+  ) {
     return (
       <div className="p-4">
         <text className="font-semibold text-white">
           Invalid market cofigurator:{" "}
-          {adminInfoError?.message || mcInfoError?.message || "Unknown address"}
+          {adminInfoError?.message ||
+            mcInfoError?.message ||
+            sdkError?.message ||
+            "Unknown address"}
         </text>
       </div>
     );
   }
 
-  if (!emergencyTx) return null;
+  if (!emergencyTx || !sdk) return <></>;
 
   return (
     <PageLayout
@@ -120,12 +150,14 @@ export function EmergencyActionView({
         {adminInfo.type === "safe" ? (
           <EmergencySafeTx
             chainId={chainId}
+            sdk={sdk}
             emergencyTx={emergencyTx}
             emergencyAdminInfo={adminInfo}
           />
         ) : (
           <EmergencyEoaTx
             chainId={chainId}
+            sdk={sdk}
             emergencyTx={emergencyTx}
             emergencyAdminInfo={adminInfo}
           />

@@ -1,4 +1,4 @@
-import { ForbidBorrowingAction } from "@/core/emergency-actions/credit/credit-forbid-borrowing";
+import { ForbidBorrowingAction } from "@/core/emergency-actions";
 
 export function ForbidBorrowingParamsView({
   action,

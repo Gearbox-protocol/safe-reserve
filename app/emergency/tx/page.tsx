@@ -1,5 +1,6 @@
 "use client";
 
+import { EmergencyActionView } from "@/components/emergency/tx/emergency-action-view";
 import { chains } from "@/config/wagmi";
 import {
   EmergencyActions,
@@ -7,7 +8,6 @@ import {
 } from "@/core/emergency-actions";
 import { Suspense, useEffect, useState } from "react";
 import { Address, isAddress } from "viem";
-import { EmergencyActionView } from "../../../components/emergency/tx/emergency-action-view";
 
 function EmergencyTxContent() {
   const [chainId, setChainId] = useState<number>();

@@ -1,3 +1,4 @@
+import { ADDRESS_PROVIDER, chains } from "@/config/wagmi";
 import {
   AddressProviderContract,
   MarketConfiguratorFactoryContract,
@@ -6,7 +7,6 @@ import { useQueries } from "@tanstack/react-query";
 import { isAddress } from "viem";
 import { useConfig } from "wagmi";
 import { getPublicClient } from "wagmi/actions";
-import { ADDRESS_PROVIDER, chains } from "../../config/wagmi";
 
 export function useGetMarketConfigurators() {
   const config = useConfig();

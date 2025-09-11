@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AccessMode } from "@/core/emergency-actions/loss-policy/loss-policy-set-access-mode";
+import { AccessMode } from "@/core/emergency-actions";
 import Link from "next/link";
 import { useMemo } from "react";
 import { decodeAbiParameters, hexToString } from "viem";

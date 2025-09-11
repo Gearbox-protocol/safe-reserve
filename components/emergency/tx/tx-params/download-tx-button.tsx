@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { EmergencyTx } from "@/core/emergency-actions/types";
+import { EmergencyTx } from "@/core/emergency-actions";
 import { useTransactionDownload } from "@/hooks";
 import { Download } from "lucide-react";
 import { useState } from "react";

@@ -19,7 +19,6 @@ export const chains = [
   mainnet,
   base,
   avalanche,
-  // monadTestnet,
   bsc,
   worldchain,
   etherlink,

@@ -1,4 +1,4 @@
-import { EmergencyTx } from "@/core/emergency-actions/types";
+import { EmergencyTx } from "@/core/emergency-actions";
 import { getPriceUpdateTx } from "@gearbox-protocol/permissionless";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";

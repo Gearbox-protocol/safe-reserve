@@ -5,11 +5,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { EmergencyTx } from "@/core/emergency-actions/types";
+import { EmergencyTx } from "@/core/emergency-actions";
 import { EmergencyAdminInfo, useSendEoaEmergencyTx } from "@/hooks";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { DownloadTxButton } from "./download-tx-button";
+import { DownloadTxButton } from "../download-tx-button";
 
 interface ButtonTxProps {
   chainId: number;

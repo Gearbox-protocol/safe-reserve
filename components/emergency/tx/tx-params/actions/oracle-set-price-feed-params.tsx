@@ -1,4 +1,4 @@
-import { SetPriceFeedAction } from "@/core/emergency-actions/oracle/oracle-set-price-feed";
+import { SetPriceFeedAction } from "@/core/emergency-actions";
 
 export function SetPriceFeedParamsView({
   action,

@@ -1,6 +1,5 @@
 "use client";
 
-// import { Header } from "@/components/header";
 import { config } from "@/config/wagmi";
 import SafeProvider from "@safe-global/safe-apps-react-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

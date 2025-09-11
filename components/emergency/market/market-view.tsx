@@ -1,6 +1,9 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { PageLayout } from "@/components/ui/page";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TokenIcon } from "@/components/ui/token-icon";
 import { chains } from "@/config/wagmi";
 import { useGetMarketConfiguratorInfo, useSDK } from "@/hooks";
 import { shortenHash } from "@gearbox-protocol/permissionless";
@@ -9,9 +12,6 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Address } from "viem";
-import { Button } from "../../ui/button";
-import { PageLayout } from "../../ui/page";
-import { TokenIcon } from "../../ui/token-icon";
 import { AssetsTab } from "./tabs/tab-assets";
 import { CreditManagerDetails } from "./tabs/tab-credit-manager-details";
 import { LossPolicyTab } from "./tabs/tab-loss-policy";
@@ -62,7 +62,8 @@ export function MarketView({
       description={
         <div className="flex items-center gap-2 text-gray-100">
           <div className="text-sm text-muted-foreground break-all">
-            {chain?.name ?? chainId} · {mcInfo.curatorName} · {shortenHash(marketSuite.pool.pool.address)}
+            {chain?.name ?? chainId} · {mcInfo.curatorName} ·{" "}
+            {shortenHash(marketSuite.pool.pool.address)}
           </div>
 
           <Button

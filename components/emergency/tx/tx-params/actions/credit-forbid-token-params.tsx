@@ -1,9 +1,9 @@
-import { ForbidAdapterAction } from "@/core/emergency-actions/credit/credit-forbid-adapter";
+import { ForbidTokenAction } from "@/core/emergency-actions";
 
-export function ForbidAdapterParamsView({
+export function ForbidTokenParamsView({
   action,
 }: {
-  action: ForbidAdapterAction;
+  action: ForbidTokenAction;
 }) {
   return (
     <div className="space-y-2">
@@ -12,8 +12,8 @@ export function ForbidAdapterParamsView({
         <div className="break-all font-mono">{action.params.creditManager}</div>
       </div>
       <div className="grid grid-cols-[140px_auto] gap-2 text-gray-300">
-        <div className="text-gray-400">adapter</div>
-        <div className="break-all font-mono">{action.params.adapter}</div>
+        <div className="text-gray-400">token</div>
+        <div className="break-all font-mono">{action.params.token}</div>
       </div>
     </div>
   );

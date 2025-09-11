@@ -1,4 +1,4 @@
-import { PoolPauseAction } from "@/core/emergency-actions/pool/pool-pause";
+import { PoolPauseAction } from "@/core/emergency-actions";
 
 export function PoolPauseParams({ action }: { action: PoolPauseAction }) {
   return (

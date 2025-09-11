@@ -1,21 +1,16 @@
 "use client";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { emergencyActionsMap } from "@/core/emergency-actions";
-import { EmergencyTx } from "@/core/emergency-actions/types";
-import { EmergencyAdminInfo } from "@/hooks";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../ui/card";
+import { RenderedParams } from "../rendered-tx-params";
+import { EmergencyTxProps } from "../types";
 import { EoaEmergencyTxButton } from "./eoa-emergency-tx-button";
-import { RenderedParams } from "./rendered-tx-params";
 
 export function EmergencyEoaTx({
   chainId,
   emergencyTx,
   emergencyAdminInfo,
-}: {
-  chainId: number;
-  emergencyTx: EmergencyTx;
-  emergencyAdminInfo: EmergencyAdminInfo;
-}) {
+}: EmergencyTxProps) {
   const actionMeta = emergencyActionsMap[emergencyTx.action.type];
 
   if (emergencyAdminInfo.type === "safe") return <></>;

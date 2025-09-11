@@ -1,12 +1,12 @@
+import {
+  EmergencyActions,
+  emergencyActionsMap,
+} from "@/core/emergency-actions";
+import { MarketConfiguratorContract } from "@gearbox-protocol/permissionless";
 import { useMemo } from "react";
 import { Address } from "viem";
 import { useConfig } from "wagmi";
 import { getPublicClient } from "wagmi/actions";
-import {
-  EmergencyActions,
-  emergencyActionsMap,
-} from "../../core/emergency-actions";
-import { MarketConfiguratorContract } from "@gearbox-protocol/permissionless";
 
 export function useGetEmergencyTx({
   chainId,

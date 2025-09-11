@@ -1,23 +1,19 @@
 "use client";
 
+import { InstanceProposalSignatures } from "@/components/txs/instance/instance-proposal-signatures";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { emergencyActionsMap } from "@/core/emergency-actions";
-import { EmergencyTx } from "@/core/emergency-actions/types";
-import { EmergencyAdminInfo, useBuildEmergencySafeTx } from "@/hooks";
+import { useBuildEmergencySafeTx } from "@/hooks";
 import { useEffect, useState } from "react";
-import { InstanceProposalSignatures } from "../../../txs/instance/instance-proposal-signatures";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../ui/card";
-import { RenderedParams } from "./rendered-tx-params";
+import { RenderedParams } from "../rendered-tx-params";
+import { EmergencyTxProps } from "../types";
 import { SafeEmergencyTxButton } from "./safe-emergency-tx-button";
 
 export function EmergencySafeTx({
   chainId,
   emergencyTx,
   emergencyAdminInfo,
-}: {
-  chainId: number;
-  emergencyTx: EmergencyTx;
-  emergencyAdminInfo: EmergencyAdminInfo;
-}) {
+}: EmergencyTxProps) {
   const actionMeta = emergencyActionsMap[emergencyTx.action.type];
 
   const [nonce, setNonce] = useState<number>();

@@ -1,4 +1,4 @@
-import { CreditPauseAction } from "@/core/emergency-actions/credit/credit-pause";
+import { CreditPauseAction } from "@/core/emergency-actions";
 
 export function CreditPauseParamsView({
   action,
