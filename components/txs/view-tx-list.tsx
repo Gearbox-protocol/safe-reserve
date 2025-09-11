@@ -36,7 +36,7 @@ export function ViewTxList({ cid }: { cid: string }) {
   const { threshold } = useSafeParams(safe);
 
   const { switchChain, chains } = useSwitchChain();
-  const { chain } = useAccount();
+  const { chain, address } = useAccount();
 
   useEffect(() => {
     if (!!chainId && chainId !== chain?.id) {
@@ -159,7 +159,7 @@ export function ViewTxList({ cid }: { cid: string }) {
                 </div>
               </div>
             </Card>
-            {chainId === chain?.id &&
+            {(chainId === chain?.id || !address) &&
               (type === "timelock" ? (
                 <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
                   {txs.map((tx, index) => (
