@@ -15,19 +15,6 @@ config({ path: ".env.local" });
 
 const RPC = process.env.RPC_URL;
 
-// OK: set 0 quota to sUSDf
-
-// FAIL: set 0 feed for crv (0x781719a4296a5aff39157cc04985756b44ce795cdaf7f7a188b8a575ecd1dcd9)
-// FAIL: forbiden acces mode (0x3fd4b5aeef1623f93ad6754ffac122ac206b97c9c7f76f3525e7e1d9b80e20b8)
-// FAIL: disable checks (0x99131de90c0c59aef33e310c65d3c4f8e4d2f739b727aecb915f7b4240e47f62)
-
-// OK: forbid YUSD
-// OK: forbid pendle adapter
-// OK: forbid borrow
-// OK: set 0 limit
-// OK: pause cm
-// OK: pause pool
-
 async function main() {
   // Get JSON file path from command line args
   const jsonPath = process.argv[2];
