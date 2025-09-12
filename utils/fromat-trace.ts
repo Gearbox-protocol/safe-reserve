@@ -170,7 +170,7 @@ export const formatCallSignature = (
   const formattedArgs = args?.map((arg: unknown) => formatArg(arg, level, config)).join(", ");
 
   const error = trace.revertReason || trace.error;
-  let returnValue = error || trace.output;
+  let returnValue: string = trace.output || error;
 
   try {
     if (error == null) {

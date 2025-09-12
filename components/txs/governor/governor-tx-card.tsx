@@ -7,11 +7,11 @@ import { TimelockTxStatus } from "@/utils/tx-status";
 import { ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Address } from "viem";
+import { Address, zeroAddress } from "viem";
+import { SimulateTxButton } from "../simulate-tx-button";
 import { GovernorProposalCall } from "./governor-proposal-call";
 import { GovernorProposalSignatures } from "./governor-proposal-signatures";
 import { GovernorButtonTx } from "./governor-tx-button";
-// import { SimulateTxButton } from "../simulate-tx-button";
 
 interface TransactionCardProps {
   cid: string;
@@ -75,11 +75,16 @@ export function GovernorTransactionCard({
             {tx.signedBy.length} / {Number(threshold)}
           </span>
 
-          {/* <SimulateTxButton
-            tx={tx}
-            safeAddress={safeAddress}
-            instanceManager={governor}
-          /> */}
+          {/* Only show simulation button for non-queued and ready transactions */}
+          {(tx.status === TimelockTxStatus.NotFound || tx.status === TimelockTxStatus.Ready) && (
+            <SimulateTxButton
+              tx={tx}
+              safeAddress={safeAddress}
+              governor={governor}
+              instanceManager={zeroAddress}
+              isGovernorTxs={true}
+            />
+          )}
 
           <GovernorButtonTx
             tx={tx}

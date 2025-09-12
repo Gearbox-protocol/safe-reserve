@@ -1,32 +1,119 @@
 import { Button } from "@/components/ui/button";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { FormattedTrace } from "@/components/ui/formatted-trace";
-import { SignedTx, ParsedSignedTx } from "@/core/safe-tx";
-import { useSimulateTx } from "@/hooks/actions/use-simulate-tx";
-import { Play, Loader2, CheckCircle, XCircle, Eye } from "lucide-react";
-import { useState } from "react";
+import { ParsedSignedTx, SignedTx } from "@/core/safe-tx";
+import { useSimulateGovernorTx } from "@/hooks/actions/use-simulate-governor-tx";
+import { useSimulateInstanceTx } from "@/hooks/actions/use-simulate-instance-tx";
+import { CheckCircle, Eye, Loader2, Play, XCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Address } from "viem";
 
 interface SimulateTxButtonProps {
   tx: SignedTx | ParsedSignedTx;
   safeAddress: Address;
+  governor: Address;
   instanceManager: Address;
+  isGovernorTxs: boolean;
 }
 
-export function SimulateTxButton({
+function GovernorSimulateTxButton({
+  tx,
+  safeAddress,
+  governor,
+}: {
+  tx: ParsedSignedTx;
+  safeAddress: Address;
+  governor: Address;
+}) {
+  const [hasSimulated, setHasSimulated] = useState(false);
+  const [isTraceDialogOpen, setIsTraceDialogOpen] = useState(false);
+  const { data, isLoading, error, simulate } = useSimulateGovernorTx(safeAddress, governor, tx);
+  
+  return (
+    <SimulateTxButtonComponent
+      data={data}
+      isLoading={isLoading}
+      error={error}
+      simulate={simulate}
+      hasSimulated={hasSimulated}
+      setHasSimulated={setHasSimulated}
+      isTraceDialogOpen={isTraceDialogOpen}
+      setIsTraceDialogOpen={setIsTraceDialogOpen}
+    />
+  );
+}
+
+function InstanceSimulateTxButton({
   tx,
   safeAddress,
   instanceManager,
-}: SimulateTxButtonProps) {
+}: {
+  tx: SignedTx;
+  safeAddress: Address;
+  instanceManager: Address;
+}) {
   const [hasSimulated, setHasSimulated] = useState(false);
   const [isTraceDialogOpen, setIsTraceDialogOpen] = useState(false);
-  const { data, isLoading, error, simulate } = useSimulateTx(safeAddress, instanceManager, tx);
+  const { data, isLoading, error, simulate } = useSimulateInstanceTx(safeAddress, instanceManager, tx);
+  
+  return (
+    <SimulateTxButtonComponent
+      data={data}
+      isLoading={isLoading}
+      error={error}
+      simulate={simulate}
+      hasSimulated={hasSimulated}
+      setHasSimulated={setHasSimulated}
+      isTraceDialogOpen={isTraceDialogOpen}
+      setIsTraceDialogOpen={setIsTraceDialogOpen}
+    />
+  );
+}
+
+function SimulateTxButtonComponent({
+  data,
+  isLoading,
+  error,
+  simulate,
+  hasSimulated,
+  setHasSimulated,
+  isTraceDialogOpen,
+  setIsTraceDialogOpen,
+}: {
+  data: {
+    success: boolean;
+    result: string;
+    gasEstimate: bigint;
+    fromatTrace?: string;
+  } | undefined;
+  isLoading: boolean;
+  error: Error | null;
+  simulate: () => void;
+  hasSimulated: boolean;
+  setHasSimulated: (value: boolean) => void;
+  isTraceDialogOpen: boolean;
+  setIsTraceDialogOpen: (value: boolean) => void;
+}) {
+  // Handle success/error notifications
+  useEffect(() => {
+    if (hasSimulated && !isLoading) {
+      if (error) {
+        toast.error(`Simulation failed: ${error.message}`);
+      } else if (data) {
+        if (data.success) {
+          toast.success("Transaction simulation successful");
+        } else {
+          toast.error("Transaction simulation failed - transaction would revert");
+        }
+      }
+    }
+  }, [hasSimulated, isLoading, error, data]);
 
   const handleSimulate = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -43,18 +130,7 @@ export function SimulateTxButton({
     }
     
     setHasSimulated(true);
-    simulate(undefined, {
-      onSuccess: (result) => {
-        if (result?.success) {
-          toast.success("Transaction simulation successful");
-        } else {
-          toast.error("Transaction simulation failed - transaction would revert");
-        }
-      },
-      onError: (error) => {
-        toast.error(`Simulation failed: ${error.message}`);
-      }
-    });
+    simulate();
   };
 
   const getButtonContent = () => {
@@ -161,5 +237,31 @@ export function SimulateTxButton({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+export function SimulateTxButton({
+  tx,
+  safeAddress,
+  governor,
+  instanceManager,
+  isGovernorTxs,
+}: SimulateTxButtonProps) {
+  if (isGovernorTxs) {
+    return (
+      <GovernorSimulateTxButton
+        tx={tx as ParsedSignedTx}
+        safeAddress={safeAddress}
+        governor={governor}
+      />
+    );
+  }
+  
+  return (
+    <InstanceSimulateTxButton
+      tx={tx}
+      safeAddress={safeAddress}
+      instanceManager={instanceManager}
+    />
   );
 }

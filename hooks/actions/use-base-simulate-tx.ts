@@ -1,11 +1,8 @@
 import { safeAbi, simulateTxAccessorAbi } from "@/abi";
 import { SignedTx } from "@/core/safe-tx";
-import { useDecodeInstanceCalls } from "@/hooks";
 import { traceCall } from "@/utils/debug-trace";
 import { formatFullTrace } from "@/utils/fromat-trace";
 import { getMulticall3Params } from "@/utils/multicall3";
-import { getPriceFeedFromInstanceParsedCall } from "@/utils/parsed-call-utils";
-import { getPriceUpdateTx } from "@gearbox-protocol/permissionless";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Address, decodeAbiParameters, encodeFunctionData, Hex } from "viem";
@@ -96,21 +93,20 @@ export function decodeSafeSimulation(revertData: Hex): DecodedSafeSimulation {
   };
 }
 
-export function useSimulateTx(
-  safeAddress: Address,
-  instanceManager: Address,
-  tx: SignedTx
-) {
+export interface SimulationConfig {
+  safeAddress: Address;
+  tx: SignedTx;
+  priceFeeds: Address[];
+  useMulticall3ForPriceUpdate?: boolean;
+}
+
+export function useBaseSimulateTx(config: SimulationConfig) {
   const publicClient = usePublicClient();
-  const parsedCalls = useDecodeInstanceCalls(instanceManager, tx.calls);
-  const priceFeeds = parsedCalls
-    .map(getPriceFeedFromInstanceParsedCall)
-    .filter((priceFeed) => priceFeed !== undefined) as Address[];
 
   const mutation = useMutation({
-    mutationKey: ["simulate-tx", safeAddress, instanceManager, tx.hash],
+    mutationKey: ["simulate-tx", config.safeAddress, config.tx.hash],
     mutationFn: async () => {
-      if (!publicClient || !safeAddress || !tx) {
+      if (!publicClient || !config.safeAddress || !config.tx) {
         throw new Error("Missing required parameters for simulation");
       }
 
@@ -120,19 +116,29 @@ export function useSimulateTx(
         return;
       }
 
-      let updateTx =
-        priceFeeds.length === 0
+      const updateTx =
+        config.priceFeeds.length === 0
           ? undefined
-          : await getPriceUpdateTx({
-              client: publicClient,
-              priceFeeds,
-              useMulticall3: true,
-            });
+          : await (async () => {
+              const { getPriceUpdateTx } = await import(
+                "@gearbox-protocol/permissionless"
+              );
+              return getPriceUpdateTx({
+                client: publicClient,
+                priceFeeds: config.priceFeeds,
+                useMulticall3: config.useMulticall3ForPriceUpdate ?? true,
+              });
+            })();
 
       const callData = encodeFunctionData({
         abi: simulateTxAccessorAbi,
         functionName: "simulate",
-        args: [tx.to, tx.value, tx.data, tx.operation],
+        args: [
+          config.tx.to,
+          config.tx.value,
+          config.tx.data,
+          config.tx.operation,
+        ],
       });
 
       // simulateAndRevert always reverts, so we use call instead of simulateContract
@@ -143,7 +149,7 @@ export function useSimulateTx(
       });
 
       const safeSimulateCall = {
-        to: safeAddress,
+        to: config.safeAddress,
         callData: simulateAndRevertData,
         allowFailure: true,
       } as const;
@@ -161,13 +167,14 @@ export function useSimulateTx(
       try {
         const { result } = await publicClient.simulateContract({
           ...multicall3Params,
-          gas: 20_000_000n,
+          gas: 30_000_000n,
         });
 
         const simulationResult = updateTx
           ? result[1]
           : (result[0] as { success: boolean; returnData: Hex });
         const decoded = decodeSafeSimulation(simulationResult.returnData);
+        console.log("decoded", decoded);
 
         if (!decoded.delegateCallSuccess) {
           throw new Error("Simulation delegate call failed");
@@ -179,10 +186,11 @@ export function useSimulateTx(
             const trace = await traceCall(publicClient, {
               to: multicall3.address,
               data: multicall3Data,
-              gas: 20_000_000n,
+              gas: 30_000_000n,
             });
             fromatTrace = await formatFullTrace(trace, { gas: true });
           } catch (error) {
+            console.error(error);
             toast.warning("Failed to trace transaction");
           }
         }

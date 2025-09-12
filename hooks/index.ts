@@ -2,6 +2,8 @@ export * from "./actions/use-safe-signature";
 export * from "./actions/use-send-governor-tx";
 export * from "./actions/use-send-instance-tx";
 export * from "./actions/use-sign-tx";
+export * from "./actions/use-simulate-governor-tx";
+export * from "./actions/use-simulate-instance-tx";
 export * from "./actions/use-transaction-download";
 
 export * from "./emergency/actions/use-send-eoa-emergency-tx";

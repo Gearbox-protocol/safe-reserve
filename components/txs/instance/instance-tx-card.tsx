@@ -1,16 +1,16 @@
 import { Card } from "@/components/ui/card";
 import { SignedTx } from "@/core/safe-tx";
-import { useGetInstanceUpdatableFeeds, useSDK } from "@/hooks";
+import { useGetInstanceUpdatableFeeds, useSafeParams, useSDK } from "@/hooks";
 import { MULTISEND_ADDRESS } from "@/utils/constant";
 import { shortenHash } from "@/utils/format";
 import { ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Address } from "viem";
+import { Address, zeroAddress } from "viem";
+import { SimulateTxButton } from "../simulate-tx-button";
 import { InstanceProposalCall } from "./instance-proposal-call";
 import { InstanceProposalSignatures } from "./instance-proposal-signatures";
 import { InstanceButtonTx } from "./instance-tx-button";
-import { SimulateTxButton } from "../simulate-tx-button";
 
 interface TransactionCardProps {
   cid: string;
@@ -29,6 +29,7 @@ export function InstanceTransactionCard({
   threshold,
   index,
 }: TransactionCardProps) {
+  const { nonce: currentNonce } = useSafeParams(safeAddress);
   useSDK({});
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -67,11 +68,16 @@ export function InstanceTransactionCard({
             {tx.signedBy.length} / {Number(threshold)}
           </span>
 
-          <SimulateTxButton
-            tx={tx}
-            safeAddress={safeAddress}
-            instanceManager={instanceManager}
-          />
+          {/* Only show simulation button for non-executed transactions */}
+          {currentNonce !== undefined && tx.nonce >= currentNonce && (
+            <SimulateTxButton
+              tx={tx}
+              safeAddress={safeAddress}
+              governor={zeroAddress}
+              instanceManager={instanceManager}
+              isGovernorTxs={false}
+            />
+          )}
 
           <InstanceButtonTx
             tx={tx}

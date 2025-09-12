@@ -1,5 +1,4 @@
 import { safeAbi } from "@/abi";
-import { defaultChainId } from "@/config/wagmi";
 import { ParsedSignedTx } from "@/core/safe-tx";
 import { useDecodeGovernorCalls, useSafeParams } from "@/hooks";
 import { useSafeSignature } from "@/hooks/actions/use-safe-signature";
