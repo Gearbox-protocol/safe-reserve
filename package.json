@@ -14,7 +14,9 @@
     "set-dns-record": "tsx script/set-dns-record.ts",
     "create-gateway": "tsx script/set-dns-record.ts --create",
     "update-gateway": "tsx script/set-dns-record.ts --update",
-    "deploy-full": "pnpm build && pnpm publish-ipfs && pnpm set-dns-record"
+    "deploy-full": "pnpm build && pnpm test && pnpm publish-ipfs && pnpm set-dns-record",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@gearbox-protocol/permissionless": "^0.1.12",
@@ -63,7 +65,9 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.19.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "tsconfig-paths": "^4.2.0",
+    "vitest": "^2.1.3"
   },
   "pnpm": {
     "overrides": {

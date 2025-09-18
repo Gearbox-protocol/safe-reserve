@@ -1,3 +1,4 @@
+import { sendTxs } from "@/utils/test/send-txs";
 import { SafeTx } from "@gearbox-protocol/permissionless";
 import { config } from "dotenv";
 import { readFileSync } from "fs";
@@ -13,7 +14,7 @@ import {
 
 config({ path: ".env.local" });
 
-const RPC = process.env.RPC_URL;
+const RPC = process.env.ANVIL_RPC_URL;
 
 async function main() {
   // Get JSON file path from command line args
@@ -82,47 +83,11 @@ async function main() {
   });
 
   // Execute transactions
-  for (let i = 0; i < txs.length; i++) {
-    const tx = txs[i];
-    console.log(`\nTransaction ${i + 1}/${txs.length}`);
-    console.log("----------------------------------------");
-
-    // Log transaction details
-    console.log(`To: ${tx.to}`);
-    if (tx.contractMethod) {
-      console.log(`Method: ${tx.contractMethod.name}`);
-      if (tx.contractInputsValues) {
-        console.log("Input Values:");
-        Object.entries(tx.contractInputsValues).forEach(([key, value]) => {
-          console.log(`  ${key}: ${value}`);
-        });
-      }
-    }
-
-    console.log(`Value: ${tx.value || 0} wei`);
-
-    try {
-      console.log("\nSending transaction...");
-      const hash = await walletClient.sendTransaction({
-        to: tx.to as Address,
-        value: BigInt(tx.value || 0),
-        data: tx.data as Address,
-        gas: BigInt(29_000_000),
-        chain: walletClient.chain!,
-      });
-      console.log(`Transaction hash: ${hash}`);
-
-      console.log("Waiting for confirmation...");
-      const receipt = await client.waitForTransactionReceipt({ hash });
-      console.log(`Confirmed in block ${receipt.blockNumber}`);
-      console.log(`Gas used: ${receipt.gasUsed}`);
-      console.log(
-        `Status: ${receipt.status === "success" ? "Success" : "Failed"}`
-      );
-    } catch (error) {
-      console.error("Error executing transaction:", error);
-    }
-  }
+  await sendTxs({
+    publicClient: client,
+    walletClient,
+    txs,
+  });
 }
 
 main()
