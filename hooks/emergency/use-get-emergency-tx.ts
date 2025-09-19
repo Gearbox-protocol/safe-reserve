@@ -5,8 +5,7 @@ import {
 import { MarketConfiguratorContract } from "@gearbox-protocol/permissionless";
 import { useMemo } from "react";
 import { Address } from "viem";
-import { useConfig } from "wagmi";
-import { getPublicClient } from "wagmi/actions";
+import { usePublicClient } from "wagmi";
 
 export function useGetEmergencyTx({
   chainId,
@@ -17,10 +16,9 @@ export function useGetEmergencyTx({
   marketConfigurator: Address;
   action: EmergencyActions;
 }) {
-  const config = useConfig();
+  const publicClient = usePublicClient({ chainId });
 
   return useMemo(() => {
-    const publicClient = getPublicClient(config, { chainId });
     if (!publicClient) return;
 
     const mc = new MarketConfiguratorContract(marketConfigurator, publicClient);
@@ -29,5 +27,5 @@ export function useGetEmergencyTx({
       mc,
       action,
     });
-  }, [config, chainId, marketConfigurator, action]);
+  }, [publicClient, marketConfigurator, action]);
 }

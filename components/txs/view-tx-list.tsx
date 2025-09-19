@@ -33,7 +33,7 @@ export function ViewTxList({ cid }: { cid: string }) {
     error: errorInfo,
   } = useIpfsData(cid);
 
-  const { threshold } = useSafeParams(safe);
+  const { threshold } = useSafeParams(chainId, safe);
 
   const { switchChain, chains } = useSwitchChain();
   const { chain, address } = useAccount();
@@ -159,12 +159,14 @@ export function ViewTxList({ cid }: { cid: string }) {
                 </div>
               </div>
             </Card>
-            {(chainId === chain?.id || !address) &&
+            {chainId &&
+              (chainId === chain?.id || !address) &&
               (type === "timelock" ? (
                 <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
                   {txs.map((tx, index) => (
                     <GovernorTransactionCard
                       key={tx.hash}
+                      chainId={chainId}
                       cid={cid}
                       tx={tx}
                       safeAddress={safe!}
@@ -179,6 +181,7 @@ export function ViewTxList({ cid }: { cid: string }) {
                   {txs.map((tx, index) => (
                     <InstanceTransactionCard
                       key={tx.hash}
+                      chainId={chainId}
                       cid={cid}
                       tx={tx}
                       safeAddress={safe!}

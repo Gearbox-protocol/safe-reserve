@@ -2,8 +2,7 @@ import { safeAbi } from "@/abi";
 import { iMarketConfiguratorAbi } from "@gearbox-protocol/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
-import { useConfig } from "wagmi";
-import { getPublicClient } from "wagmi/actions";
+import { usePublicClient } from "wagmi";
 
 export type EmergencyAdminInfo =
   | { type: "eoa"; emergencyAdmin: Address }
@@ -21,7 +20,7 @@ export function useGetEmergencyAdminInfo({
   chainId: number;
   marketConfigurator: Address;
 }) {
-  const config = useConfig();
+  const publicClient = usePublicClient({ chainId });
 
   return useQuery<EmergencyAdminInfo | undefined, Error>({
     queryKey: [
@@ -30,7 +29,6 @@ export function useGetEmergencyAdminInfo({
       marketConfigurator.toLowerCase(),
     ],
     queryFn: async () => {
-      const publicClient = getPublicClient(config, { chainId });
       if (!publicClient) return;
 
       const emergencyAdmin = await publicClient.readContract({
@@ -89,6 +87,7 @@ export function useGetEmergencyAdminInfo({
         };
       }
     },
+    enabled: !!publicClient,
     retry: 3,
   });
 }

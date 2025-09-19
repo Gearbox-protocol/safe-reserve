@@ -4,8 +4,7 @@ import {
   iCreditManagerV310Abi,
 } from "@gearbox-protocol/sdk/abi";
 import { useQuery } from "@tanstack/react-query";
-import { useConfig } from "wagmi";
-import { getPublicClient } from "wagmi/actions";
+import { usePublicClient } from "wagmi";
 
 export function useGetCollateralStatuses({
   chainId,
@@ -14,7 +13,7 @@ export function useGetCollateralStatuses({
   chainId: number;
   creditSuite: CreditSuite;
 }) {
-  const config = useConfig();
+  const publicClient = usePublicClient({ chainId });
 
   return useQuery({
     queryKey: [
@@ -23,7 +22,6 @@ export function useGetCollateralStatuses({
       creditSuite.creditManager.address.toLowerCase(),
     ],
     queryFn: async () => {
-      const publicClient = getPublicClient(config, { chainId });
       if (!publicClient) return [];
 
       const forbiddenMask = await publicClient.readContract({
@@ -48,6 +46,7 @@ export function useGetCollateralStatuses({
         forbidden: (forbiddenMask & bits[index]) !== 0n,
       }));
     },
+    enabled: !!publicClient,
     retry: 3,
   });
 }

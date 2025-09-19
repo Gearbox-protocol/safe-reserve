@@ -1,10 +1,8 @@
 import { GearboxSDK, simulateWithPriceUpdates } from "@gearbox-protocol/sdk";
 import { iVersionAbi } from "@gearbox-protocol/sdk/abi";
 import { useQueries } from "@tanstack/react-query";
-import { useMemo } from "react";
 import { Address, hexToString } from "viem";
-import { useConfig } from "wagmi";
-import { getPublicClient } from "wagmi/actions";
+import { usePublicClient } from "wagmi";
 
 export function useGetPriceFeedsInfo({
   sdk,
@@ -13,12 +11,8 @@ export function useGetPriceFeedsInfo({
   sdk: GearboxSDK;
   priceFeeds: Address[];
 }) {
-  const config = useConfig();
+  const publicClient = usePublicClient({ chainId: sdk.provider.chainId });
 
-  const publicClient = useMemo(
-    () => getPublicClient(config, { chainId: sdk.provider.chainId }),
-    [config, sdk.provider.chainId]
-  );
   return useQueries({
     queries: priceFeeds.map((priceFeed) => ({
       queryKey: ["price-feed-info", sdk.provider.chainId, priceFeed],
@@ -68,7 +62,7 @@ export function useGetPriceFeedsInfo({
           return { price, type: "EXTERNAL" };
         }
       },
-
+      enabled: !!publicClient,
       retry: 3,
     })),
   });

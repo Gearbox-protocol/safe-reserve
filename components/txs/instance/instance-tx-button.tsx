@@ -13,34 +13,38 @@ import { useAccount } from "wagmi";
 import { TransactionInfoDialog } from "../transaction-info-dialog";
 
 interface ButtonTxProps {
+  cid: string;
+  chainId: number;
   tx: SignedTx;
   safeAddress: Address;
   instanceManager: Address;
-  cid: string;
 }
 
 export function InstanceButtonTx({
+  cid,
+  chainId,
   tx,
   safeAddress,
   instanceManager,
-  cid,
 }: ButtonTxProps) {
   const [isSent, setIsSent] = useState(false);
   const [alreadySigned, setAlreadySigned] = useState(false);
 
-  const { signers, threshold, nonce } = useSafeParams(safeAddress);
+  const { signers, threshold, nonce } = useSafeParams(chainId, safeAddress);
   const { address } = useAccount();
 
   const { sdk } = useSafeAppsSDK();
   const isSafeApp = useIsSafeApp(safeAddress);
 
   const { send: sendTx, isPending: isSendPending } = useSendInstanceTx(
+    chainId,
     safeAddress,
     instanceManager,
     tx
   );
 
   const { sign: signTx, isPending: isSignPending } = useSignTx(
+    chainId,
     cid,
     safeAddress,
     (txHash) => {

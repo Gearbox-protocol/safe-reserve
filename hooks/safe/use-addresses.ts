@@ -3,12 +3,13 @@ import { Address, isAddress } from "viem";
 import { usePublicClient } from "wagmi";
 
 function useAddress(args: {
+  chainId?: number;
   address?: Address;
   functionName: string;
   key: string;
 }) {
-  const { address, functionName, key } = args;
-  const publicClient = usePublicClient();
+  const { chainId, address, functionName, key } = args;
+  const publicClient = usePublicClient({ chainId });
 
   return useQuery({
     queryKey: [key, address],
@@ -38,8 +39,12 @@ function useAddress(args: {
   });
 }
 
-export function useTimelockAddress(marketConfigurator?: Address) {
+export function useTimelockAddress(
+  chainId?: number,
+  marketConfigurator?: Address
+) {
   const { data, isLoading, error } = useAddress({
+    chainId,
     key: "timelock-address",
     address: marketConfigurator,
     functionName: "admin",
@@ -52,8 +57,9 @@ export function useTimelockAddress(marketConfigurator?: Address) {
   };
 }
 
-export function useGovernorAddress(timelock?: Address) {
+export function useGovernorAddress(chainId?: number, timelock?: Address) {
   const { data, isLoading, error } = useAddress({
+    chainId,
     key: "governor-address",
     address: timelock,
     functionName: "admin",
@@ -66,8 +72,9 @@ export function useGovernorAddress(timelock?: Address) {
   };
 }
 
-export function useSafeAddress(governor?: Address) {
+export function useSafeAddress(chainId?: number, governor?: Address) {
   const { data, isLoading, error } = useAddress({
+    chainId,
     key: "safe-address",
     address: governor,
     functionName: "owner",
@@ -80,24 +87,27 @@ export function useSafeAddress(governor?: Address) {
   };
 }
 
-export function useGovernanceAddresses(marketConfigurator?: Address) {
+export function useGovernanceAddresses(
+  chainId?: number,
+  marketConfigurator?: Address
+) {
   const {
     timelock,
     isLoading: isLoadingTimelock,
     error: errorTimelock,
-  } = useTimelockAddress(marketConfigurator);
+  } = useTimelockAddress(chainId, marketConfigurator);
 
   const {
     governor,
     isLoading: isLoadingGovernor,
     error: errorGovernor,
-  } = useGovernorAddress(timelock);
+  } = useGovernorAddress(chainId, timelock);
 
   const {
     safe,
     isLoading: isLoadingSafe,
     error: errorSafe,
-  } = useSafeAddress(governor);
+  } = useSafeAddress(chainId, governor);
 
   return {
     safeAddress: safe,

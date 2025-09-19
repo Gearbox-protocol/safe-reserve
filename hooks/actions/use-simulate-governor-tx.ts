@@ -6,11 +6,12 @@ import { Address } from "viem";
 import { useBaseSimulateTx } from "./use-base-simulate-tx";
 
 export function useSimulateGovernorTx(
+  chainId: number,
   safeAddress: Address,
   governor: Address,
   tx: ParsedSignedTx
 ) {
-  const parsedCalls = useDecodeGovernorCalls(governor, tx.calls);
+  const parsedCalls = useDecodeGovernorCalls(chainId, governor, tx.calls);
   const isQueueTx = tx.status === TimelockTxStatus.NotFound;
   const priceFeeds = getCallsTouchedPriceFeeds(parsedCalls);
 
@@ -18,6 +19,7 @@ export function useSimulateGovernorTx(
   const effectivePriceFeeds = isQueueTx ? [] : priceFeeds;
 
   return useBaseSimulateTx({
+    chainId,
     safeAddress,
     tx,
     priceFeeds: effectivePriceFeeds,

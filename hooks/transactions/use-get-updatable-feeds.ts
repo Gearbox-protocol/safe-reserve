@@ -11,14 +11,16 @@ import { useDecodeInstanceCalls } from "./use-decode-instance-call";
 
 function useGetUpdatableFeeds({
   cid,
+  chainId,
   index,
   parsedCalls,
 }: {
   cid: string;
+  chainId: number;
   index: number;
   parsedCalls: ParsedCall[];
 }) {
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({ chainId });
 
   return useQuery({
     queryKey: [cid, index],
@@ -36,6 +38,7 @@ function useGetUpdatableFeeds({
 }
 
 export function useGetGovernorUpdatableFeeds({
+  chainId,
   governor,
   tx,
   ...rest
@@ -43,17 +46,20 @@ export function useGetGovernorUpdatableFeeds({
   governor: Address;
   tx: ParsedSignedTx;
   cid: string;
+  chainId: number;
   index: number;
 }) {
-  const parsedCalls = useDecodeGovernorCalls(governor, tx.calls);
+  const parsedCalls = useDecodeGovernorCalls(chainId, governor, tx.calls);
 
   return useGetUpdatableFeeds({
+    chainId,
     parsedCalls,
     ...rest,
   });
 }
 
 export function useGetInstanceUpdatableFeeds({
+  chainId,
   instanceManager,
   tx,
   ...rest
@@ -61,13 +67,17 @@ export function useGetInstanceUpdatableFeeds({
   instanceManager: Address;
   tx: SignedTx;
   cid: string;
+  chainId: number;
   index: number;
 }) {
-  const parsedCalls = useDecodeInstanceCalls(instanceManager, tx.calls).filter(
-    ({ args }) => args.data.startsWith("addPriceFeed")
-  );
+  const parsedCalls = useDecodeInstanceCalls(
+    chainId,
+    instanceManager,
+    tx.calls
+  ).filter(({ args }) => args.data.startsWith("addPriceFeed"));
 
   return useGetUpdatableFeeds({
+    chainId,
     parsedCalls,
     ...rest,
   });

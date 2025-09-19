@@ -94,6 +94,7 @@ export function decodeSafeSimulation(revertData: Hex): DecodedSafeSimulation {
 }
 
 export interface SimulationConfig {
+  chainId: number;
   safeAddress: Address;
   tx: SignedTx;
   priceFeeds: Address[];
@@ -101,7 +102,7 @@ export interface SimulationConfig {
 }
 
 export function useBaseSimulateTx(config: SimulationConfig) {
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({ chainId: config.chainId });
 
   const mutation = useMutation({
     mutationKey: ["simulate-tx", config.safeAddress, config.tx.hash],

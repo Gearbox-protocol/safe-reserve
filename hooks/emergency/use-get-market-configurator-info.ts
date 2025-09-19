@@ -1,8 +1,7 @@
 import { iMarketConfiguratorAbi } from "@gearbox-protocol/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
-import { useConfig } from "wagmi";
-import { getPublicClient } from "wagmi/actions";
+import { usePublicClient } from "wagmi";
 
 export function useGetMarketConfiguratorInfo({
   chainId,
@@ -11,12 +10,11 @@ export function useGetMarketConfiguratorInfo({
   chainId: number;
   address: Address;
 }) {
-  const config = useConfig();
+  const publicClient = usePublicClient({ chainId });
 
   return useQuery({
     queryKey: ["marketConfigurator", chainId, address.toLowerCase()],
     queryFn: async () => {
-      const publicClient = getPublicClient(config, { chainId });
       if (!publicClient) return;
 
       const [curatorName, emergencyAdmin] = (await publicClient.multicall({
@@ -40,6 +38,7 @@ export function useGetMarketConfiguratorInfo({
         emergencyAdmin,
       };
     },
+    enabled: !!publicClient,
     retry: 3,
   });
 }

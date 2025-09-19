@@ -1,5 +1,4 @@
 import { safeAbi } from "@/abi";
-import { defaultChainId } from "@/config/wagmi";
 import { useCurrentTransactions } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -12,13 +11,14 @@ import {
 } from "wagmi";
 
 export function useSignTx(
+  chainId: number,
   cid: string,
   safeAddress: Address,
   onSuccess: (txHash: Hex) => void
 ) {
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({ chainId });
   const { switchChainAsync } = useSwitchChain();
 
   const { refetchSigs } = useCurrentTransactions(cid);
@@ -27,9 +27,7 @@ export function useSignTx(
     mutationFn: async (args: { txHash: Hex }) => {
       if (!walletClient || !publicClient || !address || !safeAddress) return;
 
-      // await switchChainAsync({
-      //   chainId: defaultChainId,
-      // });
+      await switchChainAsync({ chainId });
 
       try {
         const tx = await walletClient.writeContract({

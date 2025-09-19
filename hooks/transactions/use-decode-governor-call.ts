@@ -3,8 +3,12 @@ import { GovernorContract } from "@gearbox-protocol/permissionless";
 import { Address, PublicClient } from "viem";
 import { usePublicClient } from "wagmi";
 
-export function useDecodeGovernorCall(governor: Address, call: Call) {
-  const publicClient = usePublicClient();
+export function useDecodeGovernorCall(
+  chainId: number,
+  governor: Address,
+  call: Call
+) {
+  const publicClient = usePublicClient({ chainId });
   const governorContract = new GovernorContract(
     governor,
     publicClient as PublicClient
@@ -12,7 +16,7 @@ export function useDecodeGovernorCall(governor: Address, call: Call) {
 
   if (call.to.toLowerCase() !== governor.toLowerCase()) {
     return {
-      chainId: 0,
+      chainId,
       target: call.to,
       label: "Unknown contract",
       functionName: `Unknown function: ${call.data}`,
@@ -22,8 +26,12 @@ export function useDecodeGovernorCall(governor: Address, call: Call) {
   return governorContract.parseFunctionData(call.data);
 }
 
-export function useDecodeGovernorCalls(governor: Address, calls: Call[]) {
-  const publicClient = usePublicClient();
+export function useDecodeGovernorCalls(
+  chainId: number,
+  governor: Address,
+  calls: Call[]
+) {
+  const publicClient = usePublicClient({ chainId });
   const governorContract = new GovernorContract(
     governor,
     publicClient as PublicClient
@@ -32,7 +40,7 @@ export function useDecodeGovernorCalls(governor: Address, calls: Call[]) {
   return calls.map((call) => {
     if (call.to.toLowerCase() !== governor.toLowerCase()) {
       return {
-        chainId: 0,
+        chainId,
         target: call.to,
         label: "Unknown contract",
         functionName: `Unknown function: ${call.data}`,

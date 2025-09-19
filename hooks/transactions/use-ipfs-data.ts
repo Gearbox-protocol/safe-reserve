@@ -4,7 +4,6 @@ import { instanceTxsSchema, timelockTxsSchema } from "@/utils/validation";
 import { SafeTx } from "@gearbox-protocol/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
-import { usePublicClient } from "wagmi";
 
 interface IpfsTxs {
   chainId: number;
@@ -100,8 +99,6 @@ export function useIpfsData(cid: string): {
   isLoading: boolean;
   error: Error | null;
 } {
-  const publicClient = usePublicClient();
-
   const {
     data: ipfsData,
     isLoading,
@@ -109,7 +106,7 @@ export function useIpfsData(cid: string): {
   } = useQuery({
     queryKey: ["ipfs-transactions", cid],
     queryFn: async () => {
-      if (!cid || !publicClient) {
+      if (!cid) {
         throw new Error("Missing required parameters");
       }
 
@@ -122,7 +119,7 @@ export function useIpfsData(cid: string): {
         return { type: "instance", ...validatedData } as InstanceTxs;
       }
     },
-    enabled: !!cid && !!publicClient,
+    enabled: !!cid,
     retry: 3,
   });
 

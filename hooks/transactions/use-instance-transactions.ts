@@ -14,10 +14,12 @@ import { usePublicClient } from "wagmi";
 
 export function useInstanceTransactions({
   cid,
+  chainId,
   batches,
   instanceManager,
 }: {
   cid: string;
+  chainId?: number;
   instanceManager?: Address;
   batches?: SafeTx[][];
 }): {
@@ -27,15 +29,15 @@ export function useInstanceTransactions({
   error: Error | null;
   refetchSigs: () => Promise<unknown>;
 } {
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({ chainId });
 
   const {
     safe,
     isLoading: isLoadingSafe,
     error: errorSafe,
-  } = useSafeAddress(instanceManager);
+  } = useSafeAddress(chainId, instanceManager);
 
-  const { nonce, signers } = useSafeParams(safe);
+  const { nonce, signers } = useSafeParams(chainId, safe);
 
   const {
     data: preparedTxs,

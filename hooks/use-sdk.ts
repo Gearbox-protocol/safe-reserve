@@ -1,8 +1,7 @@
 import { GearboxSDK } from "@gearbox-protocol/sdk";
 import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
-import { useConfig, usePublicClient } from "wagmi";
-import { getPublicClient } from "wagmi/actions";
+import { usePublicClient } from "wagmi";
 
 export function useSDK({
   chainId,
@@ -11,8 +10,9 @@ export function useSDK({
   chainId?: number;
   configurators?: Address[];
 }) {
-  const config = useConfig();
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({
+    chainId,
+  });
 
   return useQuery({
     queryKey: [
@@ -23,13 +23,10 @@ export function useSDK({
         .map((c) => c.toLowerCase()),
     ],
     queryFn: async () => {
-      const client = chainId
-        ? getPublicClient(config, { chainId: chainId })
-        : publicClient;
-      if (!client) return null;
+      if (!publicClient) return null;
 
       return await GearboxSDK.attach({
-        rpcURLs: [client.transport.url!],
+        rpcURLs: [publicClient.transport.url!],
         marketConfigurators: configurators ?? [],
       });
     },

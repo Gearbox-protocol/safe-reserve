@@ -7,6 +7,7 @@ import { useCallback, useState } from "react";
 import { Address, formatUnits } from "viem";
 
 interface ProposalCallProps {
+  chainId: number;
   instanceManager: Address;
   index: number;
   call: Call;
@@ -18,13 +19,14 @@ const convertToUsd = (value?: bigint) =>
     : undefined;
 
 export function InstanceProposalCall({
+  chainId,
   instanceManager,
   index,
   call,
 }: ProposalCallProps) {
-  const parsedCall = useDecodeInstanceCall(instanceManager, call);
+  const parsedCall = useDecodeInstanceCall(chainId, instanceManager, call);
 
-  const callMeta = useGetInstanceCallMeta(parsedCall);
+  const callMeta = useGetInstanceCallMeta(chainId, parsedCall);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const tryPrettyPrint = useCallback(

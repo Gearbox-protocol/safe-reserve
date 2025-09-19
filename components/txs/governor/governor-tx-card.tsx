@@ -9,30 +9,29 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Address, zeroAddress } from "viem";
 import { SimulateTxButton } from "../simulate-tx-button";
+import { TransactionCardProps } from "../types";
 import { GovernorProposalCall } from "./governor-proposal-call";
 import { GovernorProposalSignatures } from "./governor-proposal-signatures";
 import { GovernorButtonTx } from "./governor-tx-button";
 
-interface TransactionCardProps {
-  cid: string;
+interface GovernorTransactionCardProps extends TransactionCardProps {
   tx: ParsedSignedTx;
-  safeAddress: Address;
   governor: Address;
-  threshold: number;
-  index: number;
 }
 
 export function GovernorTransactionCard({
   cid,
+  chainId,
   tx,
   safeAddress,
   governor,
   threshold,
   index,
-}: TransactionCardProps) {
+}: GovernorTransactionCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { data: updatableFeeds, isLoading } = useGetGovernorUpdatableFeeds({
     cid,
+    chainId,
     index,
     governor,
     tx,
@@ -76,8 +75,10 @@ export function GovernorTransactionCard({
           </span>
 
           {/* Only show simulation button for non-queued and ready transactions */}
-          {(tx.status === TimelockTxStatus.NotFound || tx.status === TimelockTxStatus.Ready) && (
+          {(tx.status === TimelockTxStatus.NotFound ||
+            tx.status === TimelockTxStatus.Ready) && (
             <SimulateTxButton
+              chainId={chainId}
               tx={tx}
               safeAddress={safeAddress}
               governor={governor}
@@ -87,9 +88,10 @@ export function GovernorTransactionCard({
           )}
 
           <GovernorButtonTx
+            chainId={chainId}
+            cid={cid}
             tx={tx}
             safeAddress={safeAddress}
-            cid={cid}
             governor={governor}
           />
 
@@ -131,6 +133,7 @@ export function GovernorTransactionCard({
                 <div className="mb-4 text-gray-200">Calls:</div>
                 {tx.calls.map((call, index) => (
                   <GovernorProposalCall
+                    chainId={chainId}
                     governor={governor}
                     key={`call-${index}`}
                     index={index + 1}
@@ -182,6 +185,7 @@ export function GovernorTransactionCard({
 
             <div className="border-l border-gray-800 pl-8">
               <GovernorProposalSignatures
+                chainId={chainId}
                 signers={tx.signedBy || []}
                 safeAddress={safeAddress}
                 status={tx.status}

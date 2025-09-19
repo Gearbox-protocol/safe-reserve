@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Address } from "viem";
 
 interface ProposalCallProps {
+  chainId: number;
   governor: Address;
   index: number;
   call: Call;
@@ -27,13 +28,14 @@ function tryPrettyPrint(value: unknown): React.ReactNode {
 }
 
 export function GovernorProposalCall({
+  chainId,
   governor,
   index,
   call,
 }: ProposalCallProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const parsedCall = useDecodeGovernorCall(governor, call);
+  const parsedCall = useDecodeGovernorCall(chainId, governor, call);
 
   const isDecoded = !parsedCall.functionName.startsWith("Unknown function");
   const isExpandable = !isDecoded || Object.keys(parsedCall.args).length > 0;

@@ -15,10 +15,11 @@ import { useAccount } from "wagmi";
 import { TransactionInfoDialog } from "../transaction-info-dialog";
 
 interface ButtonTxProps {
+  cid: string;
+  chainId: number;
   tx: ParsedSignedTx;
   safeAddress: Address;
   governor: Address;
-  cid: string;
 }
 
 const getButtonText = (status: TimelockTxStatus, eta: number = 0) => {
@@ -45,26 +46,29 @@ const getButtonText = (status: TimelockTxStatus, eta: number = 0) => {
 };
 
 export function GovernorButtonTx({
+  cid,
+  chainId,
   tx,
   safeAddress,
   governor,
-  cid,
 }: ButtonTxProps) {
   const [isSent, setIsSent] = useState(false);
   const [alreadySigned, setAlreadySigned] = useState(false);
 
-  const { signers, threshold, nonce } = useSafeParams(safeAddress);
+  const { signers, threshold, nonce } = useSafeParams(chainId, safeAddress);
   const { address } = useAccount();
 
   const { sdk } = useSafeAppsSDK();
   const isSafeApp = useIsSafeApp(safeAddress);
 
   const { send: sendTx, isPending: isSendPending } = useSendGovernorTx(
+    chainId,
     safeAddress,
     governor,
     tx
   );
   const { sign: signTx, isPending: isSignPending } = useSignTx(
+    chainId,
     cid,
     safeAddress,
     (txHash) => {

@@ -8,33 +8,32 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Address, zeroAddress } from "viem";
 import { SimulateTxButton } from "../simulate-tx-button";
+import { TransactionCardProps } from "../types";
 import { InstanceProposalCall } from "./instance-proposal-call";
 import { InstanceProposalSignatures } from "./instance-proposal-signatures";
 import { InstanceButtonTx } from "./instance-tx-button";
 
-interface TransactionCardProps {
-  cid: string;
+interface InstanceTransactionCardProps extends TransactionCardProps {
   tx: SignedTx;
-  safeAddress: Address;
   instanceManager: Address;
-  threshold: number;
-  index: number;
 }
 
 export function InstanceTransactionCard({
   cid,
+  chainId,
   tx,
   safeAddress,
   instanceManager,
   threshold,
   index,
-}: TransactionCardProps) {
-  const { nonce: currentNonce } = useSafeParams(safeAddress);
+}: InstanceTransactionCardProps) {
+  const { nonce: currentNonce } = useSafeParams(chainId, safeAddress);
   useSDK({});
 
   const [isExpanded, setIsExpanded] = useState(false);
   const { data: updatableFeeds, isLoading } = useGetInstanceUpdatableFeeds({
     cid,
+    chainId,
     index,
     instanceManager,
     tx,
@@ -71,6 +70,7 @@ export function InstanceTransactionCard({
           {/* Only show simulation button for non-executed transactions */}
           {currentNonce !== undefined && tx.nonce >= currentNonce && (
             <SimulateTxButton
+              chainId={chainId}
               tx={tx}
               safeAddress={safeAddress}
               governor={zeroAddress}
@@ -80,9 +80,10 @@ export function InstanceTransactionCard({
           )}
 
           <InstanceButtonTx
+            chainId={chainId}
+            cid={cid}
             tx={tx}
             safeAddress={safeAddress}
-            cid={cid}
             instanceManager={instanceManager}
           />
 
@@ -124,6 +125,7 @@ export function InstanceTransactionCard({
                 <div className="mb-4 text-gray-200">Calls:</div>
                 {tx.calls.map((call, index) => (
                   <InstanceProposalCall
+                    chainId={chainId}
                     instanceManager={instanceManager}
                     key={`call-${index}`}
                     index={index + 1}
@@ -175,6 +177,7 @@ export function InstanceTransactionCard({
 
             <div className="border-l border-gray-800 pl-8">
               <InstanceProposalSignatures
+                chainId={chainId}
                 signers={tx.signedBy || []}
                 safeAddress={safeAddress}
               />

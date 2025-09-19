@@ -1,13 +1,10 @@
 import { safeAbi } from "@/abi";
-import { defaultChainId } from "@/config/wagmi";
 import { SignedTx } from "@/core/safe-tx";
 import { useDecodeInstanceCalls, useSafeParams } from "@/hooks";
 import { useSafeSignature } from "@/hooks/actions/use-safe-signature";
 import { getMulticall3Params } from "@/utils/multicall3";
 import { getPriceFeedFromInstanceParsedCall } from "@/utils/parsed-call-utils";
-import {
-  getPriceUpdateTx,
-} from "@gearbox-protocol/permissionless";
+import { getPriceUpdateTx } from "@gearbox-protocol/permissionless";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Address, encodeFunctionData, Hex } from "viem";
@@ -19,6 +16,7 @@ import {
 } from "wagmi";
 
 export function useSendInstanceTx(
+  chainId: number,
   safeAddress: Address,
   instanceManager: Address,
   tx: SignedTx
@@ -28,10 +26,10 @@ export function useSendInstanceTx(
     threshold,
     refetch,
     isLoading: isLoadingThreshold,
-  } = useSafeParams(safeAddress);
+  } = useSafeParams(chainId, safeAddress);
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({ chainId });
 
   // Use the Safe signature hook
   const {
@@ -39,12 +37,16 @@ export function useSendInstanceTx(
     isAlreadySigned,
     signTransaction,
     isSigningPending,
-  } = useSafeSignature(tx.hash);
+  } = useSafeSignature(chainId, tx.hash);
 
-  const parsedCalls = useDecodeInstanceCalls(instanceManager, tx.calls);
+  const parsedCalls = useDecodeInstanceCalls(
+    chainId,
+    instanceManager,
+    tx.calls
+  );
   const priceFeeds = parsedCalls
-  .map(getPriceFeedFromInstanceParsedCall)
-  .filter((priceFeed) => priceFeed !== undefined) as Address[];
+    .map(getPriceFeedFromInstanceParsedCall)
+    .filter((priceFeed) => priceFeed !== undefined) as Address[];
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async () => {
@@ -57,9 +59,7 @@ export function useSendInstanceTx(
       )
         return;
 
-      // await switchChainAsync({
-      //   chainId: defaultChainId,
-      // });
+      await switchChainAsync({ chainId });
 
       let processedSignature: string | null = null;
 

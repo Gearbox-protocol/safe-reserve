@@ -4,16 +4,14 @@ import {
 } from "@gearbox-protocol/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
-import { useConfig } from "wagmi";
-import { getPublicClient } from "wagmi/actions";
+import { usePublicClient } from "wagmi";
 
 export function useGetPriceFeeds({ chainId }: { chainId: number }) {
-  const config = useConfig();
+  const publicClient = usePublicClient({ chainId });
 
   return useQuery({
     queryKey: ["price-feeds", chainId],
     queryFn: async () => {
-      const publicClient = getPublicClient(config, { chainId });
       if (!publicClient) return;
 
       const priceFeedStore = new PriceFeedStoreContract(
@@ -62,6 +60,7 @@ export function useGetPriceFeeds({ chainId }: { chainId: number }) {
 
       return { priceFeedsInfo, tokenMap };
     },
+    enabled: !!publicClient,
     retry: 3,
   });
 }

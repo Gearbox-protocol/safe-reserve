@@ -12,8 +12,12 @@ import { Address, erc20Abi, hexToString, isAddress, PublicClient } from "viem";
 import { usePublicClient } from "wagmi";
 import { useSDK } from "../use-sdk";
 
-export function useDecodeInstanceCall(inatsnceManager: Address, call: Call) {
-  const publicClient = usePublicClient();
+export function useDecodeInstanceCall(
+  chainId: number,
+  inatsnceManager: Address,
+  call: Call
+) {
+  const publicClient = usePublicClient({ chainId });
   const instanceManagerContract = new InstanceManagerContract(
     inatsnceManager,
     publicClient as PublicClient
@@ -21,7 +25,7 @@ export function useDecodeInstanceCall(inatsnceManager: Address, call: Call) {
 
   if (call.to.toLowerCase() !== inatsnceManager.toLowerCase()) {
     return {
-      chainId: 0,
+      chainId,
       target: call.to,
       label: "Unknown contract",
       functionName: `Unknown function: ${call.data}`,
@@ -31,8 +35,11 @@ export function useDecodeInstanceCall(inatsnceManager: Address, call: Call) {
   return instanceManagerContract.parseFunctionData(call.data);
 }
 
-export function useGetInstanceCallMeta(parsedCall: ParsedCall) {
-  const publicClient = usePublicClient();
+export function useGetInstanceCallMeta(
+  chainId: number,
+  parsedCall: ParsedCall
+) {
+  const publicClient = usePublicClient({ chainId });
 
   const [fnName, token, priceFeed] = useMemo(() => {
     let fnName;
@@ -159,10 +166,11 @@ export function useGetInstanceCallMeta(parsedCall: ParsedCall) {
 }
 
 export function useDecodeInstanceCalls(
+  chainId: number,
   inatsnceManager: Address,
   calls: Call[]
 ) {
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({ chainId });
   const instanceManagerContract = new InstanceManagerContract(
     inatsnceManager,
     publicClient as PublicClient
@@ -171,7 +179,7 @@ export function useDecodeInstanceCalls(
   return calls.map((call) => {
     if (call.to.toLowerCase() !== inatsnceManager.toLowerCase()) {
       return {
-        chainId: 0,
+        chainId,
         target: call.to,
         label: "Unknown contract",
         functionName: `Unknown function: ${call.data}`,

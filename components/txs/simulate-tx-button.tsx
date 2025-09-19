@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { Address } from "viem";
 
 interface SimulateTxButtonProps {
+  chainId: number;
   tx: SignedTx | ParsedSignedTx;
   safeAddress: Address;
   governor: Address;
@@ -23,18 +24,25 @@ interface SimulateTxButtonProps {
 }
 
 function GovernorSimulateTxButton({
+  chainId,
   tx,
   safeAddress,
   governor,
 }: {
+  chainId: number;
   tx: ParsedSignedTx;
   safeAddress: Address;
   governor: Address;
 }) {
   const [hasSimulated, setHasSimulated] = useState(false);
   const [isTraceDialogOpen, setIsTraceDialogOpen] = useState(false);
-  const { data, isLoading, error, simulate } = useSimulateGovernorTx(safeAddress, governor, tx);
-  
+  const { data, isLoading, error, simulate } = useSimulateGovernorTx(
+    chainId,
+    safeAddress,
+    governor,
+    tx
+  );
+
   return (
     <SimulateTxButtonComponent
       data={data}
@@ -50,18 +58,25 @@ function GovernorSimulateTxButton({
 }
 
 function InstanceSimulateTxButton({
+  chainId,
   tx,
   safeAddress,
   instanceManager,
 }: {
+  chainId: number;
   tx: SignedTx;
   safeAddress: Address;
   instanceManager: Address;
 }) {
   const [hasSimulated, setHasSimulated] = useState(false);
   const [isTraceDialogOpen, setIsTraceDialogOpen] = useState(false);
-  const { data, isLoading, error, simulate } = useSimulateInstanceTx(safeAddress, instanceManager, tx);
-  
+  const { data, isLoading, error, simulate } = useSimulateInstanceTx(
+    chainId,
+    safeAddress,
+    instanceManager,
+    tx
+  );
+
   return (
     <SimulateTxButtonComponent
       data={data}
@@ -86,12 +101,14 @@ function SimulateTxButtonComponent({
   isTraceDialogOpen,
   setIsTraceDialogOpen,
 }: {
-  data: {
-    success: boolean;
-    result: string;
-    gasEstimate: bigint;
-    fromatTrace?: string;
-  } | undefined;
+  data:
+    | {
+        success: boolean;
+        result: string;
+        gasEstimate: bigint;
+        fromatTrace?: string;
+      }
+    | undefined;
   isLoading: boolean;
   error: Error | null;
   simulate: () => void;
@@ -109,7 +126,9 @@ function SimulateTxButtonComponent({
         if (data.success) {
           toast.success("Transaction simulation successful");
         } else {
-          toast.error("Transaction simulation failed - transaction would revert");
+          toast.error(
+            "Transaction simulation failed - transaction would revert"
+          );
         }
       }
     }
@@ -117,18 +136,18 @@ function SimulateTxButtonComponent({
 
   const handleSimulate = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     // If simulation already done and failed with trace, show trace dialog
     if (hasSimulated && data && !data.success && data.fromatTrace) {
       setIsTraceDialogOpen(true);
       return;
     }
-    
+
     // Only allow simulation if not already simulated
     if (hasSimulated) {
       return;
     }
-    
+
     setHasSimulated(true);
     simulate();
   };
@@ -142,7 +161,7 @@ function SimulateTxButtonComponent({
         </>
       );
     }
-    
+
     if (hasSimulated) {
       if (error) {
         return (
@@ -179,7 +198,7 @@ function SimulateTxButtonComponent({
         }
       }
     }
-    
+
     return (
       <>
         <Play className="h-3 w-3" />
@@ -190,11 +209,11 @@ function SimulateTxButtonComponent({
 
   const getButtonClassName = () => {
     const baseClasses = "px-4 py-1 text-xs bg-transparent border";
-    
+
     if (isLoading) {
       return `${baseClasses} border-blue-500 text-blue-500 hover:bg-blue-500/10`;
     }
-    
+
     if (hasSimulated) {
       if (error) {
         return `${baseClasses} border-red-500 text-red-500 hover:bg-red-500/10`;
@@ -207,11 +226,12 @@ function SimulateTxButtonComponent({
         }
       }
     }
-    
+
     return `${baseClasses} border-blue-500 text-blue-500 hover:bg-blue-500/10`;
   };
 
-  const isButtonDisabled = isLoading || (hasSimulated && !(data && !data.success && data.fromatTrace));
+  const isButtonDisabled =
+    isLoading || (hasSimulated && !(data && !data.success && data.fromatTrace));
 
   return (
     <Dialog open={isTraceDialogOpen} onOpenChange={setIsTraceDialogOpen}>
@@ -224,14 +244,14 @@ function SimulateTxButtonComponent({
       >
         {getButtonContent()}
       </Button>
-      
+
       <DialogContent className="max-w-6xl max-h-[80vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>Transaction Trace</DialogTitle>
         </DialogHeader>
         <div className="overflow-auto max-h-[60vh] bg-gray-900 p-4 rounded-lg">
-          <FormattedTrace 
-            content={data?.fromatTrace || ''} 
+          <FormattedTrace
+            content={data?.fromatTrace || ""}
             className="text-xs text-gray-100"
           />
         </div>
@@ -241,6 +261,7 @@ function SimulateTxButtonComponent({
 }
 
 export function SimulateTxButton({
+  chainId,
   tx,
   safeAddress,
   governor,
@@ -250,15 +271,17 @@ export function SimulateTxButton({
   if (isGovernorTxs) {
     return (
       <GovernorSimulateTxButton
+        chainId={chainId}
         tx={tx as ParsedSignedTx}
         safeAddress={safeAddress}
         governor={governor}
       />
     );
   }
-  
+
   return (
     <InstanceSimulateTxButton
+      chainId={chainId}
       tx={tx}
       safeAddress={safeAddress}
       instanceManager={instanceManager}

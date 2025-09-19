@@ -1,8 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAccount, useWalletClient, useSwitchChain } from "wagmi";
-import { Address, Hex } from "viem";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { defaultChainId } from "@/config/wagmi";
+import { Hex } from "viem";
+import { useAccount, useSwitchChain, useWalletClient } from "wagmi";
 
 /**
  * Processes a raw signature to handle different v values according to Safe contract requirements
@@ -13,14 +12,14 @@ export function processSignature(signature: string): string {
 
   const lastByte = signature.slice(-2).toLowerCase();
   let newLastByte = lastByte;
-  
+
   // Convert v value: 0 -> 27 (0x1b), 1 -> 28 (0x1c)
   if (lastByte === "00" || lastByte === "1b") {
     newLastByte = "1f"; // 0 -> 31
   } else if (lastByte === "01" || lastByte === "1c") {
     newLastByte = "20"; // 1 -> 32
   }
-  
+
   return signature.slice(0, -2) + newLastByte;
 }
 
@@ -40,7 +39,7 @@ const SAFE_SIGNATURE_CACHE_KEY = "safe-signature-cache";
  * Hook for managing Safe transaction signature caching with TanStack Query
  * Caches signatures by tx hash and signer address to avoid repeated signing
  */
-export function useSafeSignature(txHash: Hex) {
+export function useSafeSignature(chainId: number, txHash: Hex) {
   const queryClient = useQueryClient();
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
@@ -55,7 +54,9 @@ export function useSafeSignature(txHash: Hex) {
   });
 
   // Get cached signature for current user and tx
-  const cachedSignature = address ? signatureCache[txHash]?.[address] || null : null;
+  const cachedSignature = address
+    ? signatureCache[txHash]?.[address] || null
+    : null;
   const isAlreadySigned = cachedSignature !== null;
 
   // Mutation to sign and cache a signature
@@ -71,9 +72,7 @@ export function useSafeSignature(txHash: Hex) {
         return cachedSignature;
       }
 
-      // await switchChainAsync({
-      //   chainId: defaultChainId,
-      // });
+      await switchChainAsync({ chainId });
 
       console.log("Signing new message for tx:", txHash);
       const signature = await walletClient.signMessage({
@@ -81,7 +80,7 @@ export function useSafeSignature(txHash: Hex) {
       });
 
       const processedSignature = processSignature(signature);
-      
+
       const signatureData = {
         signature,
         processedSignature,
@@ -111,16 +110,16 @@ export function useSafeSignature(txHash: Hex) {
   return {
     // The processed signature ready for use
     processedSignature: cachedSignature?.processedSignature || null,
-    
+
     // Raw signature
     signature: cachedSignature?.signature || null,
-    
+
     // Whether user has already signed this tx
     isAlreadySigned,
-    
+
     // Function to sign (will use cache if available)
     signTransaction: signMutation.mutateAsync,
-    
+
     // Loading state
     isSigningPending: signMutation.isPending,
   };

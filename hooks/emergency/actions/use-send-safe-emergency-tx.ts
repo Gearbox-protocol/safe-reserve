@@ -6,11 +6,14 @@ import { useSafeSignature } from "@/hooks/actions/use-safe-signature";
 import { getMulticall3Params } from "@/utils/multicall3";
 import { getPriceUpdateTx } from "@gearbox-protocol/permissionless";
 import { useMutation } from "@tanstack/react-query";
-import { useMemo } from "react";
 import { toast } from "sonner";
 import { Address, encodeFunctionData, Hex } from "viem";
-import { useAccount, useConfig, useSwitchChain, useWalletClient } from "wagmi";
-import { getPublicClient } from "wagmi/actions";
+import {
+  useAccount,
+  usePublicClient,
+  useSwitchChain,
+  useWalletClient,
+} from "wagmi";
 
 export function useSendSafeEmergencyTx({
   chainId,
@@ -28,16 +31,11 @@ export function useSendSafeEmergencyTx({
     threshold,
     refetch,
     isLoading: isLoadingThreshold,
-  } = useSafeParams(safe);
+  } = useSafeParams(chainId, safe);
 
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
-  const config = useConfig();
-
-  const publicClient = useMemo(
-    () => getPublicClient(config, { chainId }),
-    [config, chainId]
-  );
+  const publicClient = usePublicClient({ chainId });
 
   // Use the Safe signature hook
   const {
@@ -45,7 +43,7 @@ export function useSendSafeEmergencyTx({
     isAlreadySigned,
     signTransaction,
     isSigningPending,
-  } = useSafeSignature(tx.hash);
+  } = useSafeSignature(chainId, tx.hash);
 
   const priceFeeds =
     emergencyTx.action.type === "ORACLE::setPriceFeed"
@@ -57,9 +55,7 @@ export function useSendSafeEmergencyTx({
       if (!walletClient || !publicClient || !address || threshold === undefined)
         return;
 
-      await switchChainAsync({
-        chainId,
-      });
+      await switchChainAsync({ chainId });
 
       let processedSignature: string | null = null;
 

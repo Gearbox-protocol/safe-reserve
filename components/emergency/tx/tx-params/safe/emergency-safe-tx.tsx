@@ -91,6 +91,7 @@ export function EmergencySafeTx({
 
             <div className="border-l border-gray-800 pl-8">
               <InstanceProposalSignatures
+                chainId={chainId}
                 signers={tx.signedBy || []}
                 safeAddress={emergencyAdminInfo.emergencyAdmin}
                 nonce={nonce}

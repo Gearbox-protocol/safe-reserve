@@ -19,6 +19,7 @@ import {
 } from "wagmi";
 
 export function useSendGovernorTx(
+  chainId: number,
   safeAddress: Address,
   governor: Address,
   tx: ParsedSignedTx
@@ -28,10 +29,10 @@ export function useSendGovernorTx(
     threshold,
     refetch,
     isLoading: isLoadingThreshold,
-  } = useSafeParams(safeAddress);
+  } = useSafeParams(chainId, safeAddress);
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({ chainId });
 
   // Use the Safe signature hook
   const {
@@ -39,9 +40,9 @@ export function useSendGovernorTx(
     isAlreadySigned,
     signTransaction,
     isSigningPending,
-  } = useSafeSignature(tx.hash);
+  } = useSafeSignature(chainId, tx.hash);
 
-  const parsedCalls = useDecodeGovernorCalls(governor, tx.calls);
+  const parsedCalls = useDecodeGovernorCalls(chainId, governor, tx.calls);
   const priceFeeds = getCallsTouchedPriceFeeds(parsedCalls);
 
   const { mutateAsync, isPending } = useMutation({
@@ -55,9 +56,7 @@ export function useSendGovernorTx(
       )
         return;
 
-      // await switchChainAsync({
-      //   chainId: defaultChainId,
-      // });
+      await switchChainAsync({ chainId });
 
       let processedSignature: string | null = null;
 

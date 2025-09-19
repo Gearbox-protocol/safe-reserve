@@ -12,8 +12,7 @@ import { convertRawTxToSafeMultisigTx } from "@gearbox-protocol/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Address, Hex } from "viem";
-import { useConfig } from "wagmi";
-import { getPublicClient } from "wagmi/actions";
+import { usePublicClient } from "wagmi";
 
 export function useBuildEmergencySafeTx({
   chainId,
@@ -32,19 +31,14 @@ export function useBuildEmergencySafeTx({
   error: Error | null;
   refetchSigs: () => Promise<unknown>;
 } {
-  const config = useConfig();
-
-  const publicClient = useMemo(
-    () => getPublicClient(config, { chainId }),
-    [config, chainId]
-  );
+  const publicClient = usePublicClient({ chainId });
 
   const {
     nonce: currentNonce,
     signers,
     isLoading,
     error,
-  } = useSafeParams(safe);
+  } = useSafeParams(chainId, safe);
 
   const usingNonce = useMemo(
     () => (nonce === undefined ? currentNonce : BigInt(nonce)),

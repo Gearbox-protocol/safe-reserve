@@ -5,31 +5,23 @@ import { Check, Copy, ExternalLink, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Address } from "viem";
+import { Identicon } from "../identicon";
 
 interface ProposalSignaturesProps {
+  chainId: number;
   safeAddress: Address;
   signers: Address[];
   status: TimelockTxStatus;
 }
 
-function Identicon({ address, size = 32 }: { address: string; size?: number }) {
-  return (
-    <div
-      className="rounded-full bg-gray-700 flex items-center justify-center text-white text-xs"
-      style={{ width: size, height: size }}
-    >
-      {address.slice(2, 4)}
-    </div>
-  );
-}
-
 export function GovernorProposalSignatures({
+  chainId,
   safeAddress,
   signers,
   status,
 }: ProposalSignaturesProps) {
   const [showAll, setShowAll] = useState(false);
-  const { threshold } = useSafeParams(safeAddress);
+  const { threshold } = useSafeParams(chainId, safeAddress);
 
   return (
     <div className="relative w-[400px]">

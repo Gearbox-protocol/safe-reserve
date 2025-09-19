@@ -15,12 +15,14 @@ import { usePublicClient } from "wagmi";
 
 export function useGovernanceTransactions({
   cid,
+  chainId,
   marketConfigurator,
   eta,
   queueBatches,
   createdAtBlock,
 }: {
   cid: string;
+  chainId?: number;
   marketConfigurator?: Address;
   eta?: number;
   queueBatches?: SafeTx[][];
@@ -33,7 +35,7 @@ export function useGovernanceTransactions({
   error: Error | null;
   refetchSigs: () => Promise<unknown>;
 } {
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({ chainId });
 
   const {
     safeAddress,
@@ -41,7 +43,7 @@ export function useGovernanceTransactions({
     governorAddress,
     isLoading: isLoadingAddresses,
     error: errorAddresses,
-  } = useGovernanceAddresses(marketConfigurator);
+  } = useGovernanceAddresses(chainId, marketConfigurator);
 
   const statuses = useQueries({
     queries: (queueBatches ?? []).map((batch, index) => ({
@@ -99,7 +101,7 @@ export function useGovernanceTransactions({
     })),
   });
 
-  const { nonce, signers } = useSafeParams(safeAddress);
+  const { nonce, signers } = useSafeParams(chainId, safeAddress);
 
   const {
     data: preparedTxs,

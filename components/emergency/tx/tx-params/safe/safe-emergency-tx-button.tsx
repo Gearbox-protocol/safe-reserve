@@ -45,7 +45,7 @@ export function SafeEmergencyTxButton({
     }
   }, []);
 
-  const { signers, threshold, nonce } = useSafeParams(safeAddress);
+  const { signers, threshold, nonce } = useSafeParams(chainId, safeAddress);
   const { address } = useAccount();
 
   const { sdk } = useSafeAppsSDK();

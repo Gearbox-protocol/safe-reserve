@@ -1,10 +1,13 @@
 import { EmergencyTx } from "@/core/emergency-actions";
 import { getPriceUpdateTx } from "@gearbox-protocol/permissionless";
 import { useMutation } from "@tanstack/react-query";
-import { useMemo } from "react";
 import { toast } from "sonner";
-import { useAccount, useConfig, useSwitchChain, useWalletClient } from "wagmi";
-import { getPublicClient } from "wagmi/actions";
+import {
+  useAccount,
+  usePublicClient,
+  useSwitchChain,
+  useWalletClient,
+} from "wagmi";
 
 export function useSendEoaEmergencyTx({
   chainId,
@@ -17,12 +20,7 @@ export function useSendEoaEmergencyTx({
 
   const { data: walletClient } = useWalletClient();
   const { switchChainAsync } = useSwitchChain();
-  const config = useConfig();
-
-  const publicClient = useMemo(
-    () => getPublicClient(config, { chainId }),
-    [config, chainId]
-  );
+  const publicClient = usePublicClient({ chainId });
 
   const priceFeeds =
     emergencyTx.action.type === "ORACLE::setPriceFeed"
@@ -33,9 +31,7 @@ export function useSendEoaEmergencyTx({
     mutationFn: async () => {
       if (!walletClient || !publicClient || !address) return;
 
-      await switchChainAsync({
-        chainId,
-      });
+      await switchChainAsync({ chainId });
 
       const updateTx =
         priceFeeds.length === 0

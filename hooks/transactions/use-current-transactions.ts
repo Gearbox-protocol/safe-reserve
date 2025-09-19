@@ -31,6 +31,7 @@ export function useCurrentTransactions(
   cid: string
 ): CurrentGovernorTransactions | CurrentInstanceTransactions {
   const {
+    chainId,
     type,
     marketConfigurator,
     eta,
@@ -50,6 +51,7 @@ export function useCurrentTransactions(
     refetchSigs: refetchGovernorSigs,
   } = useGovernanceTransactions({
     cid,
+    chainId,
     marketConfigurator,
     eta,
     queueBatches: batches,
@@ -64,6 +66,7 @@ export function useCurrentTransactions(
     refetchSigs: refetchInstanceSigs,
   } = useInstanceTransactions({
     cid,
+    chainId,
     instanceManager,
     batches,
   });

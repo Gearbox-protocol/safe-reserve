@@ -2,11 +2,14 @@ import { safeAbi } from "@/abi";
 import { EmergencyTx } from "@/core/emergency-actions";
 import { useBuildEmergencySafeTx } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
-import { useMemo } from "react";
 import { toast } from "sonner";
 import { Address, Hex } from "viem";
-import { useAccount, useConfig, useSwitchChain, useWalletClient } from "wagmi";
-import { getPublicClient } from "wagmi/actions";
+import {
+  useAccount,
+  usePublicClient,
+  useSwitchChain,
+  useWalletClient,
+} from "wagmi";
 
 export function useSignEmergencyTx({
   chainId,
@@ -23,13 +26,7 @@ export function useSignEmergencyTx({
 }) {
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
-
-  const config = useConfig();
-
-  const publicClient = useMemo(
-    () => getPublicClient(config, { chainId }),
-    [config, chainId]
-  );
+  const publicClient = usePublicClient({ chainId });
 
   const { switchChainAsync } = useSwitchChain();
 
@@ -44,9 +41,7 @@ export function useSignEmergencyTx({
     mutationFn: async (args: { txHash: Hex }) => {
       if (!walletClient || !publicClient || !address) return;
 
-      await switchChainAsync({
-        chainId,
-      });
+      await switchChainAsync({ chainId });
 
       try {
         const tx = await walletClient.writeContract({
