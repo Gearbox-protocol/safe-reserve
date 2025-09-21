@@ -11,6 +11,7 @@ import {
   hemi,
   lisk,
   mainnet,
+  plasma,
   worldchain,
 } from "wagmi/chains";
 // import { safe, walletConnect } from "wagmi/connectors";
@@ -19,6 +20,16 @@ const hemiWithMulticall3 = defineChain({
   ...hemi,
   contracts: {
     ...hemi.contracts,
+    multicall3: {
+      address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+    },
+  },
+});
+
+const plasmaWithMulticall3 = defineChain({
+  ...plasma,
+  contracts: {
+    ...plasma.contracts,
     multicall3: {
       address: "0xcA11bde05977b3631167028862bE2a173976CA11",
     },
@@ -35,6 +46,7 @@ export const chains = [
   hemiWithMulticall3,
   lisk,
   berachain,
+  plasmaWithMulticall3,
 ] as const;
 
 export const ADDRESS_PROVIDER = process.env.NEXT_PUBLIC_ADDRESS_PROVIDER;
@@ -105,6 +117,16 @@ export const getChainTransport = (chain: Chain): Transport => {
     }).getTransport();
   }
 
+  if (chain.id === plasma.id) {
+    const tenderlyRpc =
+      "https://plasma.gateway.tenderly.co/75ewmNAMLVnWRFd6qJ54PG";
+    return http(tenderlyRpc, {
+      retryCount: 3,
+      retryDelay: 1000,
+      timeout: 10000,
+    });
+  }
+
   // Try to use window.ethereum if available
   // if (typeof window !== "undefined" && window.ethereum) {
   //   return custom(window.ethereum);
@@ -132,6 +154,7 @@ export const config = createConfig(
       [hemi.id]: getChainTransport(hemi),
       [lisk.id]: getChainTransport(lisk),
       [berachain.id]: getChainTransport(berachain),
+      [plasma.id]: getChainTransport(plasma),
     } as Record<number, Transport>,
 
     // connectors: [

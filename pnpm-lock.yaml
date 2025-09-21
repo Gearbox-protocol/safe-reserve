@@ -15,8 +15,8 @@ importers:
         specifier: ^0.1.12
         version: 0.1.12(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
       '@gearbox-protocol/sdk':
-        specifier: ^8.26.2
-        version: 8.27.10(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
+        specifier: ^9.7.0
+        version: 9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@radix-ui/react-alert-dialog':
         specifier: ^1.1.4
         version: 1.1.15(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -108,7 +108,7 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
       viem:
-        specifier: ^2.24.3
+        specifier: ^2.36
         version: 2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
       wagmi:
         specifier: ^2.14.11
@@ -250,9 +250,6 @@ packages:
 
   '@base-org/account@1.1.1':
     resolution: {integrity: sha512-IfVJPrDPhHfqXRDb89472hXkpvJuQQR7FDI9isLPHEqSYt/45whIoBxSPgZ0ssTt379VhQo4+87PWI1DoLSfAQ==}
-
-  '@chainlink/contracts@0.6.1':
-    resolution: {integrity: sha512-EuwijGexttw0UjfrW+HygwhQIrGAbqpf1ue28R55HhWMHBzphEH0PhWm8DQmFfj5OZNy8Io66N4L0nStkZ3QKQ==}
 
   '@coinbase/wallet-sdk@3.9.3':
     resolution: {integrity: sha512-N/A2DRIf0Y3PHc1XAMvbBUu4zisna6qAdqABMZwBMNEfWrXpAwx16pZGkYCLGE+Rvv1edbcB2LYDRnACNcmCiw==}
@@ -605,14 +602,6 @@ packages:
     resolution: {integrity: sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  '@eth-optimism/contracts@0.5.40':
-    resolution: {integrity: sha512-MrzV0nvsymfO/fursTB7m/KunkPsCndltVgfdHaT1Aj5Vi6R/doKIGGkOofHX+8B6VMZpuZosKCMQ5lQuqjt8w==}
-    peerDependencies:
-      ethers: ^5
-
-  '@eth-optimism/core-utils@0.12.0':
-    resolution: {integrity: sha512-qW+7LZYCz7i8dRa7SRlUKIo1VBU8lvN0HeXCxJR+z+xtMzMQpPds20XJNCMclszxYQHkXY00fOT6GvFw9ZL6nw==}
-
   '@ethereumjs/common@3.2.0':
     resolution: {integrity: sha512-pksvzI0VyLgmuEF2FA/JR/4/y6hcPq8OUail3/AvycBaW1d5VSauOZzqGvJ3RTmR4MU35lWE8KseKOsEhrFRBA==}
 
@@ -746,13 +735,8 @@ packages:
       '@gearbox-protocol/sdk': '>=8.20.0 <10.0.0'
       viem: '>=2.23.15 <3.0.0'
 
-  '@gearbox-protocol/sdk@8.27.10':
-    resolution: {integrity: sha512-wtivtww7QCBHCjHLURKl9JZj98QN4/iG0+0HhnKuffckacAl9WMjRAKLY9/BsPUP+iEiPl0lqIutK/FFMjYd1A==}
-    peerDependencies:
-      axios: ^1.0.0
-
-  '@gearbox-protocol/sdk@9.1.0':
-    resolution: {integrity: sha512-5h/+CnRVAygUx/w4h8vG7Mhni6q7sM2k93UKAFCPu+VzpVqDDZ/RE1vyZjFWtMeJvfiByHSdIH03bJc8Hb7Sdw==}
+  '@gearbox-protocol/sdk@9.7.0':
+    resolution: {integrity: sha512-B5b137S6xHjcsrFW36zojr1HyxTG72C21mXStGA7qarIOqxmaHiNxHLD+5iplURSfel1KlQ5/eeHa0Mgwjn01g==}
     peerDependencies:
       axios: ^1.0.0
 
@@ -1016,15 +1000,6 @@ packages:
   '@nolyfill/is-core-module@1.0.39':
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
-
-  '@openzeppelin/contracts-upgradeable@4.9.6':
-    resolution: {integrity: sha512-m4iHazOsOCv1DgM7eD7GupTJ+NFVujRZt1wzddDPSVGpWdKq1SKkla5htKG7+IS4d2XOCtzkUNwRZ7Vq5aEUMA==}
-
-  '@openzeppelin/contracts@3.4.2':
-    resolution: {integrity: sha512-z0zMCjyhhp4y7XKAcDAi3Vgms4T2PstwBdahiO0+9NaGICQKjynK3wduSRplTgk4LXmoO1yfDGO5RbjKYxtuxA==}
-
-  '@openzeppelin/contracts@4.3.3':
-    resolution: {integrity: sha512-tDBopO1c98Yk7Cv/PZlHqrvtVjlgK5R4J6jxLwoO7qxK4xqOiZG+zSkIvGFpPZ0ikc3QOED3plgdqjgNTnBc7g==}
 
   '@openzeppelin/contracts@4.9.6':
     resolution: {integrity: sha512-xSmezSupL+y9VkHZJGDoCBpmnB2ogM13ccaYDWqJTfS3dbuHkgjuwDFUmaFauBCboQMGB/S5UqUl2y54X99BmA==}
@@ -1419,20 +1394,17 @@ packages:
   '@radix-ui/rect@1.1.1':
     resolution: {integrity: sha512-HPwpGIzkl28mWyZqG52jiqDJ12waP11Pa1lGoiyUkIEuMLBP0oeK/C89esbXrxsky5we7dfd8U58nm0SgAWpVw==}
 
-  '@redstone-finance/evm-connector@0.7.5':
-    resolution: {integrity: sha512-YJRkeEgkgMpLIYeWkfFOumM13Im2DbpQr6KmLHq1Iec96G7pW2KrvgzFz1J83yO4LjNMkHAd5g7skpJnDWM4FA==}
+  '@redstone-finance/evm-connector@0.9.0':
+    resolution: {integrity: sha512-iA7akDBqEWb/O2eWAc0syNmp8VfPMbzpHf50I+xGG3rnA4y//9F5G+tA4ysUcWMFTzlfX28os7v00SOmgJ1LjQ==}
 
-  '@redstone-finance/oracles-smartweave-contracts@0.7.5':
-    resolution: {integrity: sha512-js9X7HbKqLAttbElOLQO9/kf6kU/pGMtfUyd2PuOPFWcLgSGWPBoXQgtGstJyeY91Uhzg2TveqgbrZow+4PstQ==}
+  '@redstone-finance/protocol@0.9.0':
+    resolution: {integrity: sha512-Yuny8D3mQa9pzdQDOOXz93puCtQDqzu4Jm0ZJRHk0htX/3I5a/9zxTVBE9moplRIxrG5R/f6ydxok4Mga8REbA==}
 
-  '@redstone-finance/protocol@0.7.5':
-    resolution: {integrity: sha512-Yh/tCDqBM293JdDg84f1jPlmxHcg76UboDs5OnRwv3T0Ra0M5NH8GKydKNaAc83LVQhxbA7z829brPDaefbPLQ==}
+  '@redstone-finance/sdk@0.9.0':
+    resolution: {integrity: sha512-R4mYNG621U3qGHeB9qS7ky5RPQM1E1pWwHUb4SziR+BBnjPyDdVt7m7tRTpFdkRxymUSpYGKPEIAc3fitHZVJg==}
 
-  '@redstone-finance/sdk@0.7.5':
-    resolution: {integrity: sha512-IAJDpHxsHg0hv5yW26Gocn5WScR/LRB/+mnSKZzUk72ILBq6vUkV9J9lE/zdgKYBBlMtzj7OElIkcDNjkR2xKQ==}
-
-  '@redstone-finance/utils@0.7.5':
-    resolution: {integrity: sha512-hldeC00/V397GMn/UHtYQ9ybbUET9bAM2sinlyK0bnLNx+nLlPAV9ePltqh56V5/7Bn+BDYYDDkRSGy7cj9X5w==}
+  '@redstone-finance/utils@0.9.0':
+    resolution: {integrity: sha512-+faPe54GFaVrfW4lN4uJtzIxtmi6cZkBEa5TttwV++R+UeBvpT5/B9sC3J87NQ5tQ52k2XJP7CJZs4XcNJILEQ==}
 
   '@reown/appkit-common@1.7.8':
     resolution: {integrity: sha512-ridIhc/x6JOp7KbDdwGKY4zwf8/iK8EYBl+HtWrruutSLwZyVi5P8WaZa+8iajL6LcDcDF7LoyLwMTym7SRuwQ==}
@@ -2023,6 +1995,17 @@ packages:
       zod:
         optional: true
 
+  abitype@1.1.1:
+    resolution: {integrity: sha512-Loe5/6tAgsBukY95eGaPSDmQHIjRZYQq8PB1MpsNccDIK8WiV+Uw6WzaIXipvaxTEL2yEB0OpEaQv3gs8pkS9Q==}
+    peerDependencies:
+      typescript: '>=5.0.4'
+      zod: ^3.22.0 || ^4.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+      zod:
+        optional: true
+
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
     peerDependencies:
@@ -2107,9 +2090,6 @@ packages:
   arraybuffer.prototype.slice@1.0.4:
     resolution: {integrity: sha512-BNoCY6SXXPQ7gF2opIP4GBE+Xw7U+pHMYKuzjgCN3GwiaIR09UUeKfheyIry77QtrCBlC0KK0q5/TER/tYh3PQ==}
     engines: {node: '>= 0.4'}
-
-  assertion-error@1.1.0:
-    resolution: {integrity: sha512-jgsaNduz+ndvGyFt3uSuWqvy4lCnIJiovtouQN5JZHOKCS2QuhEdbcQHFhVksz2N2U9hXJo8odG7ETyWlEeuDw==}
 
   assertion-error@2.0.1:
     resolution: {integrity: sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA==}
@@ -2216,10 +2196,6 @@ packages:
     resolution: {integrity: sha512-WDtdLmJvAuNNPzByAYpRo2rF1Mmradw6gvWsQKf63476DDXmomT9zUiGypLcG4ibIM67vhAj8jJRdbmEws2Aqw==}
     engines: {node: '>=6.14.2'}
 
-  bufio@1.2.3:
-    resolution: {integrity: sha512-5Tt66bRzYUSlVZatc0E92uDenreJ+DpTBmSAUwL4VSxJn3e6cUyYwx+PoqML0GRZatgA/VX8ybhxItF8InZgqA==}
-    engines: {node: '>=8.0.0'}
-
   bundle-require@5.1.0:
     resolution: {integrity: sha512-3WrrOuZiyaaZPWiEt4G3+IffISVC9HYlWueJEBWED4ZH4aIAC2PnkdnuRrR94M+w6yGWn4AglWtJtBI8YqvgoA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -2267,10 +2243,6 @@ packages:
   ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
 
-  chai@4.5.0:
-    resolution: {integrity: sha512-RITGBfijLkBddZvnn8jdqoTypxvqbOLYQkGGxXzeFjVHvudaPw0HNFD9x928/eUwYWd2dPCugVqspGALTZZQKw==}
-    engines: {node: '>=4'}
-
   chai@5.3.3:
     resolution: {integrity: sha512-4zNhdJD/iOjSH0A05ea+Ke6MU5mmpQcbQsSOkgdaUMJ9zTlDTD/GYlwohmIE2u0gaxHYiVHEn1Fw9mZ/ktJWgw==}
     engines: {node: '>=18'}
@@ -2293,9 +2265,6 @@ packages:
 
   character-reference-invalid@2.0.1:
     resolution: {integrity: sha512-iBZ4F4wRbyORVsu0jPV7gXkOsGYjGHPmAyv+HiHG8gi5PtC9KI2j1+v8/tlibRvjoWX027ypmG/n0HtO5t7unw==}
-
-  check-error@1.0.3:
-    resolution: {integrity: sha512-iKEoDYaRmd1mxM90a2OEfWhjsjPpYPuQ+lMYsoxB126+t8fw7ySEO48nmDg5COTjxDI65/Y2OWpeEHk3ZOe8zg==}
 
   check-error@2.1.1:
     resolution: {integrity: sha512-OAlb+T7V4Op9OwdkjmguYRqncdlx5JiofwOAUkmTF+jNdHwzTaTs4sRAGpzLF3oOz5xAyDGrPgeIDFQmDOTiJw==}
@@ -2493,10 +2462,6 @@ packages:
 
   dedent@0.7.0:
     resolution: {integrity: sha512-Q6fKUPqnAHAyhiUgFU7BUzLiv0kd8saH9al7tnu5Q/okj6dnupxyTgFIBjVzJATdfIAm9NAsvXNzjaKa+bxVyA==}
-
-  deep-eql@4.1.4:
-    resolution: {integrity: sha512-SUwdGfqdKOwxCPeVYjwSyRpJ7Z+fhpwIAtmCUdZIWZ/YP5R9WAsyuSgpLVDi9bjWoN2LXHNss/dk3urXtdQxGg==}
-    engines: {node: '>=6'}
 
   deep-eql@5.0.2:
     resolution: {integrity: sha512-h5k/5U50IJJFpzfL6nO9jaaumfjO/f2NjK/oYB2Djzm4p9L+3T9qWpZqZ2hAbLPuuYq9wrU08WQyBTL5GbPk5Q==}
@@ -2964,9 +2929,6 @@ packages:
     resolution: {integrity: sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==}
     engines: {node: 6.* || 8.* || >= 10.*}
 
-  get-func-name@2.0.2:
-    resolution: {integrity: sha512-8vXOvuE167CtIc3OyItco7N/dpRtBbYOsPsXCz7X/PMnlGjYjSGuZJgM1Y7mmew7BKf9BqvLX2tnOVy1BBUsxQ==}
-
   get-intrinsic@1.3.0:
     resolution: {integrity: sha512-9fSjSaos/fRIVIp+xSJlE6lfwhES7LNtKaCBIamHsjr2na1BiABJPo0mOjjz8GJDURarmCPGqaiVg5mfjb98CQ==}
     engines: {node: '>= 0.4'}
@@ -3425,9 +3387,6 @@ packages:
   loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
-
-  loupe@2.3.7:
-    resolution: {integrity: sha512-zSMINGVYkdpYSOBmLi0D1Uo7JU9nVdQKrHxC8eYlV+9YKK9WePqAlL7lSlorG/U2Fw1w0hTBmaa/jrQ3UbPHtA==}
 
   loupe@3.2.1:
     resolution: {integrity: sha512-CdzqowRJCeLU72bHvWqwRBBlLcMEtIvGrlvef74kMnV2AolS9Y8xUv1I0U/MNAWMhBlKIoyuEgoJ0t/bbwHbLQ==}
@@ -3894,9 +3853,6 @@ packages:
 
   pathe@1.1.2:
     resolution: {integrity: sha512-whLdWMYL2TwI08hn8/ZqAbrVemu0LNaNNJZX73O6qaIdCTfXutsLhMkjdENX0qhsQ9uIimo4/aQOmXkoon2nDQ==}
-
-  pathval@1.1.1:
-    resolution: {integrity: sha512-Dp6zGqpTdETdR63lehJYPeIOqpiNBNtc7BpWSLrOje7UaIsE5aY92r/AunQA7rsXvet3lrJ3JnZX29UPTKXyKQ==}
 
   pathval@2.0.1:
     resolution: {integrity: sha512-//nshmD55c46FuFw26xV/xFAaB5HF9Xdap7HJBBnrKdAd6/GxDBaNA1870O79+9ueg61cZLSVc+OaFlfmObYVQ==}
@@ -4646,10 +4602,6 @@ packages:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
 
-  type-detect@4.1.0:
-    resolution: {integrity: sha512-Acylog8/luQ8L7il+geoSxhEkazvkslg7PSNKOX59mbB9cOveP5aq9h74Y7YU8yDpJwetzQQrfIwtf4Wp4LKcw==}
-    engines: {node: '>=4'}
-
   type-fest@0.20.2:
     resolution: {integrity: sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ==}
     engines: {node: '>=10'}
@@ -5114,11 +5066,8 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
-  zod@4.1.5:
-    resolution: {integrity: sha512-rcUUZqlLJgBC33IT3PNMgsCq6TzLQEG/Ei/KTCU0PedSWRMAXoOUN+4t/0H+Q8bdnLPdqUYnvboJT0bn/229qg==}
-
-  zod@4.1.8:
-    resolution: {integrity: sha512-5R1P+WwQqmmMIEACyzSvo4JXHY5WiAFHRMg+zBZKgKS+Q1viRa0C1hmUKtHltoIFKtIdki3pRxkmpP74jnNYHQ==}
+  zod@4.1.11:
+    resolution: {integrity: sha512-WPsqwxITS2tzx1bzhIKsEs19ABD5vmCVa4xBo2tq/SrV4RNZtfws1EnCWQXM6yh8bD08a1idvkB5MZSBiZsjwg==}
 
   zustand@5.0.0:
     resolution: {integrity: sha512-LE+VcmbartOPM+auOjCCLQOsQ05zUTp8RkgwRzefUk+2jISdMMFnxvyTjA4YNWr5ZGXYbVsEMZosttuxUBkojQ==}
@@ -5297,17 +5246,6 @@ snapshots:
       - use-sync-external-store
       - utf-8-validate
       - zod
-
-  '@chainlink/contracts@0.6.1(bufferutil@4.0.9)(ethers@5.8.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)':
-    dependencies:
-      '@eth-optimism/contracts': 0.5.40(bufferutil@4.0.9)(ethers@5.8.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)
-      '@openzeppelin/contracts': 4.3.3
-      '@openzeppelin/contracts-upgradeable': 4.9.6
-      '@openzeppelin/contracts-v0.7': '@openzeppelin/contracts@3.4.2'
-    transitivePeerDependencies:
-      - bufferutil
-      - ethers
-      - utf-8-validate
 
   '@coinbase/wallet-sdk@3.9.3':
     dependencies:
@@ -5550,38 +5488,6 @@ snapshots:
       - supports-color
 
   '@eslint/js@8.57.1': {}
-
-  '@eth-optimism/contracts@0.5.40(bufferutil@4.0.9)(ethers@5.8.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)':
-    dependencies:
-      '@eth-optimism/core-utils': 0.12.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      '@ethersproject/abstract-provider': 5.8.0
-      '@ethersproject/abstract-signer': 5.8.0
-      ethers: 5.8.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
-  '@eth-optimism/core-utils@0.12.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@ethersproject/abi': 5.8.0
-      '@ethersproject/abstract-provider': 5.8.0
-      '@ethersproject/address': 5.8.0
-      '@ethersproject/bignumber': 5.8.0
-      '@ethersproject/bytes': 5.8.0
-      '@ethersproject/constants': 5.8.0
-      '@ethersproject/contracts': 5.8.0
-      '@ethersproject/hash': 5.8.0
-      '@ethersproject/keccak256': 5.8.0
-      '@ethersproject/properties': 5.8.0
-      '@ethersproject/providers': 5.8.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      '@ethersproject/rlp': 5.8.0
-      '@ethersproject/transactions': 5.8.0
-      '@ethersproject/web': 5.8.0
-      bufio: 1.2.3
-      chai: 4.5.0
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
 
   '@ethereumjs/common@3.2.0':
     dependencies:
@@ -5879,8 +5785,8 @@ snapshots:
 
   '@gearbox-protocol/permissionless@0.1.12(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)':
     dependencies:
-      '@gearbox-protocol/sdk': 9.1.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
-      '@gearbox-protocol/sdk-adapters': 1.2.5(@gearbox-protocol/sdk@9.1.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76))
+      '@gearbox-protocol/sdk': 9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
+      '@gearbox-protocol/sdk-adapters': 1.2.5(@gearbox-protocol/sdk@9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76))
       abitype: 1.1.0(typescript@5.9.2)(zod@3.25.76)
       viem: 2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
     transitivePeerDependencies:
@@ -5891,44 +5797,26 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@gearbox-protocol/sdk-adapters@1.2.5(@gearbox-protocol/sdk@9.1.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76))':
+  '@gearbox-protocol/sdk-adapters@1.2.5(@gearbox-protocol/sdk@9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76))':
     dependencies:
       '@gearbox-protocol/integrations-v3': 1.42.0-abi.5
-      '@gearbox-protocol/sdk': 9.1.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
+      '@gearbox-protocol/sdk': 9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
       viem: 2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
 
-  '@gearbox-protocol/sdk@8.27.10(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)':
+  '@gearbox-protocol/sdk@9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)':
     dependencies:
-      '@redstone-finance/evm-connector': 0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      '@redstone-finance/protocol': 0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@redstone-finance/evm-connector': 0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@redstone-finance/protocol': 0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@redstone-finance/sdk': 0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@types/bn.js': 5.2.0
-      abitype: 1.1.0(typescript@5.9.2)(zod@4.1.5)
+      abitype: 1.1.1(typescript@5.9.2)(zod@4.1.11)
       axios: 1.11.0
       bn.js: 5.2.2
       buffer: 6.0.3
       date-fns: 4.1.0
       decimal.js-light: 2.5.1
-      viem: 2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@4.1.5)
-      zod: 4.1.5
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - typescript
-      - utf-8-validate
-
-  '@gearbox-protocol/sdk@9.1.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@redstone-finance/evm-connector': 0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      '@redstone-finance/protocol': 0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      '@types/bn.js': 5.2.0
-      abitype: 1.1.0(typescript@5.9.2)(zod@4.1.8)
-      axios: 1.11.0
-      bn.js: 5.2.2
-      buffer: 6.0.3
-      date-fns: 4.1.0
-      decimal.js-light: 2.5.1
-      viem: 2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@4.1.8)
-      zod: 4.1.8
+      viem: 2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@4.1.11)
+      zod: 4.1.11
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -6288,12 +6176,6 @@ snapshots:
       fastq: 1.19.1
 
   '@nolyfill/is-core-module@1.0.39': {}
-
-  '@openzeppelin/contracts-upgradeable@4.9.6': {}
-
-  '@openzeppelin/contracts@3.4.2': {}
-
-  '@openzeppelin/contracts@4.3.3': {}
 
   '@openzeppelin/contracts@4.9.6': {}
 
@@ -6685,13 +6567,12 @@ snapshots:
 
   '@radix-ui/rect@1.1.1': {}
 
-  '@redstone-finance/evm-connector@0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@redstone-finance/evm-connector@0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
-      '@chainlink/contracts': 0.6.1(bufferutil@4.0.9)(ethers@5.8.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)
       '@openzeppelin/contracts': 4.9.6
-      '@redstone-finance/protocol': 0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      '@redstone-finance/sdk': 0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      '@redstone-finance/utils': 0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@redstone-finance/protocol': 0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@redstone-finance/sdk': 0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@redstone-finance/utils': 0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       axios: 1.11.0
       ethers: 5.8.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
@@ -6699,9 +6580,7 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@redstone-finance/oracles-smartweave-contracts@0.7.5': {}
-
-  '@redstone-finance/protocol@0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@redstone-finance/protocol@0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       decimal.js: 10.6.0
       ethers: 5.8.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -6710,13 +6589,12 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@redstone-finance/sdk@0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@redstone-finance/sdk@0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       '@ethersproject/bytes': 5.8.0
       '@ethersproject/strings': 5.8.0
-      '@redstone-finance/oracles-smartweave-contracts': 0.7.5
-      '@redstone-finance/protocol': 0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      '@redstone-finance/utils': 0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@redstone-finance/protocol': 0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@redstone-finance/utils': 0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@types/lodash': 4.17.20
       axios: 1.11.0
       ethers: 5.8.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -6727,7 +6605,7 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@redstone-finance/utils@0.7.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@redstone-finance/utils@0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       '@types/lodash': 4.17.20
       axios: 1.11.0
@@ -7119,7 +6997,7 @@ snapshots:
 
   '@scure/bip32@1.7.0':
     dependencies:
-      '@noble/curves': 1.9.1
+      '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
 
@@ -8051,15 +7929,15 @@ snapshots:
       typescript: 5.9.2
       zod: 3.25.76
 
-  abitype@1.1.0(typescript@5.9.2)(zod@4.1.5):
+  abitype@1.1.0(typescript@5.9.2)(zod@4.1.11):
     optionalDependencies:
       typescript: 5.9.2
-      zod: 4.1.5
+      zod: 4.1.11
 
-  abitype@1.1.0(typescript@5.9.2)(zod@4.1.8):
+  abitype@1.1.1(typescript@5.9.2)(zod@4.1.11):
     optionalDependencies:
       typescript: 5.9.2
-      zod: 4.1.8
+      zod: 4.1.11
 
   acorn-jsx@5.3.2(acorn@8.15.0):
     dependencies:
@@ -8170,8 +8048,6 @@ snapshots:
       get-intrinsic: 1.3.0
       is-array-buffer: 3.0.5
 
-  assertion-error@1.1.0: {}
-
   assertion-error@2.0.1: {}
 
   ast-types-flow@0.0.8: {}
@@ -8274,8 +8150,6 @@ snapshots:
     dependencies:
       node-gyp-build: 4.8.4
 
-  bufio@1.2.3: {}
-
   bundle-require@5.1.0(esbuild@0.25.9):
     dependencies:
       esbuild: 0.25.9
@@ -8316,16 +8190,6 @@ snapshots:
 
   ccount@2.0.1: {}
 
-  chai@4.5.0:
-    dependencies:
-      assertion-error: 1.1.0
-      check-error: 1.0.3
-      deep-eql: 4.1.4
-      get-func-name: 2.0.2
-      loupe: 2.3.7
-      pathval: 1.1.1
-      type-detect: 4.1.0
-
   chai@5.3.3:
     dependencies:
       assertion-error: 2.0.1
@@ -8348,10 +8212,6 @@ snapshots:
   character-entities@2.0.2: {}
 
   character-reference-invalid@2.0.1: {}
-
-  check-error@1.0.3:
-    dependencies:
-      get-func-name: 2.0.2
 
   check-error@2.1.1: {}
 
@@ -8536,10 +8396,6 @@ snapshots:
   decode-uri-component@0.2.2: {}
 
   dedent@0.7.0: {}
-
-  deep-eql@4.1.4:
-    dependencies:
-      type-detect: 4.1.0
 
   deep-eql@5.0.2: {}
 
@@ -9235,8 +9091,6 @@ snapshots:
 
   get-caller-file@2.0.5: {}
 
-  get-func-name@2.0.2: {}
-
   get-intrinsic@1.3.0:
     dependencies:
       call-bind-apply-helpers: 1.0.2
@@ -9719,10 +9573,6 @@ snapshots:
   loose-envify@1.4.0:
     dependencies:
       js-tokens: 4.0.0
-
-  loupe@2.3.7:
-    dependencies:
-      get-func-name: 2.0.2
 
   loupe@3.2.1: {}
 
@@ -10360,10 +10210,10 @@ snapshots:
   ox@0.6.7(typescript@5.9.2)(zod@3.25.76):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
-      '@noble/curves': 1.8.1
-      '@noble/hashes': 1.7.1
-      '@scure/bip32': 1.6.2
-      '@scure/bip39': 1.5.4
+      '@noble/curves': 1.9.7
+      '@noble/hashes': 1.8.0
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
       abitype: 1.1.0(typescript@5.9.2)(zod@3.25.76)
       eventemitter3: 5.0.1
     optionalDependencies:
@@ -10415,7 +10265,7 @@ snapshots:
     transitivePeerDependencies:
       - zod
 
-  ox@0.9.3(typescript@5.9.2)(zod@4.1.5):
+  ox@0.9.3(typescript@5.9.2)(zod@4.1.11):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
       '@noble/ciphers': 1.3.0
@@ -10423,22 +10273,7 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.1.0(typescript@5.9.2)(zod@4.1.5)
-      eventemitter3: 5.0.1
-    optionalDependencies:
-      typescript: 5.9.2
-    transitivePeerDependencies:
-      - zod
-
-  ox@0.9.3(typescript@5.9.2)(zod@4.1.8):
-    dependencies:
-      '@adraffy/ens-normalize': 1.11.0
-      '@noble/ciphers': 1.3.0
-      '@noble/curves': 1.9.1
-      '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      abitype: 1.1.0(typescript@5.9.2)(zod@4.1.8)
+      abitype: 1.1.0(typescript@5.9.2)(zod@4.1.11)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 5.9.2
@@ -10493,8 +10328,6 @@ snapshots:
       minipass: 7.1.2
 
   pathe@1.1.2: {}
-
-  pathval@1.1.1: {}
 
   pathval@2.0.1: {}
 
@@ -11391,8 +11224,6 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
 
-  type-detect@4.1.0: {}
-
   type-fest@0.20.2: {}
 
   typed-array-buffer@1.0.3:
@@ -11692,32 +11523,15 @@ snapshots:
       - utf-8-validate
       - zod
 
-  viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@4.1.5):
+  viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@4.1.11):
     dependencies:
       '@noble/curves': 1.9.1
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.1.0(typescript@5.9.2)(zod@4.1.5)
+      abitype: 1.1.0(typescript@5.9.2)(zod@4.1.11)
       isows: 1.0.7(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
-      ox: 0.9.3(typescript@5.9.2)(zod@4.1.5)
-      ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-    optionalDependencies:
-      typescript: 5.9.2
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-      - zod
-
-  viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@4.1.8):
-    dependencies:
-      '@noble/curves': 1.9.1
-      '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      abitype: 1.1.0(typescript@5.9.2)(zod@4.1.8)
-      isows: 1.0.7(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
-      ox: 0.9.3(typescript@5.9.2)(zod@4.1.8)
+      ox: 0.9.3(typescript@5.9.2)(zod@4.1.11)
       ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     optionalDependencies:
       typescript: 5.9.2
@@ -11967,9 +11781,7 @@ snapshots:
 
   zod@3.25.76: {}
 
-  zod@4.1.5: {}
-
-  zod@4.1.8: {}
+  zod@4.1.11: {}
 
   zustand@5.0.0(@types/react@18.3.24)(react@18.3.1)(use-sync-external-store@1.4.0(react@18.3.1)):
     optionalDependencies:
