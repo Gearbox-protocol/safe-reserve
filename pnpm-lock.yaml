@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@gearbox-protocol/permissionless':
-        specifier: ^0.1.12
-        version: 0.1.12(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
+        specifier: ^0.1.13
+        version: 0.1.13(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
       '@gearbox-protocol/sdk':
         specifier: ^9.7.0
         version: 9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
@@ -726,8 +726,8 @@ packages:
   '@gearbox-protocol/integrations-v3@1.42.0-abi.5':
     resolution: {integrity: sha512-WTaAqCxLrGkKuBzq2wMGXz7ll+W4wDXMDnFs8aH2duXMvyYPovuDZL/7LlmqZstloKNAx9LnXqIC8eekUKiC0w==}
 
-  '@gearbox-protocol/permissionless@0.1.12':
-    resolution: {integrity: sha512-DcY0rf0+Vv6wgawthLQRoMxNm4hnwUgBEWSO8nMxnBxAKkTTQJMVdA+eXmdbQ7h0ACsms5BiPpW1x3JWqA++rQ==}
+  '@gearbox-protocol/permissionless@0.1.13':
+    resolution: {integrity: sha512-O76SOok4dUvDZ1bjQp+CXFWttV9xbYVa80GKgIk9FmCRuZCRw4Xg0N2tDzjj3AZ8IykbSR9lO7RY2zVcm0l5ew==}
 
   '@gearbox-protocol/sdk-adapters@1.2.5':
     resolution: {integrity: sha512-+w+RMkjKWUO2wuxtr7LqVv+1NpX8wuS5X2lh1wKlREJlF88Cv5bgnMhtkkXBNGWrPtib9Plzc8KWeHxtHjOM/A==}
@@ -5783,11 +5783,11 @@ snapshots:
 
   '@gearbox-protocol/integrations-v3@1.42.0-abi.5': {}
 
-  '@gearbox-protocol/permissionless@0.1.12(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)':
+  '@gearbox-protocol/permissionless@0.1.13(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)':
     dependencies:
       '@gearbox-protocol/sdk': 9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@gearbox-protocol/sdk-adapters': 1.2.5(@gearbox-protocol/sdk@9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76))
-      abitype: 1.1.0(typescript@5.9.2)(zod@3.25.76)
+      abitype: 1.1.1(typescript@5.9.2)(zod@3.25.76)
       viem: 2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
     transitivePeerDependencies:
       - axios
@@ -7933,6 +7933,11 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.2
       zod: 4.1.11
+
+  abitype@1.1.1(typescript@5.9.2)(zod@3.25.76):
+    optionalDependencies:
+      typescript: 5.9.2
+      zod: 3.25.76
 
   abitype@1.1.1(typescript@5.9.2)(zod@4.1.11):
     optionalDependencies:
