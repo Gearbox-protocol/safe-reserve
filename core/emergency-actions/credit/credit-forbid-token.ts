@@ -23,7 +23,7 @@ export const forbidTokenActionData: EmergencyActionData<ForbidTokenAction> = {
     token: addressSchema,
   }),
 
-  getRawTx: ({ mc, action }) => {
+  getRawTx: async ({ mc, action }) => {
     const { params } = action;
 
     const tx = mc.emergencyConfigureCreditSuite(

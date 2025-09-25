@@ -24,6 +24,14 @@ import {
   setChecksEnabledActionData,
 } from "./loss-policy/loss-policy-set-checks-enabled";
 import {
+  PauseAllAction,
+  pauseAllActionData,
+} from "./multi-pause/multi-pause-pause-all";
+import {
+  PauseMarketAction,
+  pauseMarketActionData,
+} from "./multi-pause/multi-pause-pause-market";
+import {
   SetPriceFeedAction,
   setPriceFeedActionData,
 } from "./oracle/oracle-set-price-feed";
@@ -52,7 +60,10 @@ export type EmergencyActions =
   | SetPriceFeedAction
   // Loss Policy domain
   | SetAccessModeAction
-  | SetChecksEnabledAction;
+  | SetChecksEnabledAction
+  // Multi Pause domain
+  | PauseAllAction
+  | PauseMarketAction;
 
 export type EmergencyActionsType = EmergencyActions["type"];
 
@@ -71,6 +82,9 @@ export const emergencyActionsData = [
   // Loss Policy domain
   setAccessModeActionData,
   setChecksEnabledActionData,
+  // Multi Pause domain
+  pauseAllActionData,
+  pauseMarketActionData,
 ];
 
 export const emergencyActionsMap = emergencyActionsData.reduce(

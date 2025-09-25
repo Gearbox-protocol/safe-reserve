@@ -21,7 +21,7 @@ export const poolPauseActionData: EmergencyActionData<PoolPauseAction> = {
     pool: addressSchema,
   }),
 
-  getRawTx: ({ mc, action }) => {
+  getRawTx: async ({ mc, action }) => {
     const { params } = action;
 
     const tx = mc.emergencyConfigurePool(

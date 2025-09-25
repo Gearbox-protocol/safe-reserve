@@ -17,6 +17,9 @@ import {
   isAddress,
   parseAbi,
   PublicClient,
+  Quantity,
+  testActions,
+  TestClient,
   zeroAddress,
 } from "viem";
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
@@ -28,7 +31,8 @@ const RPC = process.env.NEXT_PUBLIC_RPC_URL;
 const AP = process.env.NEXT_PUBLIC_ADDRESS_PROVIDER;
 
 describe("Emergency oracle actions", () => {
-  let client: PublicClient;
+  let client: PublicClient & TestClient<"anvil">;
+  let snapshotId: Quantity | undefined;
   let sdk: GearboxSDK;
 
   let randomMarket: MarketSuite;
@@ -48,8 +52,22 @@ describe("Emergency oracle actions", () => {
       transport: http(ANVIL_RPC, {
         timeout: 300_000,
       }),
+      cacheTime: 0,
+      pollingInterval: 50,
+    }).extend(testActions({ mode: "anvil" })) as unknown as PublicClient &
+      TestClient<"anvil">;
+    snapshotId = await client.snapshot();
+
+    sdk = await GearboxSDK.attach({
+      rpcURLs: [RPC],
+      addressProvider: AP,
+      redstone: {
+        ignoreMissingFeeds: true,
+      },
+      pyth: {
+        ignoreMissingFeeds: true,
+      },
     });
-    sdk = await GearboxSDK.attach({ rpcURLs: [RPC], addressProvider: AP });
 
     const priceFeedStore = new PriceFeedStoreContract(
       Addresses.PRICE_FEED_STORE,
@@ -123,6 +141,9 @@ describe("Emergency oracle actions", () => {
   afterEach(async () => {
     console.groupEnd();
     console.log("\n\n\n");
+    if (snapshotId) {
+      await client.revert({ id: snapshotId });
+    }
   });
 
   it("sets main price feed for a token", async () => {
@@ -164,23 +185,23 @@ describe("Emergency oracle actions", () => {
       useMulticall3: true,
     });
 
+    const action = await emergencyActionsMap["ORACLE::setPriceFeed"].getRawTx({
+      mc,
+      action: {
+        type: "ORACLE::setPriceFeed",
+        params: {
+          pool: randomMarket.pool.pool.address,
+          token: randomToken.address,
+          priceFeed: newFeed.address,
+        },
+      },
+    });
+
     await impersonateAndSendTxs({
       rpc: ANVIL_RPC,
       publicClient: client,
       account: admin,
-      txs: (updateTx ? [updateTx] : []).concat([
-        emergencyActionsMap["ORACLE::setPriceFeed"].getRawTx({
-          mc,
-          action: {
-            type: "ORACLE::setPriceFeed",
-            params: {
-              pool: randomMarket.pool.pool.address,
-              token: randomToken.address,
-              priceFeed: newFeed.address,
-            },
-          },
-        }).tx,
-      ]),
+      txs: (updateTx ? [updateTx] : []).concat([action.tx]),
     });
 
     const mainFeed = (await client.readContract({

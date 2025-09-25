@@ -30,7 +30,7 @@ export const setAccessModeActionData: EmergencyActionData<SetAccessModeAction> =
       mode: z.nativeEnum(AccessMode),
     }),
 
-    getRawTx: ({ mc, action }) => {
+    getRawTx:async  ({ mc, action }) => {
       const { params } = action;
 
       const tx = mc.emergencyConfigureLossPolicy(

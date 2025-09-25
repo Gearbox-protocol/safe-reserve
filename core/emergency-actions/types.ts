@@ -24,5 +24,5 @@ export interface EmergencyActionData<
   getRawTx: (params: {
     mc: MarketConfiguratorContract;
     action: A;
-  }) => EmergencyTx;
+  }) => Promise<EmergencyTx>;
 }

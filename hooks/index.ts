@@ -12,10 +12,12 @@ export * from "./emergency/actions/use-sign-emergency-tx";
 
 export * from "./emergency/use-build-emergency-safe-tx";
 export * from "./emergency/use-get-collateral-statuses";
-export * from "./emergency/use-get-emergency-admin-info";
+export * from "./emergency/use-get-executor-admin-info";
+// export * from "./emergency/use-get-emergency-admin-info";
 export * from "./emergency/use-get-emergency-tx";
 export * from "./emergency/use-get-market-configurator-info";
 export * from "./emergency/use-get-market-configurators";
+export * from "./emergency/use-get-multipause";
 export * from "./emergency/use-get-price-feeds";
 export * from "./emergency/use-get-price-feeds-info";
 

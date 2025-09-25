@@ -24,7 +24,7 @@ export const setChecksEnabledActionData: EmergencyActionData<SetChecksEnabledAct
       enabled: z.boolean(),
     }),
 
-    getRawTx: ({ mc, action }) => {
+    getRawTx: async ({ mc, action }) => {
       const { params } = action;
 
       const tx = mc.emergencyConfigureLossPolicy(

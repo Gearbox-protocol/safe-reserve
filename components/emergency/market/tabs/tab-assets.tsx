@@ -133,7 +133,11 @@ export function AssetsTab(props: MarketProps) {
                         nowrap
                         customButton={
                           asset.quotaLimit === 0 ? (
-                            <Button variant={"pink"} size={"xs"} disabled>
+                            <Button
+                              variant={"destructive"}
+                              size={"xs"}
+                              disabled
+                            >
                               Set to 0
                             </Button>
                           ) : (
@@ -152,7 +156,7 @@ export function AssetsTab(props: MarketProps) {
                                 },
                               }}
                             >
-                              <Button variant={"pink"} size={"xs"}>
+                              <Button variant={"destructive"} size={"xs"}>
                                 Set to 0
                               </Button>
                             </Link>

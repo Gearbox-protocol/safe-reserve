@@ -16,6 +16,9 @@ import {
   isAddress,
   parseAbi,
   PublicClient,
+  Quantity,
+  testActions,
+  TestClient,
 } from "viem";
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
@@ -26,7 +29,8 @@ const RPC = process.env.NEXT_PUBLIC_RPC_URL;
 const AP = process.env.NEXT_PUBLIC_ADDRESS_PROVIDER;
 
 describe("Emergency pool actions", () => {
-  let client: PublicClient;
+  let client: PublicClient & TestClient<"anvil">;
+  let snapshotId: Quantity | undefined;
   let sdk: GearboxSDK;
 
   let randomMarket: MarketSuite;
@@ -44,8 +48,22 @@ describe("Emergency pool actions", () => {
       transport: http(ANVIL_RPC, {
         timeout: 300_000,
       }),
+      cacheTime: 0,
+      pollingInterval: 50,
+    }).extend(testActions({ mode: "anvil" })) as unknown as PublicClient &
+      TestClient<"anvil">;
+    snapshotId = await client.snapshot();
+
+    sdk = await GearboxSDK.attach({
+      rpcURLs: [RPC],
+      addressProvider: AP,
+      redstone: {
+        ignoreMissingFeeds: true,
+      },
+      pyth: {
+        ignoreMissingFeeds: true,
+      },
     });
-    sdk = await GearboxSDK.attach({ rpcURLs: [RPC], addressProvider: AP });
   });
 
   beforeEach(async () => {
@@ -75,24 +93,27 @@ describe("Emergency pool actions", () => {
   afterEach(async () => {
     console.groupEnd();
     console.log("\n\n\n");
+    if (snapshotId) {
+      await client.revert({ id: snapshotId });
+    }
   });
 
   it("pauses a random pool", async () => {
+    const action = await emergencyActionsMap["POOL::pause"].getRawTx({
+      mc,
+      action: {
+        type: "POOL::pause",
+        params: {
+          pool: randomMarket.pool.pool.address,
+        },
+      },
+    });
+
     await impersonateAndSendTxs({
       rpc: ANVIL_RPC,
       publicClient: client,
       account: admin,
-      txs: [
-        emergencyActionsMap["POOL::pause"].getRawTx({
-          mc,
-          action: {
-            type: "POOL::pause",
-            params: {
-              pool: randomMarket.pool.pool.address,
-            },
-          },
-        }).tx,
-      ],
+      txs: [action.tx],
     });
 
     // Verify paused state
@@ -118,22 +139,23 @@ describe("Emergency pool actions", () => {
 
     console.log(`Picked random cm: ${randomCm.creditManager.address}`);
 
+    const action = await emergencyActionsMap[
+      "POOL::setCreditManagerDebtLimitToZero"
+    ].getRawTx({
+      mc,
+      action: {
+        type: "POOL::setCreditManagerDebtLimitToZero",
+        params: {
+          pool: randomMarket.pool.pool.address,
+          creditManager: randomCm.creditManager.address,
+        },
+      },
+    });
     await impersonateAndSendTxs({
       rpc: ANVIL_RPC,
       publicClient: client,
       account: admin,
-      txs: [
-        emergencyActionsMap["POOL::setCreditManagerDebtLimitToZero"].getRawTx({
-          mc,
-          action: {
-            type: "POOL::setCreditManagerDebtLimitToZero",
-            params: {
-              pool: randomMarket.pool.pool.address,
-              creditManager: randomCm.creditManager.address,
-            },
-          },
-        }).tx,
-      ],
+      txs: [action.tx],
     });
 
     // Verify via pool storage mapping read
@@ -163,22 +185,24 @@ describe("Emergency pool actions", () => {
       `Picked random token: ${randomToken.token} [${sdk.tokensMeta.symbol(randomToken.token)}] with limit ${formatUnits(randomToken.limit, underlying.decimals)} ${underlying.symbol}`
     );
 
+    const action = await emergencyActionsMap[
+      "POOL::setTokenLimitToZero"
+    ].getRawTx({
+      mc,
+      action: {
+        type: "POOL::setTokenLimitToZero",
+        params: {
+          pool: randomMarket.pool.pool.address,
+          token: randomToken.token,
+        },
+      },
+    });
+
     await impersonateAndSendTxs({
       rpc: ANVIL_RPC,
       publicClient: client,
       account: admin,
-      txs: [
-        emergencyActionsMap["POOL::setTokenLimitToZero"].getRawTx({
-          mc,
-          action: {
-            type: "POOL::setTokenLimitToZero",
-            params: {
-              pool: randomMarket.pool.pool.address,
-              token: randomToken.token,
-            },
-          },
-        }).tx,
-      ],
+      txs: [action.tx],
     });
 
     // Verify token limit is zero via pool token params

@@ -17,6 +17,9 @@ import {
   isAddress,
   parseAbi,
   PublicClient,
+  Quantity,
+  testActions,
+  TestClient,
 } from "viem";
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
@@ -27,7 +30,8 @@ const RPC = process.env.NEXT_PUBLIC_RPC_URL;
 const AP = process.env.NEXT_PUBLIC_ADDRESS_PROVIDER;
 
 describe("Emergency credit actions", () => {
-  let client: PublicClient;
+  let client: PublicClient & TestClient<"anvil">;
+  let snapshotId: Quantity | undefined;
   let sdk: GearboxSDK;
 
   let randomCm: CreditSuite;
@@ -45,8 +49,22 @@ describe("Emergency credit actions", () => {
       transport: http(ANVIL_RPC, {
         timeout: 300_000,
       }),
+      cacheTime: 0,
+      pollingInterval: 50,
+    }).extend(testActions({ mode: "anvil" })) as unknown as PublicClient &
+      TestClient<"anvil">;
+    snapshotId = await client.snapshot();
+
+    sdk = await GearboxSDK.attach({
+      rpcURLs: [RPC],
+      addressProvider: AP,
+      redstone: {
+        ignoreMissingFeeds: true,
+      },
+      pyth: {
+        ignoreMissingFeeds: true,
+      },
     });
-    sdk = await GearboxSDK.attach({ rpcURLs: [RPC], addressProvider: AP });
   });
 
   beforeEach(async () => {
@@ -78,24 +96,27 @@ describe("Emergency credit actions", () => {
   afterEach(async () => {
     console.groupEnd();
     console.log("\n\n\n");
+
+    if (snapshotId) {
+      await client.revert({ id: snapshotId });
+    }
   });
 
   it("pause a random credit manager", async () => {
+    const action = await emergencyActionsMap["CREDIT::pause"].getRawTx({
+      mc,
+      action: {
+        type: "CREDIT::pause",
+        params: {
+          creditManager: randomCm.creditManager.address,
+        },
+      },
+    });
     await impersonateAndSendTxs({
       rpc: ANVIL_RPC,
       publicClient: client,
       account: admin,
-      txs: [
-        emergencyActionsMap["CREDIT::pause"].getRawTx({
-          mc,
-          action: {
-            type: "CREDIT::pause",
-            params: {
-              creditManager: randomCm.creditManager.address,
-            },
-          },
-        }).tx,
-      ],
+      txs: [action.tx],
     });
 
     // Verify paused state on CreditFacade
@@ -108,21 +129,23 @@ describe("Emergency credit actions", () => {
   });
 
   it("forbid borrowing in a random credit manager", async () => {
+    const action = await emergencyActionsMap[
+      "CREDIT::forbidBorrowing"
+    ].getRawTx({
+      mc,
+      action: {
+        type: "CREDIT::forbidBorrowing",
+        params: {
+          creditManager: randomCm.creditManager.address,
+        },
+      },
+    });
+
     await impersonateAndSendTxs({
       rpc: ANVIL_RPC,
       publicClient: client,
       account: admin,
-      txs: [
-        emergencyActionsMap["CREDIT::forbidBorrowing"].getRawTx({
-          mc,
-          action: {
-            type: "CREDIT::forbidBorrowing",
-            params: {
-              creditManager: randomCm.creditManager.address,
-            },
-          },
-        }).tx,
-      ],
+      txs: [action.tx],
     });
 
     // Verify borrowing is forbidden on CreditFacade
@@ -147,22 +170,22 @@ describe("Emergency credit actions", () => {
       `Picked random adapter: ${randomAdapter.address} [${randomAdapter.contractType.replace("ADAPTER::", "")}] with target ${randomAdapter.targetContract}`
     );
 
+    const action = await emergencyActionsMap["CREDIT::forbidAdapter"].getRawTx({
+      mc,
+      action: {
+        type: "CREDIT::forbidAdapter",
+        params: {
+          creditManager: randomCm.creditManager.address,
+          adapter: randomAdapter.address,
+        },
+      },
+    });
+
     await impersonateAndSendTxs({
       rpc: ANVIL_RPC,
       publicClient: client,
       account: admin,
-      txs: [
-        emergencyActionsMap["CREDIT::forbidAdapter"].getRawTx({
-          mc,
-          action: {
-            type: "CREDIT::forbidAdapter",
-            params: {
-              creditManager: randomCm.creditManager.address,
-              adapter: randomAdapter.address,
-            },
-          },
-        }).tx,
-      ],
+      txs: [action.tx],
     });
 
     // Verify adapter is forbidden on CreditFacade (bool mapping)
@@ -216,22 +239,22 @@ describe("Emergency credit actions", () => {
       `Picked random token: ${randomToken.address} [${sdk.tokensMeta.symbol(randomToken.address)}]`
     );
 
+    const action = await emergencyActionsMap["CREDIT::forbidToken"].getRawTx({
+      mc,
+      action: {
+        type: "CREDIT::forbidToken",
+        params: {
+          creditManager: randomCm.creditManager.address,
+          token: randomToken.address,
+        },
+      },
+    });
+
     await impersonateAndSendTxs({
       rpc: ANVIL_RPC,
       publicClient: client,
       account: admin,
-      txs: [
-        emergencyActionsMap["CREDIT::forbidToken"].getRawTx({
-          mc,
-          action: {
-            type: "CREDIT::forbidToken",
-            params: {
-              creditManager: randomCm.creditManager.address,
-              token: randomToken.address,
-            },
-          },
-        }).tx,
-      ],
+      txs: [action.tx],
     });
 
     const forbiddenMaskAfter = await client.readContract({

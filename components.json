@@ -16,7 +16,8 @@
     "ui": "@/components/ui",
     "lib": "@/lib",
     "hooks": "@/hooks",
-    "abi": "@/abi"
+    "abi": "@/abi",
+    "bindings": "@/bindings"
   },
   "iconLibrary": "lucide"
 }

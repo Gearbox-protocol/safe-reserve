@@ -24,7 +24,7 @@ export const forbidAdapterActionData: EmergencyActionData<ForbidAdapterAction> =
       adapter: addressSchema,
     }),
 
-    getRawTx: ({ mc, action }) => {
+    getRawTx: async ({ mc, action }) => {
       const { params } = action;
 
       const tx = mc.emergencyConfigureCreditSuite(

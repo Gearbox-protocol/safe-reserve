@@ -24,7 +24,7 @@ export const setTokenLimitToZeroActionData: EmergencyActionData<SetTokenLimitToZ
       token: addressSchema,
     }),
 
-    getRawTx: ({ mc, action }) => {
+    getRawTx: async ({ mc, action }) => {
       const { params } = action;
 
       const tx = mc.emergencyConfigurePool(

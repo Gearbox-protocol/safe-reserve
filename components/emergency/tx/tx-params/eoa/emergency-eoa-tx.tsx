@@ -10,11 +10,11 @@ export function EmergencyEoaTx({
   sdk,
   chainId,
   emergencyTx,
-  emergencyAdminInfo,
+  adminInfo,
 }: EmergencyTxProps) {
   const actionMeta = emergencyActionsMap[emergencyTx.action.type];
 
-  if (emergencyAdminInfo.type === "safe") return <></>;
+  if (adminInfo.type === "safe") return <></>;
 
   return (
     <Card>
@@ -25,7 +25,7 @@ export function EmergencyEoaTx({
           <EoaEmergencyTxButton
             chainId={chainId}
             emergencyTx={emergencyTx}
-            admin={emergencyAdminInfo}
+            admin={adminInfo}
           />
         </div>
 
@@ -34,10 +34,14 @@ export function EmergencyEoaTx({
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-3 text-sm">
-        <div className="border-t border-gray-800 pt-3">
-          <div className="font-semibold text-gray-200 mb-2 text-lg">Params</div>
-          <RenderedParams sdk={sdk} action={emergencyTx.action} />
-        </div>
+        {Object.keys(emergencyTx.action.params ?? {}).length > 0 && (
+          <div className="border-t border-gray-800 pt-3">
+            <div className="font-semibold text-gray-200 mb-2 text-lg">
+              Params
+            </div>
+            <RenderedParams sdk={sdk} action={emergencyTx.action} />
+          </div>
+        )}
       </CardContent>
     </Card>
   );

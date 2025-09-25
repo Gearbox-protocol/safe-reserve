@@ -45,9 +45,14 @@ export function EmergencyActionView({
   } = useGetEmergencyAdminInfo({
     chainId,
     marketConfigurator,
+    actionType: action.type,
   });
 
-  const emergencyTx = useGetEmergencyTx({
+  const {
+    data: emergencyTx,
+    isLoading: isLoadingTx,
+    error: txError,
+  } = useGetEmergencyTx({
     chainId,
     marketConfigurator,
     action,
@@ -70,7 +75,7 @@ export function EmergencyActionView({
     [marketConfigurator, sdk?.marketRegister.marketConfigurators]
   );
 
-  if (isLoadingMcInfo || isLoadingAdminInfo || isLoadingSdk) {
+  if (isLoadingMcInfo || isLoadingAdminInfo || isLoadingSdk || isLoadingTx) {
     return (
       <div className="divide-y divide-gray-800 space-y-6">
         {[1, 2, 3].map((i) => (
@@ -88,6 +93,7 @@ export function EmergencyActionView({
     adminInfoError ||
     mcInfoError ||
     sdkError ||
+    txError ||
     !mcInfo?.curatorName ||
     !adminInfo ||
     !marketConfiguratorContract
@@ -99,6 +105,7 @@ export function EmergencyActionView({
           {adminInfoError?.message ||
             mcInfoError?.message ||
             sdkError?.message ||
+            txError?.message ||
             "Unknown address"}
         </text>
       </div>
@@ -152,14 +159,14 @@ export function EmergencyActionView({
             chainId={chainId}
             sdk={sdk}
             emergencyTx={emergencyTx}
-            emergencyAdminInfo={adminInfo}
+            adminInfo={adminInfo}
           />
         ) : (
           <EmergencyEoaTx
             chainId={chainId}
             sdk={sdk}
             emergencyTx={emergencyTx}
-            emergencyAdminInfo={adminInfo}
+            adminInfo={adminInfo}
           />
         )}
       </div>

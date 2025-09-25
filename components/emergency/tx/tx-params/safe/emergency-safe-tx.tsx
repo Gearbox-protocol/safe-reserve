@@ -13,7 +13,7 @@ export function EmergencySafeTx({
   sdk,
   chainId,
   emergencyTx,
-  emergencyAdminInfo,
+  adminInfo,
 }: EmergencyTxProps) {
   const actionMeta = emergencyActionsMap[emergencyTx.action.type];
 
@@ -26,10 +26,10 @@ export function EmergencySafeTx({
 
     if (!!nonce) {
       setNonce(+nonce);
-    } else if (emergencyAdminInfo.type === "safe") {
-      setNonce(emergencyAdminInfo.info.nonce);
+    } else if (adminInfo.type === "safe") {
+      setNonce(adminInfo.info.nonce);
     }
-  }, [emergencyAdminInfo]);
+  }, [adminInfo]);
 
   const {
     tx,
@@ -37,12 +37,12 @@ export function EmergencySafeTx({
     error: errorTx,
   } = useBuildEmergencySafeTx({
     chainId,
-    safe: emergencyAdminInfo.emergencyAdmin,
+    safe: adminInfo.admin,
     emergencyTx,
     nonce,
   });
 
-  if (emergencyAdminInfo.type !== "safe") return <></>;
+  if (adminInfo.type !== "safe") return <></>;
 
   return (
     <Card>
@@ -54,7 +54,7 @@ export function EmergencySafeTx({
               chainId={chainId}
               tx={tx}
               emergencyTx={emergencyTx}
-              safeAddress={emergencyAdminInfo.emergencyAdmin}
+              safeAddress={adminInfo.admin}
             />
           )}
         </div>
@@ -82,18 +82,20 @@ export function EmergencySafeTx({
           )
         ) : (
           <div className="grid grid-cols-[1fr_minmax(300px,max-content)] gap-12">
-            <div className="border-t border-gray-800 pt-3">
-              <div className="font-semibold text-gray-200 mb-2 text-lg">
-                Params
+            {Object.keys(emergencyTx.action.params ?? {}).length > 0 && (
+              <div className="border-t border-gray-800 pt-3">
+                <div className="font-semibold text-gray-200 mb-2 text-lg">
+                  Params
+                </div>
+                <RenderedParams sdk={sdk} action={emergencyTx.action} />
               </div>
-              <RenderedParams sdk={sdk} action={emergencyTx.action} />
-            </div>
+            )}
 
             <div className="border-l border-gray-800 pl-8">
               <InstanceProposalSignatures
                 chainId={chainId}
                 signers={tx.signedBy || []}
-                safeAddress={emergencyAdminInfo.emergencyAdmin}
+                safeAddress={adminInfo.admin}
                 nonce={nonce}
               />
             </div>

@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { EmergencyTx } from "@/core/emergency-actions";
-import { EmergencyAdminInfo, useSendEoaEmergencyTx } from "@/hooks";
+import { AdminInfo, useSendEoaEmergencyTx } from "@/hooks";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { DownloadTxButton } from "../download-tx-button";
@@ -14,7 +14,7 @@ import { DownloadTxButton } from "../download-tx-button";
 interface ButtonTxProps {
   chainId: number;
   emergencyTx: EmergencyTx;
-  admin: EmergencyAdminInfo;
+  admin: AdminInfo;
 }
 
 export function EoaEmergencyTxButton({
@@ -35,7 +35,7 @@ export function EoaEmergencyTxButton({
       {admin.type === "unknown" && (
         <DownloadTxButton
           chainId={chainId}
-          admin={admin.emergencyAdmin}
+          admin={admin.admin}
           emergencyTx={emergencyTx}
         />
       )}
@@ -54,8 +54,8 @@ export function EoaEmergencyTxButton({
                     }
                   }}
                   disabled={
-                    address?.toLowerCase() !==
-                      admin.emergencyAdmin.toLowerCase() || isSent
+                    address?.toLowerCase() !== admin.admin.toLowerCase() ||
+                    isSent
                   }
                   className="px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
                 >
@@ -66,10 +66,9 @@ export function EoaEmergencyTxButton({
                       : "Execute"}
                 </Button>
               </TooltipTrigger>
-              {address?.toLowerCase() !==
-                admin.emergencyAdmin.toLowerCase() && (
+              {address?.toLowerCase() !== admin.admin.toLowerCase() && (
                 <TooltipContent>
-                  <p>Connect as emergency admin to execute tx</p>
+                  <p>{`Connect as ${emergencyTx.action.type.startsWith("MULTI_PAUSE::") ? "pausable" : "emergency"} admin to execute tx`}</p>
                 </TooltipContent>
               )}
             </Tooltip>

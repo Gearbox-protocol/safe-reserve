@@ -17,7 +17,7 @@ export function EditButton({
   return (
     <div className={customButton ? "px-4 py-2" : "px-2"}>
       <Button
-        className={customButton ? "p-0 h-fit" : "p-2 h-fit"}
+        className={customButton ? "p-0 h-fit hover:bg-accent/0" : "p-2 h-fit"}
         variant="ghost"
         onClick={onClick}
         disabled={disabled}

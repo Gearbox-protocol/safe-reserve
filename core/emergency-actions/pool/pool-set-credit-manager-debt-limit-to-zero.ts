@@ -24,7 +24,7 @@ export const setCreditManagerDebtLimitToZeroActionData: EmergencyActionData<SetC
       creditManager: addressSchema,
     }),
 
-    getRawTx: ({ mc, action }) => {
+    getRawTx: async ({ mc, action }) => {
       const { params } = action;
 
       const tx = mc.emergencyConfigurePool(

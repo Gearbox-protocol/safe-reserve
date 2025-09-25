@@ -1,17 +1,20 @@
 "use client";
 
-import { Card, CardTitle } from "@/components/ui/card";
 import { chains } from "@/config/wagmi";
-import { useGetMarketConfiguratorInfo, useSDK } from "@/hooks";
+import {
+  useGetMarketConfiguratorInfo,
+  useGetMultipause,
+  useSDK,
+} from "@/hooks";
 import { shortenHash } from "@gearbox-protocol/permissionless";
 import { Copy, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Address, isAddress } from "viem";
+import { Address, isAddress, zeroAddress } from "viem";
 import { Button } from "../ui/button";
 import { PageLayout } from "../ui/page";
-import { TokenIcon } from "../ui/token-icon";
+import { MarketCard } from "./market-card";
 import { MarketView } from "./market/market-view";
 
 export function MarketConfiguratorView({
@@ -32,6 +35,15 @@ export function MarketConfiguratorView({
   } = useGetMarketConfiguratorInfo({
     chainId,
     address,
+  });
+
+  const {
+    data: multipause,
+    isLoading: isLoadingMultipause,
+    error: multipauseError,
+  } = useGetMultipause({
+    chainId,
+    marketConfigurator: address,
   });
 
   const {
@@ -73,7 +85,7 @@ export function MarketConfiguratorView({
     }
   }, []);
 
-  if (isLoadingSdk || isLoadingInfo) {
+  if (isLoadingSdk || isLoadingInfo || isLoadingMultipause) {
     return (
       <div className="divide-y divide-gray-800 space-y-6">
         {[1, 2, 3].map((i) => (
@@ -87,7 +99,7 @@ export function MarketConfiguratorView({
     );
   }
 
-  if (sdkError || infoError) {
+  if (sdkError || infoError || multipauseError) {
     return (
       <div className="p-4">
         <text className="font-semibold text-white">
@@ -145,52 +157,39 @@ export function MarketConfiguratorView({
           text: "Back to market configurators",
           onClick: onClickBack,
         }}
+        actionButton={
+          !!multipause && multipause !== zeroAddress ? (
+            <Link
+              key={`${chainId}-${marketConfigurator}-pauseAll`}
+              href={{
+                pathname: "/emergency/tx",
+                query: {
+                  chainId: chainId,
+                  mc: address,
+                  action: "MULTI_PAUSE::pauseAll",
+                  params: JSON.stringify({}),
+                },
+              }}
+            >
+              <Button variant={"destructive"}>Pause all contracts</Button>
+            </Link>
+          ) : undefined
+        }
       >
         <div className="space-y-2">
-          <div className="text-lg font-bold">Markets</div>
           {markets.length === 0 ? (
             <div>There is no markets</div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {markets.map((market) => {
-                const addr = market.pool.pool.address;
-
-                return (
-                  <Link
-                    key={`${chainId}-${address}-${addr}`}
-                    href={{
-                      pathname: "/emergency",
-                      query: {
-                        chainId: chainId,
-                        mc: address,
-                        market: addr,
-                      },
-                    }}
-                  >
-                    <Card
-                      className="p-4 cursor-pointer hover:bg-gray-900/50"
-                      onClick={() => setSelectedMarket(addr)}
-                    >
-                      <div className="flex items-center space-x-2">
-                        <TokenIcon
-                          symbol={
-                            sdk?.tokensMeta.symbol(market.pool.underlying) ?? ""
-                          }
-                          size={40}
-                        />
-                        <div>
-                          <CardTitle className="truncate text-base font-medium">
-                            {market.pool.pool.symbol}
-                          </CardTitle>
-                          <div className="text-sm text-muted-foreground break-all">
-                            {shortenHash(addr)}
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </Link>
-                );
-              })}
+            <div className="space-y-6">
+              {markets.map((market) => (
+                <MarketCard
+                  key={`${address}-${market.pool.pool.address}`}
+                  chainId={chainId}
+                  marketConfigurator={address}
+                  market={market}
+                  multipause={multipause ?? zeroAddress}
+                />
+              ))}
             </div>
           )}
         </div>

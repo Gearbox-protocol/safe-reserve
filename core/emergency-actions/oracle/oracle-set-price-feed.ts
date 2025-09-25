@@ -25,7 +25,7 @@ export const setPriceFeedActionData: EmergencyActionData<SetPriceFeedAction> = {
     token: addressSchema,
   }),
 
-  getRawTx: ({ mc, action }) => {
+  getRawTx: async ({ mc, action }) => {
     const { params } = action;
 
     const tx = mc.emergencyConfigurePriceOracle(

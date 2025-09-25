@@ -12,11 +12,11 @@ importers:
   .:
     dependencies:
       '@gearbox-protocol/permissionless':
-        specifier: ^0.1.13
-        version: 0.1.13(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
+        specifier: ^0.1.15
+        version: 0.1.15(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
       '@gearbox-protocol/sdk':
-        specifier: ^9.7.0
-        version: 9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
+        specifier: ^9.9.3
+        version: 9.9.3(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@radix-ui/react-alert-dialog':
         specifier: ^1.1.4
         version: 1.1.15(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -726,8 +726,8 @@ packages:
   '@gearbox-protocol/integrations-v3@1.42.0-abi.5':
     resolution: {integrity: sha512-WTaAqCxLrGkKuBzq2wMGXz7ll+W4wDXMDnFs8aH2duXMvyYPovuDZL/7LlmqZstloKNAx9LnXqIC8eekUKiC0w==}
 
-  '@gearbox-protocol/permissionless@0.1.13':
-    resolution: {integrity: sha512-O76SOok4dUvDZ1bjQp+CXFWttV9xbYVa80GKgIk9FmCRuZCRw4Xg0N2tDzjj3AZ8IykbSR9lO7RY2zVcm0l5ew==}
+  '@gearbox-protocol/permissionless@0.1.15':
+    resolution: {integrity: sha512-qnDDP8eyKkiric3FtapsVj+l+PRxtZD+rHPvBWc8VMsTsnUG2t62n54XY5NMvSTj7MfJzeIGNHSUlOdgi+8peQ==}
 
   '@gearbox-protocol/sdk-adapters@1.2.5':
     resolution: {integrity: sha512-+w+RMkjKWUO2wuxtr7LqVv+1NpX8wuS5X2lh1wKlREJlF88Cv5bgnMhtkkXBNGWrPtib9Plzc8KWeHxtHjOM/A==}
@@ -735,8 +735,8 @@ packages:
       '@gearbox-protocol/sdk': '>=8.20.0 <10.0.0'
       viem: '>=2.23.15 <3.0.0'
 
-  '@gearbox-protocol/sdk@9.7.0':
-    resolution: {integrity: sha512-B5b137S6xHjcsrFW36zojr1HyxTG72C21mXStGA7qarIOqxmaHiNxHLD+5iplURSfel1KlQ5/eeHa0Mgwjn01g==}
+  '@gearbox-protocol/sdk@9.9.3':
+    resolution: {integrity: sha512-AUsvmMhOFw0rVy9FgGJhXohkkhQ4az+l3ZdJ2xNGeji9z4FsFWbGBHv3sO1cUyj3S2NYQjuRBggWfQRx1NzAyg==}
     peerDependencies:
       axios: ^1.0.0
 
@@ -5783,10 +5783,10 @@ snapshots:
 
   '@gearbox-protocol/integrations-v3@1.42.0-abi.5': {}
 
-  '@gearbox-protocol/permissionless@0.1.13(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)':
+  '@gearbox-protocol/permissionless@0.1.15(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)':
     dependencies:
-      '@gearbox-protocol/sdk': 9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
-      '@gearbox-protocol/sdk-adapters': 1.2.5(@gearbox-protocol/sdk@9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76))
+      '@gearbox-protocol/sdk': 9.9.3(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
+      '@gearbox-protocol/sdk-adapters': 1.2.5(@gearbox-protocol/sdk@9.9.3(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76))
       abitype: 1.1.1(typescript@5.9.2)(zod@3.25.76)
       viem: 2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
     transitivePeerDependencies:
@@ -5797,13 +5797,13 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@gearbox-protocol/sdk-adapters@1.2.5(@gearbox-protocol/sdk@9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76))':
+  '@gearbox-protocol/sdk-adapters@1.2.5(@gearbox-protocol/sdk@9.9.3(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76))':
     dependencies:
       '@gearbox-protocol/integrations-v3': 1.42.0-abi.5
-      '@gearbox-protocol/sdk': 9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
+      '@gearbox-protocol/sdk': 9.9.3(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
       viem: 2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
 
-  '@gearbox-protocol/sdk@9.7.0(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)':
+  '@gearbox-protocol/sdk@9.9.3(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@redstone-finance/evm-connector': 0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@redstone-finance/protocol': 0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)

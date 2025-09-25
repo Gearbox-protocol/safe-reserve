@@ -7,6 +7,7 @@ import {
   parseEther,
   PublicClient,
   testActions,
+  TestClient,
   WalletClient,
 } from "viem";
 
@@ -74,7 +75,7 @@ export async function impersonateAndSendTxs({
   txs,
 }: {
   rpc: string;
-  publicClient: PublicClient;
+  publicClient: PublicClient | (PublicClient & TestClient<"anvil">);
   account: Address;
   txs: RawTx[] | SafeTx[];
 }) {

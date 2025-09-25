@@ -1,4 +1,5 @@
 import { AccessMode, emergencyActionsMap } from "@/core/emergency-actions";
+import { getLossPolicyState } from "@/utils/state";
 import { impersonateAndSendTxs } from "@/utils/test/send-txs";
 import { MarketConfiguratorContract } from "@gearbox-protocol/permissionless";
 import { GearboxSDK, MarketSuite } from "@gearbox-protocol/sdk";
@@ -7,12 +8,13 @@ import { config as dotenvConfig } from "dotenv";
 import {
   Address,
   createPublicClient,
-  decodeAbiParameters,
-  hexToString,
   http,
   isAddress,
   parseAbi,
   PublicClient,
+  Quantity,
+  testActions,
+  TestClient,
 } from "viem";
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
@@ -23,7 +25,8 @@ const RPC = process.env.NEXT_PUBLIC_RPC_URL;
 const AP = process.env.NEXT_PUBLIC_ADDRESS_PROVIDER;
 
 describe("Emergency loss policy actions", () => {
-  let client: PublicClient;
+  let client: PublicClient & TestClient<"anvil">;
+  let snapshotId: Quantity | undefined;
   let sdk: GearboxSDK;
 
   let randomMarket: MarketSuite;
@@ -47,8 +50,22 @@ describe("Emergency loss policy actions", () => {
       transport: http(ANVIL_RPC, {
         timeout: 300_000,
       }),
+      cacheTime: 0,
+      pollingInterval: 50,
+    }).extend(testActions({ mode: "anvil" })) as unknown as PublicClient &
+      TestClient<"anvil">;
+    snapshotId = await client.snapshot();
+
+    sdk = await GearboxSDK.attach({
+      rpcURLs: [RPC],
+      addressProvider: AP,
+      redstone: {
+        ignoreMissingFeeds: true,
+      },
+      pyth: {
+        ignoreMissingFeeds: true,
+      },
     });
-    sdk = await GearboxSDK.attach({ rpcURLs: [RPC], addressProvider: AP });
   });
 
   beforeEach(async () => {
@@ -74,52 +91,24 @@ describe("Emergency loss policy actions", () => {
     console.log(`Configurator: ${mc.address}`);
     console.log(`Emergency Admin: ${admin}`);
 
-    const address = randomMarket.state.lossPolicy.baseParams.addr;
-    const type = hexToString(
-      randomMarket.state.lossPolicy.baseParams.contractType,
-      { size: 32 }
-    );
-
-    expect(["LOSS_POLICY::ALIASED"]).toContain(type);
+    const state = getLossPolicyState(randomMarket.state.lossPolicy.baseParams);
+    expect(["LOSS_POLICY::ALIASED"]).toContain(state.type);
     console.log(
-      `Loss Policy: ${address} [${type.replace("LOSS_POLICY::", "")}]`
+      `Loss Policy: ${state.lossPolicy} [${state.type.replace("LOSS_POLICY::", "")}]`
     );
-
-    switch (type) {
-      case "LOSS_POLICY::ALIASED": {
-        const decoded = decodeAbiParameters(
-          [
-            { name: "accessMode", type: "uint8" },
-            { name: "checksEnabled", type: "bool" },
-            { name: "tokens", type: "address[]" },
-            {
-              name: "priceFeedParams",
-              type: "tuple[]",
-              components: [
-                { name: "priceFeed", type: "address" },
-                { name: "stalenessPeriod", type: "uint32" },
-                { name: "skipCheck", type: "bool" },
-                { name: "tokenDecimals", type: "uint8" },
-              ],
-            },
-          ],
-          randomMarket.state.lossPolicy.baseParams.serializedParams
-        );
-
-        const [accessModeRaw, checksEnabled] = decoded;
-
-        lossPolicy = {
-          address,
-          accessMode: Number(accessModeRaw) as AccessMode,
-          checksEnabled,
-        };
-      }
-    }
+    lossPolicy = {
+      address: state.lossPolicy,
+      accessMode: state.state!.accessMode,
+      checksEnabled: state.state!.checksEnabled,
+    };
   });
 
   afterEach(async () => {
     console.groupEnd();
     console.log("\n\n\n");
+    if (snapshotId) {
+      await client.revert({ id: snapshotId });
+    }
   });
 
   it("set loss policy access mode", async () => {
@@ -131,22 +120,24 @@ describe("Emergency loss policy actions", () => {
     const randomeMode =
       availableModes[Math.floor(Math.random() * availableModes.length)];
 
+    const action = await emergencyActionsMap[
+      "LOSS_POLICY::setAccessMode"
+    ].getRawTx({
+      mc,
+      action: {
+        type: "LOSS_POLICY::setAccessMode",
+        params: {
+          pool: randomMarket.pool.pool.address,
+          mode: randomeMode as AccessMode,
+        },
+      },
+    });
+
     await impersonateAndSendTxs({
       rpc: ANVIL_RPC,
       publicClient: client,
       account: admin,
-      txs: [
-        emergencyActionsMap["LOSS_POLICY::setAccessMode"].getRawTx({
-          mc,
-          action: {
-            type: "LOSS_POLICY::setAccessMode",
-            params: {
-              pool: randomMarket.pool.pool.address,
-              mode: randomeMode as AccessMode,
-            },
-          },
-        }).tx,
-      ],
+      txs: [action.tx],
     });
 
     const modeAfter = Number(
@@ -161,22 +152,24 @@ describe("Emergency loss policy actions", () => {
   });
 
   it("toggles loss policy checksEnabled", async () => {
+    const action = await emergencyActionsMap[
+      "LOSS_POLICY::setChecksEnabled"
+    ].getRawTx({
+      mc,
+      action: {
+        type: "LOSS_POLICY::setChecksEnabled",
+        params: {
+          pool: randomMarket.pool.pool.address,
+          enabled: !lossPolicy.checksEnabled,
+        },
+      },
+    });
+
     await impersonateAndSendTxs({
       rpc: ANVIL_RPC,
       publicClient: client,
       account: admin,
-      txs: [
-        emergencyActionsMap["LOSS_POLICY::setChecksEnabled"].getRawTx({
-          mc,
-          action: {
-            type: "LOSS_POLICY::setChecksEnabled",
-            params: {
-              pool: randomMarket.pool.pool.address,
-              enabled: !lossPolicy.checksEnabled,
-            },
-          },
-        }).tx,
-      ],
+      txs: [action.tx],
     });
 
     const after = (await client.readContract({

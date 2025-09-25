@@ -16,7 +16,7 @@ import { chains } from "@/config/wagmi";
 import { useGetCollateralStatuses } from "@/hooks";
 import { shortenHash } from "@gearbox-protocol/permissionless";
 import { CreditSuite } from "@gearbox-protocol/sdk";
-import { Copy, ExternalLink } from "lucide-react";
+import { CirclePause, Copy, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 import { toast } from "sonner";
@@ -59,7 +59,19 @@ export function CreditManagerDetails({
   }, [sdk, market, creditSuite]);
 
   return (
-    <>
+    <div className="space-y-6">
+      {creditSuite.creditFacade.isPaused && (
+        <Card className="border-destructive p-6">
+          <div className="flex items-center gap-2 text-destructive">
+            <CirclePause className="h-8 w-8" />
+            <CardTitle>Credit manager paused</CardTitle>
+          </div>
+          <p className="text-sm text-muted-foreground/80 ml-10">
+            This credit manager is temporarily paused
+          </p>
+        </Card>
+      )}
+
       <Card className="max-h-[calc(100vh-320px)] overflow-auto">
         <CardContent className="pt-6 space-y-8">
           {collateralTokens !== undefined ? (
@@ -107,7 +119,7 @@ export function CreditManagerDetails({
                             },
                           }}
                         >
-                          <Button variant={"pink"} size={"xs"}>
+                          <Button variant={"destructive"} size={"xs"}>
                             Forbid
                           </Button>
                         </Link>
@@ -236,7 +248,7 @@ export function CreditManagerDetails({
                           },
                         }}
                       >
-                        <Button variant={"pink"} size={"xs"}>
+                        <Button variant={"destructive"} size={"xs"}>
                           Forbid
                         </Button>
                       </Link>
@@ -246,35 +258,7 @@ export function CreditManagerDetails({
             </TableBody>
           </TableEditable>
 
-          <TableEditable
-            title={"Other params"}
-            customButton={
-              creditSuite.creditFacade.isPaused ? (
-                <Button variant={"pink"} size={`sm`} disabled>
-                  Credit manager paused
-                </Button>
-              ) : (
-                <Link
-                  key={`${chainId}-${marketConfigurator}-creditPause`}
-                  href={{
-                    pathname: "/emergency/tx",
-                    query: {
-                      chainId: chainId,
-                      mc: marketConfigurator,
-                      action: "CREDIT::pause",
-                      params: JSON.stringify({
-                        creditManager: creditSuite.creditManager.address,
-                      }),
-                    },
-                  }}
-                >
-                  <Button variant={"pink"} size={`sm`}>
-                    Pause credit manager
-                  </Button>
-                </Link>
-              )
-            }
-          >
+          <TableEditable title={"Other params"}>
             <TableHeader>
               <TableRow>
                 <TableHead>Parameter</TableHead>
@@ -309,7 +293,7 @@ export function CreditManagerDetails({
                           },
                         }}
                       >
-                        <Button variant={"pink"} size={"xs"}>
+                        <Button variant={"destructive"} size={"xs"}>
                           Set to 0
                         </Button>
                       </Link>
@@ -346,7 +330,7 @@ export function CreditManagerDetails({
                         },
                       }}
                     >
-                      <Button variant={"pink"} size={"xs"}>
+                      <Button variant={"destructive"} size={"xs"}>
                         Forbid
                       </Button>
                     </Link>
@@ -357,6 +341,6 @@ export function CreditManagerDetails({
           </TableEditable>
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }

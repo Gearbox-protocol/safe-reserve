@@ -1,17 +1,17 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Card, CardTitle } from "@/components/ui/card";
 import { PageLayout } from "@/components/ui/page";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TokenIcon } from "@/components/ui/token-icon";
 import { chains } from "@/config/wagmi";
 import { useGetMarketConfiguratorInfo, useSDK } from "@/hooks";
 import { shortenHash } from "@gearbox-protocol/permissionless";
-import { Copy, ExternalLink } from "lucide-react";
-import Link from "next/link";
+import { CirclePause, Copy, ExternalLink } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Address } from "viem";
+import { Address, formatUnits } from "viem";
 import { AssetsTab } from "./tabs/tab-assets";
 import { CreditManagerDetails } from "./tabs/tab-credit-manager-details";
 import { LossPolicyTab } from "./tabs/tab-loss-policy";
@@ -48,6 +48,30 @@ export function MarketView({
       ),
     [sdk, market]
   );
+
+  const sortedCreditManagers = useMemo(() => {
+    if (!marketSuite || !sdk) return [];
+    const underlyingDecimals = sdk.tokensMeta.decimals(
+      marketSuite.pool.pool.underlying
+    );
+
+    return marketSuite.creditManagers.sort((a, b) => {
+      const limitA =
+        marketSuite.pool.pool.creditManagerDebtParams.get(
+          a.creditManager.address
+        )?.limit ?? 0n;
+
+      const limitB =
+        marketSuite.pool.pool.creditManagerDebtParams.get(
+          b.creditManager.address
+        )?.limit ?? 0n;
+
+      return (
+        Number(formatUnits(limitB, underlyingDecimals)) -
+        Number(formatUnits(limitA, underlyingDecimals))
+      );
+    });
+  }, [sdk, marketSuite]);
 
   if (!marketSuite || !mcInfo || !sdk) return <></>;
 
@@ -100,32 +124,20 @@ export function MarketView({
         text: "Back to market configurator",
         onClick: onClickBack,
       }}
-      actionButton={
-        marketSuite.pool.pool.isPaused ? (
-          <Button variant={"pink"} disabled>
-            Pool paused
-          </Button>
-        ) : (
-          <Link
-            key={`${chainId}-${marketConfigurator}-poolPause`}
-            href={{
-              pathname: "/emergency/tx",
-              query: {
-                chainId: chainId,
-                mc: marketConfigurator,
-                action: "POOL::pause",
-                params: JSON.stringify({
-                  pool: marketSuite.pool.pool.address,
-                }),
-              },
-            }}
-          >
-            <Button variant={"pink"}>Pause pool</Button>
-          </Link>
-        )
-      }
     >
       <div className="space-y-6 overflow-y-auto">
+        {marketSuite.pool.pool.isPaused && (
+          <Card className="border-destructive p-6">
+            <div className="flex items-center gap-2 text-destructive">
+              <CirclePause className="h-8 w-8" />
+              <CardTitle>Pool is paused</CardTitle>
+            </div>
+            <p className="text-sm text-muted-foreground/80 ml-10">
+              This pool is temporarily paused
+            </p>
+          </Card>
+        )}
+
         <div className="flex-1 overflow-x-hidden">
           <Tabs
             value={activeTab}
@@ -136,7 +148,8 @@ export function MarketView({
               <div className="flex">
                 <TabsTrigger value="assets">Assets</TabsTrigger>
                 <TabsTrigger value="lossPolicy">Loss Policy</TabsTrigger>
-                {marketSuite.creditManagers.map((cm) => (
+
+                {sortedCreditManagers.map((cm) => (
                   <TabsTrigger
                     key={cm.creditManager.address}
                     value={`creditManagers-${cm.creditManager.address}`}
@@ -167,7 +180,7 @@ export function MarketView({
                   />
                 </TabsContent>
 
-                {marketSuite.creditManagers.map((cm) => (
+                {sortedCreditManagers.map((cm) => (
                   <TabsContent
                     key={cm.creditManager.address}
                     value={`creditManagers-${cm.creditManager.address}`}

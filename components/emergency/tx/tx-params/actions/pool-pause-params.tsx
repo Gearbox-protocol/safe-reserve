@@ -1,4 +1,5 @@
 import { PoolPauseAction } from "@/core/emergency-actions";
+import { PauseMarketAction } from "@/core/emergency-actions/multi-pause/multi-pause-pause-market";
 import { GearboxSDK } from "@gearbox-protocol/sdk";
 import { useMemo } from "react";
 import { AddressParamsView } from "./address-param";
@@ -8,7 +9,7 @@ export function PoolPauseParams({
   action,
 }: {
   sdk: GearboxSDK;
-  action: PoolPauseAction;
+  action: PoolPauseAction | PauseMarketAction;
 }) {
   const marketSuite = useMemo(
     () => sdk.marketRegister.findByPool(action.params.pool),

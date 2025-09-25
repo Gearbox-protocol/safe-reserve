@@ -20,9 +20,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AccessMode } from "@/core/emergency-actions";
+import { getLossPolicyState } from "@/utils/state";
 import Link from "next/link";
 import { useMemo } from "react";
-import { decodeAbiParameters, hexToString } from "viem";
 import { MarketProps } from "./types";
 
 const MODE_METADATA: Record<AccessMode, { title: string; color: string }> = {
@@ -54,53 +54,10 @@ export function LossPolicyTab({
   marketConfigurator,
   market,
 }: MarketProps) {
-  const lossPolicyState = useMemo(() => {
-    const lossPolicy = market.state.lossPolicy.baseParams.addr;
-    const type = hexToString(market.state.lossPolicy.baseParams.contractType, {
-      size: 32,
-    });
-
-    switch (type) {
-      case "LOSS_POLICY::ALIASED": {
-        const decoded = decodeAbiParameters(
-          [
-            { name: "accessMode", type: "uint8" },
-            { name: "checksEnabled", type: "bool" },
-            { name: "tokens", type: "address[]" },
-            {
-              name: "priceFeedParams",
-              type: "tuple[]",
-              components: [
-                { name: "priceFeed", type: "address" },
-                { name: "stalenessPeriod", type: "uint32" },
-                { name: "skipCheck", type: "bool" },
-                { name: "tokenDecimals", type: "uint8" },
-              ],
-            },
-          ],
-          market.state.lossPolicy.baseParams.serializedParams
-        );
-
-        const [accessModeRaw, checksEnabled] = decoded;
-
-        return {
-          lossPolicy,
-          type,
-          state: {
-            accessMode: Number(accessModeRaw) as AccessMode,
-            checksEnabled,
-          },
-        };
-      }
-
-      default:
-        return {
-          lossPolicy,
-          type,
-          state: undefined,
-        };
-    }
-  }, [market]);
+  const lossPolicyState = useMemo(
+    () => getLossPolicyState(market.state.lossPolicy.baseParams),
+    [market]
+  );
 
   return (
     <>
@@ -195,7 +152,14 @@ export function LossPolicyTab({
                           },
                         }}
                       >
-                        <Button variant={"pink"} size={"xs"}>
+                        <Button
+                          variant={
+                            lossPolicyState.state.checksEnabled
+                              ? "destructive"
+                              : "pink"
+                          }
+                          size={"xs"}
+                        >
                           {lossPolicyState.state.checksEnabled
                             ? "Disable"
                             : "Enable"}
