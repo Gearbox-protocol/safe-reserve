@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { PageLayout } from "@/components/ui/page";
 import { useCurrentTransactions, useIpfsData, useSafeParams } from "@/hooks";
 import { shortenHash } from "@/utils/format";
-import { Copy } from "lucide-react";
+import { Copy, ExternalLink } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useAccount, useSwitchChain } from "wagmi";
@@ -105,6 +105,19 @@ export function ViewTxList({ cid }: { cid: string }) {
                       >
                         <Copy className="h-3.5 w-3.5" />
                       </button>
+                      {chain?.blockExplorers?.default?.url && (
+                        <button
+                          className="text-gray-400 hover:text-white"
+                          onClick={() =>
+                            window.open(
+                              `${chain?.blockExplorers?.default.url}/address/${marketConfigurator}`,
+                              "_blank"
+                            )
+                          }
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </button>
+                      )}
                     </code>
                   </div>
                 )}
@@ -124,6 +137,19 @@ export function ViewTxList({ cid }: { cid: string }) {
                       >
                         <Copy className="h-3.5 w-3.5" />
                       </button>
+                      {chain?.blockExplorers?.default?.url && (
+                        <button
+                          className="text-gray-400 hover:text-white"
+                          onClick={() =>
+                            window.open(
+                              `${chain?.blockExplorers?.default.url}/address/${marketConfigurator}`,
+                              "_blank"
+                            )
+                          }
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </button>
+                      )}
                     </code>
                   </div>
                 )}
@@ -140,6 +166,19 @@ export function ViewTxList({ cid }: { cid: string }) {
                     >
                       <Copy className="h-3.5 w-3.5" />
                     </button>
+                    {chain?.blockExplorers?.default?.url && (
+                      <button
+                        className="text-gray-400 hover:text-white"
+                        onClick={() =>
+                          window.open(
+                            `${chain?.blockExplorers?.default.url}/address/${marketConfigurator}`,
+                            "_blank"
+                          )
+                        }
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </code>
                 </div>
                 <div className="flex w-full items-center gap-2">
@@ -155,6 +194,19 @@ export function ViewTxList({ cid }: { cid: string }) {
                     >
                       <Copy className="h-3.5 w-3.5" />
                     </button>
+                    {chain?.blockExplorers?.default?.url && (
+                      <button
+                        className="text-gray-400 hover:text-white"
+                        onClick={() =>
+                          window.open(
+                            `${chain?.blockExplorers?.default.url}/address/${marketConfigurator}`,
+                            "_blank"
+                          )
+                        }
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </code>
                 </div>
               </div>

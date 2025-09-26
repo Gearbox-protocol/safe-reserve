@@ -1,10 +1,11 @@
 import { Card } from "@/components/ui/card";
+import { chains } from "@/config/wagmi";
 import { ParsedSignedTx } from "@/core/safe-tx";
 import { useGetGovernorUpdatableFeeds } from "@/hooks";
 import { MULTISEND_ADDRESS } from "@/utils/constant";
 import { shortenHash } from "@/utils/format";
 import { TimelockTxStatus } from "@/utils/tx-status";
-import { ChevronDown, ChevronUp, Copy } from "lucide-react";
+import { ChevronDown, ChevronUp, Copy, ExternalLink } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Address, zeroAddress } from "viem";
@@ -28,6 +29,7 @@ export function GovernorTransactionCard({
   threshold,
   index,
 }: GovernorTransactionCardProps) {
+  const chain = chains.find(({ id }) => id === chainId);
   const [isExpanded, setIsExpanded] = useState(false);
   const { data: updatableFeeds, isLoading } = useGetGovernorUpdatableFeeds({
     cid,
@@ -173,6 +175,19 @@ export function GovernorTransactionCard({
                               >
                                 <Copy className="h-3 w-3" />
                               </button>
+                              {chain?.blockExplorers.default.url && (
+                                <button
+                                  className="text-gray-400 hover:text-white"
+                                  onClick={() =>
+                                    window.open(
+                                      `${chain?.blockExplorers.default.url}/address/${feed}`,
+                                      "_blank"
+                                    )
+                                  }
+                                >
+                                  <ExternalLink className="h-3 w-3" />
+                                </button>
+                              )}
                             </code>
                           </div>
                         ))}

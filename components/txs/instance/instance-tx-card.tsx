@@ -1,9 +1,10 @@
 import { Card } from "@/components/ui/card";
+import { chains } from "@/config/wagmi";
 import { SignedTx } from "@/core/safe-tx";
 import { useGetInstanceUpdatableFeeds, useSafeParams, useSDK } from "@/hooks";
 import { MULTISEND_ADDRESS } from "@/utils/constant";
 import { shortenHash } from "@/utils/format";
-import { ChevronDown, ChevronUp, Copy } from "lucide-react";
+import { ChevronDown, ChevronUp, Copy, ExternalLink } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Address, zeroAddress } from "viem";
@@ -28,6 +29,8 @@ export function InstanceTransactionCard({
   index,
 }: InstanceTransactionCardProps) {
   const { nonce: currentNonce } = useSafeParams(chainId, safeAddress);
+  const chain = chains.find(({ id }) => id === chainId);
+
   useSDK({});
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -165,6 +168,20 @@ export function InstanceTransactionCard({
                               >
                                 <Copy className="h-3 w-3" />
                               </button>
+
+                              {chain?.blockExplorers.default.url && (
+                                <button
+                                  className="text-gray-400 hover:text-white"
+                                  onClick={() =>
+                                    window.open(
+                                      `${chain?.blockExplorers.default.url}/address/${feed}`,
+                                      "_blank"
+                                    )
+                                  }
+                                >
+                                  <ExternalLink className="h-3 w-3" />
+                                </button>
+                              )}
                             </code>
                           </div>
                         ))}

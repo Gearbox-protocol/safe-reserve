@@ -1,3 +1,4 @@
+import { chains } from "@/config/wagmi";
 import { useSafeParams } from "@/hooks";
 import { shortenHash } from "@/utils/format";
 import { Check, Copy, ExternalLink, Plus } from "lucide-react";
@@ -19,6 +20,7 @@ export function InstanceProposalSignatures({
   signers,
   nonce,
 }: ProposalSignaturesProps) {
+  const chain = chains.find(({ id }) => id === chainId);
   const [showAll, setShowAll] = useState(false);
   const { threshold } = useSafeParams(chainId, safeAddress);
 
@@ -87,14 +89,19 @@ export function InstanceProposalSignatures({
                       >
                         <Copy className="h-3 w-3" />
                       </button>
-                      <button
-                        className="text-gray-400 hover:text-white"
-                        onClick={() => {
-                          // TODO:
-                        }}
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                      </button>
+                      {chain?.blockExplorers.default.url && (
+                        <button
+                          className="text-gray-400 hover:text-white"
+                          onClick={() =>
+                            window.open(
+                              `${chain?.blockExplorers.default.url}/address/${confirmation}`,
+                              "_blank"
+                            )
+                          }
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
