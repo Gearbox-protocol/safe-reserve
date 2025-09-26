@@ -67,7 +67,12 @@ export function MarketCard({
             </CardTitle>
           </div>
           {marketPaused && (
-            <Button size={"lg"} variant={"ghost"} disabled>
+            <Button
+              size={"lg"}
+              variant={"ghost"}
+              disabled
+              className="text-accent-foreground/80 disabled:opacity-100"
+            >
               Market paused
             </Button>
           )}
@@ -161,7 +166,7 @@ export function MarketCard({
               <TableCell className="text-right">
                 {market.pool.pool.isPaused ? (
                   <Button
-                    className="w-24"
+                    className="w-24  text-accent-foreground/80 disabled:opacity-100"
                     size={"xs"}
                     variant={"ghost"}
                     disabled
@@ -238,7 +243,7 @@ export function MarketCard({
                 <TableCell className="text-right">
                   {cm.creditFacade.isPaused ? (
                     <Button
-                      className="w-24"
+                      className="w-24 text-accent-foreground/80 disabled:opacity-100"
                       size={"xs"}
                       variant={"ghost"}
                       disabled
