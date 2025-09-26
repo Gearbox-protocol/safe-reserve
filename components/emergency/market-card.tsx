@@ -15,6 +15,7 @@ import { shortenHash } from "@gearbox-protocol/permissionless";
 import { MarketSuite } from "@gearbox-protocol/sdk";
 import { Copy, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import { Address, zeroAddress } from "viem";
 import { TokenIcon } from "../ui/token-icon";
@@ -36,6 +37,13 @@ export function MarketCard({
   const tokenSymbol =
     market.sdk.tokensMeta.symbol(market.pool.underlying) ?? "";
 
+  const marketPaused = useMemo(
+    () =>
+      market.pool.pool.isPaused &&
+      market.creditManagers.every((cm) => cm.creditFacade.isPaused),
+    [market]
+  );
+
   return (
     <div className="space-y-4">
       <Link
@@ -49,11 +57,20 @@ export function MarketCard({
           },
         }}
       >
-        <Card className="flex items-center space-x-4 p-4 cursor-pointer hover:bg-muted/50">
-          <TokenIcon symbol={tokenSymbol} size={36} />
-          <CardTitle className="whitespace-nowrap text-base font-medium text-xl">
-            Market {market.pool.pool.symbol}
-          </CardTitle>
+        <Card
+          className={`flex items-center justify-between space-x-4 p-4 cursor-pointer ${marketPaused ? "border-destructive/70 bg-red-900/20 hover:bg-red-900/25" : "hover:bg-muted/50"}`}
+        >
+          <div className="flex items-center space-x-4">
+            <TokenIcon symbol={tokenSymbol} size={36} />
+            <CardTitle className="whitespace-nowrap text-base font-medium text-xl">
+              Market {market.pool.pool.symbol}
+            </CardTitle>
+          </div>
+          {marketPaused && (
+            <Button size={"lg"} variant={"ghost"} disabled>
+              Market paused
+            </Button>
+          )}
         </Card>
       </Link>
 
@@ -68,7 +85,7 @@ export function MarketCard({
           />
         </div>
 
-        {!!multipause && multipause !== zeroAddress ? (
+        {!!multipause && multipause !== zeroAddress && !marketPaused ? (
           <Link
             key={`${chainId}-${marketConfigurator}-pauseMarket`}
             href={{
