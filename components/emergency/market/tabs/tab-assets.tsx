@@ -95,7 +95,11 @@ export function AssetsTab(props: MarketProps) {
                   />
 
                   <TableCell>
-                    <div className={"flex justify-end w-full text-right pr-28"}>
+                    <div
+                      className={
+                        "flex justify-end w-full text-right pr-[102px]"
+                      }
+                    >
                       ---
                     </div>
                   </TableCell>
