@@ -180,7 +180,7 @@ export function MarketConfiguratorView({
           {markets.length === 0 ? (
             <div>There is no markets</div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-12">
               {markets.map((market) => (
                 <MarketCard
                   key={`${address}-${market.pool.pool.address}`}

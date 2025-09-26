@@ -22,7 +22,7 @@ export function UpdatedValue({
   nowrap = false,
 }: UpdatedValueProps) {
   return (
-    <div className="flex items-center ">
+    <div className="flex items-center">
       <span className="flex items-center gap-2">
         {oldValue !== undefined && oldValue !== newValue ? (
           <>

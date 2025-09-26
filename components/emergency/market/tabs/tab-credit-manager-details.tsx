@@ -79,7 +79,7 @@ export function CreditManagerDetails({
               <TableHeader>
                 <TableRow>
                   <TableHead>Asset</TableHead>
-                  <TableHead className="text-right pr-6">Forbidden</TableHead>
+                  <TableHead className="text-right pr-8">Forbidden</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -98,7 +98,7 @@ export function CreditManagerDetails({
                     />
 
                     <TableCellUpdatable
-                      className={`text-right ${collateralToken.forbidden ? "pr-6" : ""}`}
+                      className={`text-right ${collateralToken.forbidden ? "pr-8" : ""}`}
                       disabled={collateralToken.forbidden}
                       newValue={collateralToken.forbidden ? "Yes" : "No"}
                       isEditable={!collateralToken.forbidden}
@@ -156,7 +156,7 @@ export function CreditManagerDetails({
                 <TableHead>Protocol</TableHead>
                 <TableHead className="text-center">Type</TableHead>
                 <TableHead className="text-center">Adapter</TableHead>
-                <TableHead className="text-right pr-6">Actions</TableHead>
+                <TableHead className="text-right pr-8">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -262,7 +262,7 @@ export function CreditManagerDetails({
             <TableHeader>
               <TableRow>
                 <TableHead>Parameter</TableHead>
-                <TableHead className="text-right pr-6">Value</TableHead>
+                <TableHead className="text-right pr-8">Value</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -272,7 +272,7 @@ export function CreditManagerDetails({
                     Total Debt Limit
                   </TableCell>
                   <TableCellUpdatable
-                    className={`text-right ${debtLimit === 0 ? "pr-6" : ""}`}
+                    className={`text-right ${debtLimit === 0 ? "pr-8" : ""}`}
                     newValue={debtLimit.toString()}
                     postfix={sdk.tokensMeta.symbol(market.pool.underlying)}
                     nowrap
@@ -306,7 +306,7 @@ export function CreditManagerDetails({
                   Is Borrowing Allowed
                 </TableCell>
                 <TableCellUpdatable
-                  className={`text-right ${creditSuite.creditFacade.maxDebtPerBlockMultiplier === 0 ? "pr-6" : ""}`}
+                  className={`text-right ${creditSuite.creditFacade.maxDebtPerBlockMultiplier === 0 ? "pr-8" : ""}`}
                   newValue={
                     creditSuite.creditFacade.maxDebtPerBlockMultiplier > 0
                       ? "Yes"
