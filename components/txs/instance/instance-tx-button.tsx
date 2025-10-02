@@ -18,6 +18,7 @@ interface ButtonTxProps {
   tx: SignedTx;
   safeAddress: Address;
   instanceManager: Address;
+  isExecuted: boolean;
 }
 
 export function InstanceButtonTx({
@@ -26,8 +27,9 @@ export function InstanceButtonTx({
   tx,
   safeAddress,
   instanceManager,
+  isExecuted,
 }: ButtonTxProps) {
-  const [isSent, setIsSent] = useState(false);
+  const [isSent, setIsSent] = useState(isExecuted);
   const [alreadySigned, setAlreadySigned] = useState(false);
 
   const { signers, threshold, nonce } = useSafeParams(chainId, safeAddress);
@@ -57,7 +59,7 @@ export function InstanceButtonTx({
   const canSign = useMemo(() => {
     return (
       !alreadySigned &&
-      // TODO: check tx was not added
+      !isSent &&
       (isSafeApp ||
         ((signers || [])
           .map((addr) => addr.toLowerCase())
@@ -66,7 +68,7 @@ export function InstanceButtonTx({
             .map((s) => s.toLowerCase())
             .includes(address?.toLowerCase() || zeroAddress)))
     );
-  }, [signers, address, tx.signedBy, alreadySigned, isSafeApp]);
+  }, [signers, isSent, address, tx.signedBy, alreadySigned, isSafeApp]);
 
   const [canSignaAndSend, canSend] = useMemo(() => {
     return [

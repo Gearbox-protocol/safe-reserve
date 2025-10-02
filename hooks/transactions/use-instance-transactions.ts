@@ -11,20 +11,24 @@ import { SafeTx } from "@gearbox-protocol/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { Address, Hex } from "viem";
 import { usePublicClient } from "wagmi";
+import { useInstanceTransactionExecuted } from "./use-instance-transaction-status";
 
 export function useInstanceTransactions({
   cid,
   chainId,
   batches,
   instanceManager,
+  createdAtBlock,
 }: {
   cid: string;
   chainId?: number;
   instanceManager?: Address;
   batches?: SafeTx[][];
+  createdAtBlock?: number;
 }): {
   txs: SignedTx[];
   safe?: Address;
+  isExecuted: boolean | undefined;
   isLoading: boolean;
   error: Error | null;
   refetchSigs: () => Promise<unknown>;
@@ -40,19 +44,34 @@ export function useInstanceTransactions({
   const { nonce, signers } = useSafeParams(chainId, safe);
 
   const {
+    isExecuted,
+    nonce: executedNonce,
+    isLoading: isLoadingExecuted,
+    error: errorExecuted,
+  } = useInstanceTransactionExecuted({
+    cid,
+    chainId,
+    batches,
+    instanceManager,
+    createdAtBlock,
+  });
+
+  const {
     data: preparedTxs,
     isLoading: isLoadingPreparedTxs,
     error: errorPreparedTxs,
   } = useQuery({
     queryKey: ["prepared-batches", cid],
     queryFn: async () => {
-      if (!publicClient || !safe || nonce === undefined) return;
+      if (
+        !publicClient ||
+        !safe ||
+        nonce === undefined ||
+        isExecuted === undefined
+      )
+        return;
 
       // @note currently txs are not batched (batches.len === 1)
-      // TODO: somehow add checker is batch executed or not
-
-      const startIndex = -1;
-
       return await Promise.all(
         (batches ?? []).map((batch, index) =>
           getReserveMultisigBatch({
@@ -61,14 +80,18 @@ export function useInstanceTransactions({
             safeAddress: safe,
             batch: batch as SafeTx[],
             nonce:
-              startIndex === -1
-                ? Number(nonce) + index
-                : Number(nonce) + index - startIndex,
+              Number(executedNonce !== undefined ? executedNonce : nonce) +
+              index,
           })
         )
       );
     },
-    enabled: !!cid && !!publicClient && !!safe && nonce !== undefined,
+    enabled:
+      !!cid &&
+      !!publicClient &&
+      !!safe &&
+      nonce !== undefined &&
+      isExecuted !== undefined,
     retry: 3,
   });
 
@@ -85,7 +108,8 @@ export function useInstanceTransactions({
         !publicClient ||
         !signers ||
         !preparedTxs ||
-        nonce === undefined
+        nonce === undefined ||
+        isExecuted === undefined
       )
         return;
 
@@ -113,7 +137,7 @@ export function useInstanceTransactions({
           gasPrice: BigInt(tx.gasPrice),
           gasToken: tx.gasToken as Address,
           refundReceiver: tx.refundReceiver as Address,
-          nonce: BigInt(tx.nonce),
+          nonce: BigInt(executedNonce !== undefined ? executedNonce : tx.nonce),
           hash: tx.hash as Hex,
           signedBy: [
             ...(signers.filter((_, index) => signedBy[index] > 0) as Address[]),
@@ -130,15 +154,21 @@ export function useInstanceTransactions({
       !!signers &&
       !!safe &&
       !!preparedTxs &&
-      nonce !== undefined,
+      nonce !== undefined &&
+      isExecuted !== undefined,
     retry: 3,
   });
 
   return {
     txs: txs ?? [],
+    isExecuted,
     safe: safe,
-    isLoading: isLoadingSafe || isLoadingTxs || isLoadingPreparedTxs,
-    error: errorSafe || errorTxs || errorPreparedTxs,
+    isLoading:
+      isLoadingSafe ||
+      isLoadingTxs ||
+      isLoadingPreparedTxs ||
+      isLoadingExecuted,
+    error: errorSafe || errorTxs || errorPreparedTxs || errorExecuted,
     refetchSigs: refetch,
   };
 }

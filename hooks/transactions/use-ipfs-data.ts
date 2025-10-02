@@ -23,6 +23,7 @@ export interface InstanceTxs extends IpfsTxs {
   type: "instance";
 
   instanceManager: Address;
+  createdAtBlock?: number;
   batches: SafeTx[][];
 }
 
@@ -142,6 +143,7 @@ export function useIpfsData(cid: string): {
       author: ipfsData?.author,
       instanceManager: ipfsData?.instanceManager,
       batches: ipfsData?.batches,
+      createdAtBlock: ipfsData?.createdAtBlock,
       isLoading,
       error,
     };

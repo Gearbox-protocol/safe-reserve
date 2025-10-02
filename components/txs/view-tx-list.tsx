@@ -237,6 +237,7 @@ export function ViewTxList({ cid }: { cid: string }) {
                       cid={cid}
                       tx={tx}
                       safeAddress={safe!}
+                      isExecuted={currentTransactions.isExecuted!}
                       instanceManager={currentTransactions.instanceManager!}
                       threshold={threshold || 0}
                       index={index}

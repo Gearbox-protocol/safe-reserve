@@ -1,8 +1,10 @@
+import { safeAbi } from "@/abi";
 import {
+  BaseContract,
   getBlockNumberByTimestamp,
   TimeLockContract,
 } from "@gearbox-protocol/permissionless";
-import { Address, Hash, PublicClient } from "viem";
+import { Address, Hash, Hex, PublicClient } from "viem";
 import { HOUR_24 } from "./constant";
 
 export enum TimelockTxStatus {
@@ -23,9 +25,9 @@ export async function getTxStatus(args: {
 }): Promise<{ status: TimelockTxStatus; blockNumber: number }> {
   const { publicClient, timelock, txHash, eta, createdAtBlock = 0 } = args;
 
-  const lastBlockTimestamp = await publicClient.getBlock().then(
-    (block) => Number(block.timestamp)
-  );
+  const lastBlockTimestamp = await publicClient
+    .getBlock()
+    .then((block) => Number(block.timestamp));
 
   if (eta > lastBlockTimestamp + 14 * HOUR_24) {
     return {
@@ -138,4 +140,24 @@ export async function getTxStatus(args: {
     blockNumber,
     status,
   };
+}
+
+export async function executedSafeTxs(args: {
+  publicClient: PublicClient;
+  safe: Address;
+  createdAtBlock?: number;
+}): Promise<Hex[]> {
+  const { publicClient, safe, createdAtBlock = 0 } = args;
+
+  const safeContract = new BaseContract(safeAbi, safe, publicClient, "Safe");
+  const block = await publicClient.getBlock();
+
+  const parsedLogs = await safeContract.getEvents(
+    "ExecutionSuccess",
+    // @note if createdAt was not specified 1000000 blocks probably would be enough
+    BigInt(createdAtBlock ?? block.number - 1000000n),
+    block.number
+  );
+
+  return parsedLogs.map((log) => log.args.txHash!);
 }

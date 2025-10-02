@@ -24,6 +24,7 @@ export interface CurrentInstanceTransactions extends CurrentTransactions {
   type: "instance";
 
   txs: SignedTx[];
+  isExecuted?: boolean;
   instanceManager?: Address;
 }
 
@@ -62,6 +63,7 @@ export function useCurrentTransactions(
     txs: instanceTxs,
     safe: instanceSafe,
     isLoading: isLoadingInstanceTxs,
+    isExecuted,
     error: errorInstanceTxs,
     refetchSigs: refetchInstanceSigs,
   } = useInstanceTransactions({
@@ -69,6 +71,7 @@ export function useCurrentTransactions(
     chainId,
     instanceManager,
     batches,
+    createdAtBlock,
   });
 
   if (type === "instance")
@@ -76,6 +79,7 @@ export function useCurrentTransactions(
       type,
       txs: instanceTxs,
       safe: instanceSafe,
+      isExecuted,
       instanceManager,
       isLoading: isLoadingIpfsData || isLoadingInstanceTxs,
       error: errorIpfsData || errorInstanceTxs,

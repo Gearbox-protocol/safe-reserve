@@ -12,6 +12,7 @@ interface ProposalSignaturesProps {
   safeAddress: Address;
   signers: Address[];
   nonce?: number;
+  isExecuted: boolean;
 }
 
 export function InstanceProposalSignatures({
@@ -19,6 +20,7 @@ export function InstanceProposalSignatures({
   safeAddress,
   signers,
   nonce,
+  isExecuted,
 }: ProposalSignaturesProps) {
   const chain = chains.find(({ id }) => id === chainId);
   const [showAll, setShowAll] = useState(false);
@@ -110,16 +112,15 @@ export function InstanceProposalSignatures({
         </div>
 
         {signers.length > 0 && (
-          // TODO: get executed status
           <div className="relative flex items-center">
             <div
               className={`absolute left-[2px] flex h-5 w-5 items-center justify-center rounded-full ${
-                false
+                isExecuted
                   ? "bg-green-500"
                   : "border-2 border-gray-600 bg-transparent"
               }`}
             >
-              {false && <Check className="h-3 w-3 text-black" />}
+              {isExecuted && <Check className="h-3 w-3 text-black" />}
             </div>
             <span className="ml-10 text-white">Executed</span>
           </div>

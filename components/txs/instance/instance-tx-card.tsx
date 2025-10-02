@@ -16,6 +16,7 @@ import { InstanceButtonTx } from "./instance-tx-button";
 
 interface InstanceTransactionCardProps extends TransactionCardProps {
   tx: SignedTx;
+  isExecuted: boolean;
   instanceManager: Address;
 }
 
@@ -27,6 +28,7 @@ export function InstanceTransactionCard({
   instanceManager,
   threshold,
   index,
+  isExecuted,
 }: InstanceTransactionCardProps) {
   const { nonce: currentNonce } = useSafeParams(chainId, safeAddress);
   const chain = chains.find(({ id }) => id === chainId);
@@ -88,6 +90,7 @@ export function InstanceTransactionCard({
             tx={tx}
             safeAddress={safeAddress}
             instanceManager={instanceManager}
+            isExecuted={isExecuted}
           />
 
           <span className="text-gray-400 transform transition-transform">
@@ -197,6 +200,7 @@ export function InstanceTransactionCard({
                 chainId={chainId}
                 signers={tx.signedBy || []}
                 safeAddress={safeAddress}
+                isExecuted={isExecuted}
               />
             </div>
           </div>
