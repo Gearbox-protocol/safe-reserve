@@ -97,6 +97,7 @@ export function EmergencySafeTx({
                 signers={tx.signedBy || []}
                 safeAddress={adminInfo.admin}
                 nonce={nonce}
+                isExecuted={false}
               />
             </div>
           </div>
