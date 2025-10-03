@@ -4,17 +4,27 @@ import { ViewTxList } from "@/components/txs/view-tx-list";
 import { Suspense, useEffect, useState } from "react";
 
 function TxsContent() {
-  const [cid, setCid] = useState<string | null | undefined>(undefined);
+  const [cids, setCids] = useState<string[] | null | undefined>(undefined);
 
   useEffect(() => {
     // Read from URL after component mounts (client-side only)
     const params = new URLSearchParams(window.location.search);
-    setCid(params.get("cid"));
+
+    const cid = params.get("cid");
+    const cids = params.get("cids")?.split(",");
+
+    if (cids && Array.isArray(cids)) {
+      setCids(cids);
+    } else if (cid) {
+      setCids([cid]);
+    } else {
+      setCids(null);
+    }
   }, []);
 
-  if (cid) {
-    return <ViewTxList cid={cid} />;
-  } else if (cid === undefined) {
+  if (cids && cids.length > 0) {
+    return <ViewTxList cids={cids} onSelect={setCids} />;
+  } else if (cids === undefined) {
     <div>Loading...</div>;
   } else {
     return (

@@ -2,7 +2,7 @@
 
 import { instanceTxsSchema, timelockTxsSchema } from "@/utils/validation";
 import { SafeTx } from "@gearbox-protocol/permissionless";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 
 interface IpfsTxs {
@@ -85,6 +85,28 @@ async function fetchFromIPFS(cid: string): Promise<unknown> {
   throw lastError || new Error("All IPFS gateways failed");
 }
 
+function getTypedIPFSData(ipfsData: TimelockTxs | InstanceTxs | undefined) {
+  if (ipfsData?.type === "timelock")
+    return {
+      type: ipfsData?.type,
+      chainId: ipfsData?.chainId,
+      author: ipfsData?.author,
+      eta: ipfsData?.eta,
+      marketConfigurator: ipfsData?.marketConfigurator,
+      createdAtBlock: ipfsData?.createdAtBlock,
+      batches: ipfsData?.queueBatches,
+    };
+  else
+    return {
+      type: ipfsData?.type,
+      chainId: ipfsData?.chainId,
+      author: ipfsData?.author,
+      instanceManager: ipfsData?.instanceManager,
+      batches: ipfsData?.batches,
+      createdAtBlock: ipfsData?.createdAtBlock,
+    };
+}
+
 export function useIpfsData(cid: string): {
   type?: "timelock" | "instance";
   chainId?: number;
@@ -122,29 +144,58 @@ export function useIpfsData(cid: string): {
     },
     enabled: !!cid,
     retry: 3,
+    staleTime: Infinity,
   });
 
-  if (ipfsData?.type === "timelock")
-    return {
-      type: ipfsData?.type,
-      chainId: ipfsData?.chainId,
-      author: ipfsData?.author,
-      eta: ipfsData?.eta,
-      marketConfigurator: ipfsData?.marketConfigurator,
-      createdAtBlock: ipfsData?.createdAtBlock,
-      batches: ipfsData?.queueBatches,
-      isLoading,
-      error,
-    };
-  else
-    return {
-      type: ipfsData?.type,
-      chainId: ipfsData?.chainId,
-      author: ipfsData?.author,
-      instanceManager: ipfsData?.instanceManager,
-      batches: ipfsData?.batches,
-      createdAtBlock: ipfsData?.createdAtBlock,
-      isLoading,
-      error,
-    };
+  return {
+    ...getTypedIPFSData(ipfsData),
+    isLoading,
+    error,
+  };
+}
+export function useMultipleIpfsData(cids: string[]): {
+  data: {
+    type?: "timelock" | "instance";
+    chainId?: number;
+    author?: Address;
+
+    eta?: number;
+    marketConfigurator?: Address;
+    createdAtBlock?: number;
+    batches?: SafeTx[][];
+
+    instanceManager?: Address;
+  }[];
+
+  isLoading: boolean;
+  error: Error | null;
+} {
+  const result = useQueries({
+    queries: cids.map((cid) => ({
+      queryKey: ["ipfs-transactions", cid],
+      queryFn: async () => {
+        if (!cid) {
+          throw new Error("Missing required parameters");
+        }
+
+        const data = await fetchFromIPFS(cid);
+        try {
+          const validatedData = timelockTxsSchema.parse(data);
+          return { type: "timelock", ...validatedData } as TimelockTxs;
+        } catch {
+          const validatedData = instanceTxsSchema.parse(data);
+          return { type: "instance", ...validatedData } as InstanceTxs;
+        }
+      },
+      enabled: !!cid,
+      retry: 3,
+      staleTime: Infinity,
+    })),
+  });
+
+  return {
+    data: result.map(({ data }) => getTypedIPFSData(data)),
+    isLoading: result.some(({ isLoading }) => isLoading),
+    error: result.find(({ error }) => error)?.error || null,
+  };
 }

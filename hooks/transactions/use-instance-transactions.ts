@@ -19,12 +19,14 @@ export function useInstanceTransactions({
   batches,
   instanceManager,
   createdAtBlock,
+  useNonce,
 }: {
   cid: string;
   chainId?: number;
   instanceManager?: Address;
   batches?: SafeTx[][];
   createdAtBlock?: number;
+  useNonce?: number;
 }): {
   txs: SignedTx[];
   safe?: Address;
@@ -61,7 +63,11 @@ export function useInstanceTransactions({
     isLoading: isLoadingPreparedTxs,
     error: errorPreparedTxs,
   } = useQuery({
-    queryKey: ["prepared-batches", cid],
+    queryKey: [
+      "prepared-batches",
+      cid,
+      Number(executedNonce !== undefined ? executedNonce : (useNonce ?? nonce)),
+    ],
     queryFn: async () => {
       if (
         !publicClient ||
@@ -80,8 +86,11 @@ export function useInstanceTransactions({
             safeAddress: safe,
             batch: batch as SafeTx[],
             nonce:
-              Number(executedNonce !== undefined ? executedNonce : nonce) +
-              index,
+              Number(
+                executedNonce !== undefined
+                  ? executedNonce
+                  : (useNonce ?? nonce)
+              ) + index,
           })
         )
       );
@@ -137,7 +146,7 @@ export function useInstanceTransactions({
           gasPrice: BigInt(tx.gasPrice),
           gasToken: tx.gasToken as Address,
           refundReceiver: tx.refundReceiver as Address,
-          nonce: BigInt(executedNonce !== undefined ? executedNonce : tx.nonce),
+          nonce: BigInt(tx.nonce),
           hash: tx.hash as Hex,
           signedBy: [
             ...(signers.filter((_, index) => signedBy[index] > 0) as Address[]),

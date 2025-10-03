@@ -45,16 +45,17 @@ export function InstanceButtonTx({
     tx
   );
 
-  const { sign: signTx, isPending: isSignPending } = useSignTx(
+  const { sign: signTx, isPending: isSignPending } = useSignTx({
     chainId,
     cid,
     safeAddress,
-    (txHash) => {
+    nonce: Number(tx.nonce),
+    onSuccess: (txHash) => {
       if (txHash.toLowerCase() === tx.hash.toLowerCase()) {
         setAlreadySigned(true);
       }
-    }
-  );
+    },
+  });
 
   const canSign = useMemo(() => {
     return (

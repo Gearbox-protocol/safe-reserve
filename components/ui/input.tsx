@@ -23,11 +23,18 @@ InputInternal.displayName = "Input";
 interface InputProps extends React.ComponentProps<"input"> {
   hasError?: boolean;
   errorMessage?: string;
+  divClassName?: string;
 }
 
-export function Input({ hasError, errorMessage, value, ...props }: InputProps) {
+export function Input({
+  hasError,
+  errorMessage,
+  value,
+  divClassName,
+  ...props
+}: InputProps) {
   return (
-    <div>
+    <div className={divClassName}>
       <InputInternal
         {...props}
         value={value}
