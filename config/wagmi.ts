@@ -118,9 +118,7 @@ export const getChainTransport = (chain: Chain): Transport => {
   }
 
   if (chain.id === plasma.id) {
-    const tenderlyRpc =
-      "https://plasma.gateway.tenderly.co/75ewmNAMLVnWRFd6qJ54PG";
-    return http(tenderlyRpc, {
+    return http(drpcUrl("plasma"), {
       retryCount: 3,
       retryDelay: 1000,
       timeout: 10000,
