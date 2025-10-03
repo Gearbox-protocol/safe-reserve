@@ -26,11 +26,13 @@ export function MarketCard({
   marketConfigurator,
   market,
   multipause,
+  onSelect,
 }: {
   chainId: number;
   marketConfigurator: Address;
   market: MarketSuite;
   multipause: Address;
+  onSelect: (market: Address) => void;
 }) {
   const chain = chains.find(({ id }) => id === chainId);
 
@@ -59,6 +61,7 @@ export function MarketCard({
       >
         <Card
           className={`flex items-center justify-between space-x-4 p-4 cursor-pointer ${marketPaused ? "border-destructive/70 bg-red-900/20 hover:bg-red-900/25" : "hover:bg-muted/50"}`}
+          onClick={() => onSelect(market.pool.pool.address)}
         >
           <div className="flex items-center space-x-4">
             <TokenIcon symbol={tokenSymbol} size={36} />

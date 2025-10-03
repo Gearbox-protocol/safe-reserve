@@ -188,6 +188,9 @@ export function MarketConfiguratorView({
                   marketConfigurator={address}
                   market={market}
                   multipause={multipause ?? zeroAddress}
+                  onSelect={(market: Address) => {
+                    setSelectedMarket(market);
+                  }}
                 />
               ))}
             </div>
