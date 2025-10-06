@@ -23,7 +23,7 @@ export function useInstanceTransactionNonces({
   isLoading: boolean;
   error: Error | null;
 } {
-  const { data } = useMultipleIpfsData(cids);
+  const { data, isLoading } = useMultipleIpfsData(cids);
 
   const preparedIPFSData = useMemo(() => {
     const filteredData = (data || [])
@@ -124,7 +124,8 @@ export function useInstanceTransactionNonces({
 
   return {
     nonces: result,
-    isLoading: isLoadingSafe || isLoadingNonce || isLoadingExecuted,
+    isLoading:
+      isLoading || isLoadingSafe || isLoadingNonce || isLoadingExecuted,
     error: errorSafe || errorNonce || errorExecuted || null,
   };
 }

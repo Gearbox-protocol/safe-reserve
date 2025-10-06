@@ -1,8 +1,8 @@
 "use client";
 
 import { useInstanceTransactionNonces } from "@/hooks/transactions/use-instance-transactions-nonces";
-import { InstanceTxs } from "./instance-txs";
 import { Address } from "viem";
+import { InstanceTxs } from "./instance-txs";
 
 export type TabType = "queue" | "execute" | "history";
 
@@ -44,7 +44,7 @@ export function InstanceTxList({
   return (
     <div className="divide-y divide-gray-800 space-y-2">
       {cids.map((cid, index) => (
-        <div key={cid} className={index > 0 ? "pt-2" : undefined}>
+        <div key={`${cid}-${index}`} className={index > 0 ? "pt-2" : undefined}>
           <InstanceTxs
             cids={cids}
             chainId={chainId}
