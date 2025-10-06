@@ -17,7 +17,7 @@ export function InstanceTxList({
   instanceManager: Address;
   onSelect: (cids: string[]) => void;
 }) {
-  const { nonces, isLoading, error } = useInstanceTransactionNonces({
+  const { nonces, isLoading, error, refetch } = useInstanceTransactionNonces({
     cids,
     chainId,
     instanceManager,
@@ -44,14 +44,20 @@ export function InstanceTxList({
   return (
     <div className="divide-y divide-gray-800 space-y-2">
       {cids.map((cid, index) => (
-        <div key={`${cid}-${index}`} className={index > 0 ? "pt-2" : undefined}>
+        <div
+          key={`${cid}-${nonces![index]}-${index}`}
+          className={index > 0 ? "pt-2" : undefined}
+        >
           <InstanceTxs
             cids={cids}
             chainId={chainId}
             instanceManager={instanceManager}
             nonce={nonces![index]}
             index={index}
-            onSelect={onSelect}
+            onSelect={async (cids) => {
+              onSelect(cids);
+              await refetch();
+            }}
           />
         </div>
       ))}

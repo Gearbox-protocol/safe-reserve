@@ -15,7 +15,7 @@ export default function AddCid({
   msg?: string;
   cids: string[];
   index: number;
-  onSelect: (cids: string[]) => void;
+  onSelect: (cids: string[]) => Promise<void>;
 }) {
   const [cid, setCid] = useState("");
   const updatedCids = useMemo(
@@ -51,8 +51,8 @@ export default function AddCid({
             }}
           >
             <Button
-              onClick={() => {
-                onSelect(updatedCids);
+              onClick={async () => {
+                await onSelect(updatedCids);
               }}
               disabled={!cid}
             >
@@ -74,8 +74,11 @@ export default function AddCid({
               <Button
                 variant="outline"
                 className="w-[36px] text-red-400 border-red-400 hover:bg-red-400 hover:text-white"
-                onClick={() => {
-                  onSelect([...cids.slice(0, index), ...cids.slice(index + 1)]);
+                onClick={async () => {
+                  await onSelect([
+                    ...cids.slice(0, index),
+                    ...cids.slice(index + 1),
+                  ]);
                 }}
               >
                 <Trash2 className="h-4 w-4" />

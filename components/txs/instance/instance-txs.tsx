@@ -20,7 +20,7 @@ export function InstanceTxs({
   instanceManager: Address;
   index: number;
   nonce: number;
-  onSelect: (cids: string[]) => void;
+  onSelect: (cids: string[]) => Promise<void>;
 }) {
   const currentTransactions = useCurrentTransactions(cids[index], nonce);
 
@@ -109,7 +109,7 @@ export function InstanceTxs({
       <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
         {txs.map((tx, idx) => (
           <InstanceTransactionCard
-            key={tx.hash}
+            key={`${cids[index]}-${index}-${tx.hash}-${idx}`}
             chainId={chainId}
             cid={cids[index]}
             tx={tx}

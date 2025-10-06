@@ -185,6 +185,7 @@ export function useInstanceTransactionsExecuted({
       };
   isLoading: boolean;
   error: Error | null;
+  refetch: () => Promise<void>;
 } {
   const publicClient = usePublicClient({ chainId });
 
@@ -284,5 +285,8 @@ export function useInstanceTransactionsExecuted({
       errorHashes ||
       result.find(({ error }) => error)?.error ||
       null,
+    refetch: async () => {
+      await Promise.all(result.map((r) => r.refetch()));
+    },
   };
 }

@@ -153,6 +153,7 @@ export function useIpfsData(cid: string): {
     error,
   };
 }
+
 export function useMultipleIpfsData(cids: string[]): {
   data: {
     type?: "timelock" | "instance";
@@ -169,6 +170,7 @@ export function useMultipleIpfsData(cids: string[]): {
 
   isLoading: boolean;
   error: Error | null;
+  refetch: () => Promise<void>;
 } {
   const result = useQueries({
     queries: cids.map((cid) => ({
@@ -197,5 +199,8 @@ export function useMultipleIpfsData(cids: string[]): {
     data: result.map(({ data }) => getTypedIPFSData(data)),
     isLoading: result.some(({ isLoading }) => isLoading),
     error: result.find(({ error }) => error)?.error || null,
+    refetch: async () => {
+      await Promise.all(result.map((r) => r.refetch()));
+    },
   };
 }

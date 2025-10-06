@@ -22,8 +22,13 @@ export function useInstanceTransactionNonces({
   nonces?: number[];
   isLoading: boolean;
   error: Error | null;
+  refetch: () => Promise<void>;
 } {
-  const { data, isLoading } = useMultipleIpfsData(cids);
+  const {
+    data,
+    isLoading,
+    refetch: refetchIpfsData,
+  } = useMultipleIpfsData(cids);
 
   const preparedIPFSData = useMemo(() => {
     const filteredData = (data || [])
@@ -76,6 +81,7 @@ export function useInstanceTransactionNonces({
     data: executedStatuses,
     isLoading: isLoadingExecuted,
     error: errorExecuted,
+    refetch: refetchExecuted,
   } = useInstanceTransactionsExecuted({
     cids: preparedIPFSData.map(({ cid }) => cid),
     chainId: chainId,
@@ -91,8 +97,6 @@ export function useInstanceTransactionNonces({
       return new Array(cids.length).fill(0) as number[];
     }
 
-    const out = new Array(cids.length).fill(0) as number[];
-
     const statuses = (executedStatuses ?? []) as Array<
       | { isExecuted: true; nonce: number }
       | { isExecuted: false; nonce?: undefined }
@@ -102,18 +106,23 @@ export function useInstanceTransactionNonces({
     const base = Number(safeCurrentNonce ?? 0);
     let counter = 0;
 
-    preparedIPFSData.forEach(({ index: originalIdx }, localIdx) => {
+    const nonceByCid = new Map<string, number>();
+
+    preparedIPFSData.forEach(({ cid }, localIdx) => {
+      const cidLower = cid.toLowerCase();
       if (statuses[localIdx]?.isExecuted) {
-        out[originalIdx] = Number(statuses[localIdx].nonce);
+        nonceByCid.set(cidLower, Number(statuses[localIdx].nonce));
       } else {
-        out[originalIdx] = base + counter;
+        nonceByCid.set(cidLower, base + counter);
         counter += 1;
       }
     });
 
-    return out;
+    const out = cids.map((cid) => nonceByCid.get(cid.toLowerCase()) ?? 0);
+
+    return out as number[];
   }, [
-    cids.length,
+    cids,
     preparedIPFSData,
     executedStatuses,
     safeCurrentNonce,
@@ -127,5 +136,9 @@ export function useInstanceTransactionNonces({
     isLoading:
       isLoading || isLoadingSafe || isLoadingNonce || isLoadingExecuted,
     error: errorSafe || errorNonce || errorExecuted || null,
+    refetch: async () => {
+      await refetchIpfsData();
+      await refetchExecuted();
+    },
   };
 }
