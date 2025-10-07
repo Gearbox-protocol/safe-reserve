@@ -40,5 +40,6 @@ export const instanceTxsSchema = z.object({
   chainId: z.number(),
   author: addressSchema,
   instanceManager: addressSchema,
+  createdAtBlock: z.number().optional(),
   batches: z.array(z.array(safeTxSchema)),
 });
