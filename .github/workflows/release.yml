@@ -54,9 +54,19 @@ jobs:
           NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID }}
         run: pnpm deploy-full
 
+      - name: Extract IPFS metadata
+        id: ipfs
+        run: |
+          IPFS_HASH=$(jq -r .ipfsHash ipfs-deployment.json)
+          echo "ipfs_hash=$IPFS_HASH" >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub Release and upload assets
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.ipfs.outputs.ipfs_hash }}
+          name: ${{ steps.ipfs.outputs.ipfs_hash }}
           files: |
             ipfs-deployment.json
+          body: |
+            IPFS Hash: ${{ steps.ipfs.outputs.ipfs_hash }}
           generate_release_notes: true
