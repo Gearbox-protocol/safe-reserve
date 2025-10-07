@@ -46,7 +46,7 @@ jobs:
       - name: Full Deploy
         env:
           PINATA_JWT: ${{ secrets.PINATA_JWT }}
-          CLOUDFLARE_WEB3_TOKEN: ${{ secrets.CLOUDFLARE_WEB3_TOKEN }}
+          CLOUDFLARE_WEB3_TOKEN: ${{ secrets.CLOUDLFARE_WEB3_TOKEN }}
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
           NEXT_PUBLIC_ADDRESS_PROVIDER: ${{ secrets.NEXT_PUBLIC_ADDRESS_PROVIDER }}
           NEXT_PUBLIC_RPC_URL: ${{ secrets.NEXT_PUBLIC_RPC_URL }}
