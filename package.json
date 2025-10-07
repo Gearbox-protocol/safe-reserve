@@ -14,6 +14,7 @@
     "set-dns-record": "tsx script/set-dns-record.ts",
     "create-gateway": "tsx script/set-dns-record.ts --create",
     "update-gateway": "tsx script/set-dns-record.ts --update",
+    "deploy": "pnpm build && pnpm publish-ipfs && pnpm set-dns-record",
     "deploy-full": "pnpm build && pnpm test && pnpm publish-ipfs && pnpm set-dns-record",
     "test": "vitest run",
     "test:watch": "vitest"
