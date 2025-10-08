@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Address, isAddress, zeroAddress } from "viem";
+import { SkeletonStacks } from "../ui/skeleton";
 import { MarketCard } from "./market-card";
 import { MarketView } from "./market/market-view";
 
@@ -88,17 +89,7 @@ export function MarketConfiguratorView({
   }, []);
 
   if (isLoadingSdk || isLoadingInfo || isLoadingMultipause) {
-    return (
-      <div className="divide-y divide-gray-800 space-y-6">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="p-4 animate-pulse">
-            <div className="h-6 w-1/3 bg-gray-800 rounded mb-4" />
-            <div className="h-4 w-1/2 bg-gray-800 rounded mb-2" />
-            <div className="h-4 w-1/4 bg-gray-800 rounded" />
-          </div>
-        ))}
-      </div>
-    );
+    return <SkeletonStacks />;
   }
 
   if (sdkError || infoError || multipauseError) {

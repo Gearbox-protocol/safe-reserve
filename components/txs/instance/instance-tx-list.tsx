@@ -1,5 +1,6 @@
 "use client";
 
+import { SkeletonStacks } from "@/components/ui/skeleton";
 import { useInstanceTransactionNonces } from "@/hooks/transactions/use-instance-transactions-nonces";
 import { Address } from "viem";
 import { InstanceTxs } from "./instance-txs";
@@ -28,17 +29,7 @@ export function InstanceTxList({
   }
 
   if (isLoading) {
-    return (
-      <div className="divide-y divide-gray-800 space-y-6">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="p-4 animate-pulse">
-            <div className="h-6 w-1/3 bg-gray-800 rounded mb-4" />
-            <div className="h-4 w-1/2 bg-gray-800 rounded mb-2" />
-            <div className="h-4 w-1/4 bg-gray-800 rounded" />
-          </div>
-        ))}
-      </div>
-    );
+    return <SkeletonStacks />;
   }
 
   return (

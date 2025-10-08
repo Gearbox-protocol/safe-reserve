@@ -1,6 +1,7 @@
 import { Call } from "@/core/safe-tx";
 import { useDecodeInstanceCall, useGetInstanceCallMeta } from "@/hooks";
 import { Addresses, deepJsonParse } from "@gearbox-protocol/permissionless";
+import { Skeleton } from "@gearbox-protocol/permissionless-ui";
 import { json_stringify } from "@gearbox-protocol/sdk";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useCallback, useState } from "react";
@@ -108,7 +109,7 @@ export function InstanceProposalCall({
           (callMeta.isLoading ? (
             <div className={"flex items-center gap-2"}>
               <span className="text-gray-300">{`[${callMeta.fnName}]`}</span>
-              <div className="h-4 min-w-[56px] w-[56px] bg-gray-800 rounded  animate-pulse" />
+              <Skeleton className="h-4 min-w-[56px] w-[56px]" />
             </div>
           ) : (
             <span className="text-gray-300">
@@ -133,7 +134,7 @@ export function InstanceProposalCall({
             >
               <div className="font-semibold">{arg}: </div>
               {arg === "data" && callMeta.isLoading ? (
-                <div className="h-4 w-1/2 bg-gray-800 rounded animate-pulse" />
+                <Skeleton className="h-4 w-1/2" />
               ) : (
                 <div>{tryPrettyPrint(value)}</div>
               )}

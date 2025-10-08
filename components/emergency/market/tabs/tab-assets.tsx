@@ -1,30 +1,27 @@
 "use client";
 
-import { Button } from "@gearbox-protocol/permissionless-ui";
+import { chains } from "@/config/wagmi";
+import { useGetPriceFeeds } from "@/hooks";
+import { shortenHash } from "@gearbox-protocol/permissionless";
 import {
+  Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@gearbox-protocol/permissionless-ui";
-import { chains } from "@/config/wagmi";
-import { shortenHash } from "@gearbox-protocol/permissionless";
-import Link from "next/link";
-import { useMemo, useState } from "react";
-import { Address, formatUnits, zeroAddress } from "viem";
-import {
+  Skeleton,
+  TableBody,
+  TableCell,
   TableCellAsset,
   TableCellUpdatable,
   TableEditable,
-} from "@gearbox-protocol/permissionless-ui";
-import {
-  TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@gearbox-protocol/permissionless-ui";
-import { useGetPriceFeeds } from "@/hooks";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import { Address, formatUnits, zeroAddress } from "viem";
 import { PricefeedSelector } from "./selector-pricefeed";
 import { MarketAsset, MarketProps } from "./types";
 
@@ -220,10 +217,10 @@ export function AssetsTab(props: MarketProps) {
               <CardTitle className="font-bold">Assets</CardTitle>
             </CardHeader>
             {isLoading ? (
-              <div className="space-y-2 p-4 animate-pulse">
-                <div className="h-6 w-full bg-muted rounded" />
-                <div className="h-6 w-full bg-muted rounded" />
-                <div className="h-6 w-full bg-muted rounded" />
+              <div className="space-y-2 p-4">
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
               </div>
             ) : error ? (
               <div className="space-y-2 p-4">

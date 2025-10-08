@@ -1,5 +1,6 @@
 "use client";
 
+import { SkeletonStack } from "@/components/ui/skeleton";
 import { useCurrentTransactions, useIpfsData, useSafeParams } from "@/hooks";
 import { Address } from "viem";
 import AddCid from "./add-cid";
@@ -42,13 +43,7 @@ export function InstanceTxs({
   const { threshold } = useSafeParams(chainId, safe);
 
   if (isLoadingTxs || isLoadingInfo) {
-    return (
-      <div className="animate-pulse">
-        <div className="h-6 w-1/3 bg-gray-800 rounded mb-4" />
-        <div className="h-4 w-1/2 bg-gray-800 rounded mb-2" />
-        <div className="h-4 w-1/4 bg-gray-800 rounded" />
-      </div>
-    );
+    return <SkeletonStack />;
   }
 
   if (errorTxs || errorInfo) {

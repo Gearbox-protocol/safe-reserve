@@ -1,6 +1,7 @@
 "use client";
 
 import { InstanceProposalSignatures } from "@/components/txs/instance/instance-proposal-signatures";
+import { SkeletonStacks } from "@/components/ui/skeleton";
 import { emergencyActionsMap } from "@/core/emergency-actions";
 import { useBuildEmergencySafeTx } from "@/hooks";
 import {
@@ -70,15 +71,7 @@ export function EmergencySafeTx({
       <CardContent className="p-4 pt-0 space-y-3 text-sm w-full">
         {!tx ? (
           isLoadingTx ? (
-            <div className="divide-y divide-gray-800 space-y-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="p-4 animate-pulse">
-                  <div className="h-6 w-1/3 bg-gray-800 rounded mb-4" />
-                  <div className="h-4 w-1/2 bg-gray-800 rounded mb-2" />
-                  <div className="h-4 w-1/4 bg-gray-800 rounded" />
-                </div>
-              ))}
-            </div>
+            <SkeletonStacks />
           ) : (
             <div className="space-y-2 p-4">
               Something went wrong loading tx:{" "}

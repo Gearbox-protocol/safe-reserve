@@ -1,6 +1,7 @@
 import {
   CopyButton,
   ExternalButton,
+  Skeleton,
 } from "@gearbox-protocol/permissionless-ui";
 import { GearboxSDK } from "@gearbox-protocol/sdk";
 import { Address } from "viem";
@@ -34,7 +35,7 @@ export function AddressParamsView({
 
         {description &&
           (isLoading ? (
-            <div className="h-5 w-1/3 bg-muted rounded animate-pulse" />
+            <Skeleton className="h-5 w-1/3" />
           ) : (
             <div className="break-all font-mono">{`[${description}]`}</div>
           ))}

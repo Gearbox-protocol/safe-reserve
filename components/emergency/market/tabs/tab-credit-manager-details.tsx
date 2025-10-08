@@ -9,6 +9,7 @@ import {
   CardTitle,
   CopyButton,
   ExternalButton,
+  Skeleton,
   TableBody,
   TableCell,
   TableCellAsset,
@@ -137,10 +138,10 @@ export function CreditManagerDetails({
                 <CardTitle className="font-bold">Collateral</CardTitle>
               </CardHeader>
               {isLoading ? (
-                <div className="space-y-2 p-4 animate-pulse">
-                  <div className="h-6 w-full bg-muted rounded" />
-                  <div className="h-6 w-full bg-muted rounded" />
-                  <div className="h-6 w-full bg-muted rounded" />
+                <div className="space-y-2 p-4">
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
                 </div>
               ) : error ? (
                 <div className="space-y-2 p-4">

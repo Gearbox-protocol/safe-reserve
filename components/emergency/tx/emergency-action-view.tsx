@@ -1,5 +1,6 @@
 "use client";
 
+import { SkeletonStacks } from "@/components/ui/skeleton";
 import { chains } from "@/config/wagmi";
 import { EmergencyActions } from "@/core/emergency-actions";
 import {
@@ -77,17 +78,7 @@ export function EmergencyActionView({
   );
 
   if (isLoadingMcInfo || isLoadingAdminInfo || isLoadingSdk || isLoadingTx) {
-    return (
-      <div className="divide-y divide-gray-800 space-y-6">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="p-4 animate-pulse">
-            <div className="h-6 w-1/3 bg-gray-800 rounded mb-4" />
-            <div className="h-4 w-1/2 bg-gray-800 rounded mb-2" />
-            <div className="h-4 w-1/4 bg-gray-800 rounded" />
-          </div>
-        ))}
-      </div>
-    );
+    return <SkeletonStacks />;
   }
 
   if (

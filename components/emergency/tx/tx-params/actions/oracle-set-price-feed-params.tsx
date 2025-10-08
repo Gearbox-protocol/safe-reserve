@@ -3,6 +3,7 @@ import { useGetPriceFeedsInfo } from "@/hooks";
 import {
   CopyButton,
   ExternalButton,
+  Skeleton,
 } from "@gearbox-protocol/permissionless-ui";
 import { GearboxSDK } from "@gearbox-protocol/sdk";
 import { useMemo } from "react";
@@ -65,12 +66,12 @@ export function SetPriceFeedParamsView({
             )}
 
             {queries[1].isLoading ? (
-              <div className="h-5 w-1/4 bg-muted rounded animate-pulse" />
+              <Skeleton className="h-5 w-1/4" />
             ) : (
               <div className="break-all font-mono">{`[${queries[1].data?.type ?? "unknown"}]`}</div>
             )}
             {queries[0].isLoading || queries[1].isLoading ? (
-              <div className="h-5 w-1/3 bg-muted rounded animate-pulse" />
+              <Skeleton className="h-5 w-1/3" />
             ) : !queries[0].data || !queries[1].data ? (
               <></>
             ) : (
