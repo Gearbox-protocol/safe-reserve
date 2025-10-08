@@ -146,7 +146,12 @@ export async function executedSafeTxs(args: {
   publicClient: PublicClient;
   safe: Address;
   createdAtBlock?: number;
-}): Promise<Hex[]> {
+}): Promise<
+  {
+    txHash: Hex;
+    safeTxHash: Hex;
+  }[]
+> {
   const { publicClient, safe, createdAtBlock = 0 } = args;
 
   const safeContract = new BaseContract(safeAbi, safe, publicClient, "Safe");
@@ -159,5 +164,8 @@ export async function executedSafeTxs(args: {
     block.number
   );
 
-  return parsedLogs.map((log) => log.args.txHash!);
+  return parsedLogs.map((log) => ({
+    txHash: log.transactionHash,
+    safeTxHash: log.args.txHash!,
+  }));
 }

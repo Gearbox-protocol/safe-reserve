@@ -115,6 +115,7 @@ export function InstanceTxs({
             tx={tx}
             safeAddress={safe!}
             isExecuted={currentTransactions.isExecuted!}
+            executedTxHash={currentTransactions.executedTxHash}
             instanceManager={currentTransactions.instanceManager!}
             threshold={threshold || 0}
             index={idx}

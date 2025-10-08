@@ -19,7 +19,8 @@ export function useSendInstanceTx(
   chainId: number,
   safeAddress: Address,
   instanceManager: Address,
-  tx: SignedTx
+  tx: SignedTx,
+  onSuccess?: (txHash: Hex) => void
 ) {
   const { address } = useAccount();
   const {
@@ -186,6 +187,9 @@ export function useSendInstanceTx(
 
           toast.success(`Transaction executed successfully`);
 
+          if (onSuccess) {
+            onSuccess(txHash);
+          }
           refetch();
 
           return true;

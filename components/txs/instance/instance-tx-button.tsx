@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { chains } from "@/config/wagmi";
 import { SignedTx } from "@/core/safe-tx";
 import {
   useIsSafeApp,
@@ -7,8 +8,9 @@ import {
   useSignTx,
 } from "@/hooks";
 import { useSafeAppsSDK } from "@safe-global/safe-apps-react-sdk";
+import { ExternalLink } from "lucide-react";
 import { useMemo, useState } from "react";
-import { Address, zeroAddress } from "viem";
+import { Address, Hex, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
 import { TransactionInfoDialog } from "../transaction-info-dialog";
 
@@ -19,6 +21,7 @@ interface ButtonTxProps {
   safeAddress: Address;
   instanceManager: Address;
   isExecuted: boolean;
+  executedTxHash?: Hex;
 }
 
 export function InstanceButtonTx({
@@ -28,7 +31,11 @@ export function InstanceButtonTx({
   safeAddress,
   instanceManager,
   isExecuted,
+  executedTxHash,
 }: ButtonTxProps) {
+  const chain = chains.find(({ id }) => id === chainId);
+  const [txHash, setTxHash] = useState(executedTxHash);
+
   const [isSent, setIsSent] = useState(isExecuted);
   const [alreadySigned, setAlreadySigned] = useState(false);
 
@@ -42,7 +49,8 @@ export function InstanceButtonTx({
     chainId,
     safeAddress,
     instanceManager,
-    tx
+    tx,
+    (txHash) => setTxHash(txHash)
   );
 
   const { sign: signTx, isPending: isSignPending } = useSignTx({
@@ -123,7 +131,7 @@ export function InstanceButtonTx({
       )}
 
       {isSendButton && (
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
             onClick={async (e) => {
@@ -138,7 +146,23 @@ export function InstanceButtonTx({
           >
             {isSendPending ? "Executing.." : isSent ? "Executed" : "Execute"}
           </Button>
-          <TransactionInfoDialog isConfirmButton={false} canSend={canSend} />
+          {isSent && txHash && chain?.blockExplorers.default.url && (
+            <Button
+              variant="outline"
+              onClick={() =>
+                window.open(
+                  `${chain?.blockExplorers.default.url}/tx/${txHash}`,
+                  "_blank"
+                )
+              }
+            >
+              View
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          )}
+          {!isSent && (
+            <TransactionInfoDialog isConfirmButton={false} canSend={canSend} />
+          )}
         </div>
       )}
     </div>

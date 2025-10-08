@@ -31,6 +31,7 @@ export function useInstanceTransactions({
   txs: SignedTx[];
   safe?: Address;
   isExecuted: boolean | undefined;
+  executedTxHash?: Hex;
   isLoading: boolean;
   error: Error | null;
   refetchSigs: () => Promise<unknown>;
@@ -48,6 +49,7 @@ export function useInstanceTransactions({
   const {
     isExecuted,
     nonce: executedNonce,
+    txHash: executedTxHash,
     isLoading: isLoadingExecuted,
     error: errorExecuted,
   } = useInstanceTransactionExecuted({
@@ -171,6 +173,7 @@ export function useInstanceTransactions({
   return {
     txs: txs ?? [],
     isExecuted,
+    executedTxHash,
     safe: safe,
     isLoading:
       isLoadingSafe ||

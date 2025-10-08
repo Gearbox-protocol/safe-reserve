@@ -7,7 +7,7 @@ import { shortenHash } from "@/utils/format";
 import { ChevronDown, ChevronUp, Copy, ExternalLink } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Address, zeroAddress } from "viem";
+import { Address, Hex, zeroAddress } from "viem";
 import { SimulateTxButton } from "../simulate-tx-button";
 import { TransactionCardProps } from "../types";
 import { InstanceProposalCall } from "./instance-proposal-call";
@@ -17,6 +17,7 @@ import { InstanceButtonTx } from "./instance-tx-button";
 interface InstanceTransactionCardProps extends TransactionCardProps {
   tx: SignedTx;
   isExecuted: boolean;
+  executedTxHash?: Hex;
   instanceManager: Address;
 }
 
@@ -28,6 +29,7 @@ export function InstanceTransactionCard({
   instanceManager,
   threshold,
   index,
+  executedTxHash,
   isExecuted,
 }: InstanceTransactionCardProps) {
   const { nonce: currentNonce } = useSafeParams(chainId, safeAddress);
@@ -91,6 +93,7 @@ export function InstanceTransactionCard({
             safeAddress={safeAddress}
             instanceManager={instanceManager}
             isExecuted={isExecuted}
+            executedTxHash={executedTxHash}
           />
 
           <span className="text-gray-400 transform transition-transform">

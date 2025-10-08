@@ -18,7 +18,10 @@ export function useExecutedTxs({
   instanceManager?: Address;
   createdAtBlock?: number;
 }): {
-  executedHashes?: Hex[];
+  executedHashes?: {
+    safeTxHash: Hex;
+    txHash: Hex;
+  }[];
   isLoading: boolean;
   error: Error | null;
 } {
@@ -59,7 +62,10 @@ export function useExecutedTxs({
           safe,
           createdAtBlock: effectiveCreatedAtBlock,
         })
-      ).map((tx) => tx.toLowerCase() as Hex);
+      ).map(({ safeTxHash, txHash }) => ({
+        safeTxHash: safeTxHash.toLowerCase() as Hex,
+        txHash: txHash.toLowerCase() as Hex,
+      }));
     },
     enabled: !!publicClient && !!safe,
     retry: 3,
@@ -87,6 +93,7 @@ export function useInstanceTransactionExecuted({
 }): {
   isExecuted?: boolean;
   nonce?: number;
+  txHash?: Hex;
   isLoading: boolean;
   error: Error | null;
 } {
@@ -140,8 +147,16 @@ export function useInstanceTransactionExecuted({
       );
 
       for (const [index, tx] of preparedTxMap.entries()) {
-        if (executedHashes.includes(tx.hash.toLowerCase() as Hex)) {
-          return { isExecuted: true, nonce: nonces[index] };
+        const executedTx = executedHashes.find(
+          ({ safeTxHash }) => safeTxHash.toLowerCase() === tx.hash.toLowerCase()
+        );
+
+        if (executedTx) {
+          return {
+            isExecuted: true,
+            nonce: nonces[index],
+            txHash: executedTx.txHash,
+          };
         }
       }
 
@@ -155,6 +170,7 @@ export function useInstanceTransactionExecuted({
   return {
     isExecuted: status?.isExecuted,
     nonce: status?.nonce,
+    txHash: status?.txHash,
     isLoading:
       isLoadingSafe || isLoadingNonce || isLoadingHashes || isLoadingStatus,
     error: errorSafe || errorNonce || errorHashes || errorStatus,
@@ -178,6 +194,7 @@ export function useInstanceTransactionsExecuted({
     | {
         isExecuted: true;
         nonce: number;
+        txHash: Hex;
       }
     | {
         isExecuted: false;
@@ -245,8 +262,16 @@ export function useInstanceTransactionsExecuted({
         );
 
         for (const [index, tx] of preparedTxMap.entries()) {
-          if (executedHashes.includes(tx.hash.toLowerCase() as Hex)) {
-            return { isExecuted: true, nonce: nonces[index] };
+          const executedTx = executedHashes.find(
+            ({ safeTxHash }) =>
+              safeTxHash.toLowerCase() === tx.hash.toLowerCase()
+          );
+          if (executedTx) {
+            return {
+              isExecuted: true,
+              nonce: nonces[index],
+              txHash: executedTx.txHash,
+            };
           }
         }
 
@@ -268,6 +293,7 @@ export function useInstanceTransactionsExecuted({
       | {
           isExecuted: true;
           nonce: number;
+          txHash: Hex;
         }
       | {
           isExecuted: false;

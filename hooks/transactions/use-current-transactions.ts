@@ -2,7 +2,7 @@
 
 import { ParsedSignedTx, SignedTx } from "@/core/safe-tx";
 import { useIpfsData } from "@/hooks";
-import { Address } from "viem";
+import { Address, Hex } from "viem";
 import { useGovernanceTransactions } from "./use-governance-transactions";
 import { useInstanceTransactions } from "./use-instance-transactions";
 
@@ -25,6 +25,7 @@ export interface CurrentInstanceTransactions extends CurrentTransactions {
 
   txs: SignedTx[];
   isExecuted?: boolean;
+  executedTxHash?: Hex;
   instanceManager?: Address;
 }
 
@@ -65,6 +66,7 @@ export function useCurrentTransactions(
     safe: instanceSafe,
     isLoading: isLoadingInstanceTxs,
     isExecuted,
+    executedTxHash,
     error: errorInstanceTxs,
     refetchSigs: refetchInstanceSigs,
   } = useInstanceTransactions({
@@ -83,6 +85,7 @@ export function useCurrentTransactions(
       safe: instanceSafe,
       isExecuted,
       instanceManager,
+      executedTxHash,
       isLoading: isLoadingIpfsData || isLoadingInstanceTxs,
       error: errorIpfsData || errorInstanceTxs,
       refetchSigs: refetchInstanceSigs,
