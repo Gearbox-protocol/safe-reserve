@@ -118,11 +118,13 @@ export const getChainTransport = (chain: Chain): Transport => {
   }
 
   if (chain.id === plasma.id) {
-    return http(drpcUrl("plasma"), {
-      retryCount: 3,
-      retryDelay: 1000,
-      timeout: 10000,
-    });
+    return new ArchiveTransport({
+      primaryRpcUrl: drpcUrl("plasma"),
+      archiveRpcUrl:
+        "https://plasma.gateway.tenderly.co/75ewmNAMLVnWRFd6qJ54PG",
+      blockThreshold: 999,
+      enableLogging: true,
+    }).getTransport();
   }
 
   // Try to use window.ethereum if available
