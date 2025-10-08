@@ -119,12 +119,51 @@ async function createWeb3Gateway(
       body: JSON.stringify(requestBody),
     });
 
-    const data = (await response.json()) as CloudflareApiResponse;
+    let data: CloudflareApiResponse | null = null;
+    const contentType = response.headers.get("content-type") || "";
+    try {
+      if (contentType.includes("application/json")) {
+        data = (await response.json()) as CloudflareApiResponse;
+      } else {
+        const rawBody = await response.text();
+        console.error(
+          "❌ Unexpected non-JSON response from Cloudflare (create):"
+        );
+        console.error(rawBody);
+        console.error(`  HTTP ${response.status}: ${response.statusText}`);
+        process.exit(1);
+      }
+    } catch (e) {
+      const rawBody = await response.text().catch(() => "<unavailable>");
+      console.error(
+        "❌ Failed to parse Cloudflare response as JSON (create):",
+        e
+      );
+      console.error("Raw body:");
+      console.error(rawBody);
+      process.exit(1);
+    }
 
-    if (!response.ok || !data.success) {
+    if (!response.ok || !data!.success) {
+      // If hostname already exists (Cloudflare code 1001), fallback to update flow
+      const errorCodes = (data!.errors || []).map((e) => e.code);
+      if (errorCodes.includes(1001)) {
+        console.warn(
+          "ℹ️ Hostname already exists. Falling back to update flow..."
+        );
+        const existingGateway = await findExistingGateway();
+        if (!existingGateway) {
+          console.error(
+            "❌ Hostname reported as existing, but could not be found via list API."
+          );
+          process.exit(1);
+        }
+        return await updateWeb3Gateway(existingGateway.id, ipfsHash);
+      }
+
       console.error("❌ Error creating Web3 gateway:");
-      if (data.errors && data.errors.length > 0) {
-        data.errors.forEach((error) => {
+      if (data!.errors && data!.errors.length > 0) {
+        data!.errors.forEach((error) => {
           console.error(`  Code ${error.code}: ${error.message}`);
         });
       } else {
@@ -133,7 +172,7 @@ async function createWeb3Gateway(
       process.exit(1);
     }
 
-    return data.result;
+    return data!.result;
   } catch (error) {
     console.error("❌ Error making API request:", error);
     process.exit(1);
@@ -152,10 +191,32 @@ async function findExistingGateway(): Promise<CloudflareWeb3Gateway | null> {
       },
     });
 
-    const data = (await response.json()) as CloudflareListResponse;
+    let data: CloudflareListResponse | null = null;
+    const contentType = response.headers.get("content-type") || "";
+    try {
+      if (contentType.includes("application/json")) {
+        data = (await response.json()) as CloudflareListResponse;
+      } else {
+        const rawBody = await response.text();
+        console.warn(
+          "⚠️  Unexpected non-JSON response from Cloudflare (list):"
+        );
+        console.warn(rawBody);
+        return null;
+      }
+    } catch (e) {
+      const rawBody = await response.text().catch(() => "<unavailable>");
+      console.warn(
+        "⚠️  Failed to parse Cloudflare response as JSON (list):",
+        e
+      );
+      console.warn("Raw body:");
+      console.warn(rawBody);
+      return null;
+    }
 
-    if (response.ok && data.success && data.result) {
-      const existingGateway = data.result.find(
+    if (response.ok && data!.success && data!.result) {
+      const existingGateway = data!.result.find(
         (gateway) => gateway.name === GATEWAY_HOSTNAME
       );
       return existingGateway || null;
@@ -193,12 +254,35 @@ async function updateWeb3Gateway(
       body: JSON.stringify(requestBody),
     });
 
-    const data = (await response.json()) as CloudflareApiResponse;
+    let data: CloudflareApiResponse | null = null;
+    const contentType = response.headers.get("content-type") || "";
+    try {
+      if (contentType.includes("application/json")) {
+        data = (await response.json()) as CloudflareApiResponse;
+      } else {
+        const rawBody = await response.text();
+        console.error(
+          "❌ Unexpected non-JSON response from Cloudflare (update):"
+        );
+        console.error(rawBody);
+        console.error(`  HTTP ${response.status}: ${response.statusText}`);
+        process.exit(1);
+      }
+    } catch (e) {
+      const rawBody = await response.text().catch(() => "<unavailable>");
+      console.error(
+        "❌ Failed to parse Cloudflare response as JSON (update):",
+        e
+      );
+      console.error("Raw body:");
+      console.error(rawBody);
+      process.exit(1);
+    }
 
-    if (!response.ok || !data.success) {
+    if (!response.ok || !data!.success) {
       console.error("❌ Error updating Web3 gateway:");
-      if (data.errors && data.errors.length > 0) {
-        data.errors.forEach((error) => {
+      if (data!.errors && data!.errors.length > 0) {
+        data!.errors.forEach((error) => {
           console.error(`  Code ${error.code}: ${error.message}`);
         });
       } else {
@@ -207,7 +291,7 @@ async function updateWeb3Gateway(
       process.exit(1);
     }
 
-    return data.result;
+    return data!.result;
   } catch (error) {
     console.error("❌ Error making API request:", error);
     process.exit(1);
