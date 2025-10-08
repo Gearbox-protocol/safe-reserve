@@ -1,7 +1,8 @@
-import { Button } from "@/components/ui/button";
+import {
+  CopyButton,
+  ExternalButton,
+} from "@gearbox-protocol/permissionless-ui";
 import { GearboxSDK } from "@gearbox-protocol/sdk";
-import { Copy, ExternalLink } from "lucide-react";
-import { toast } from "sonner";
 import { Address } from "viem";
 
 export function AddressParamsView({
@@ -23,33 +24,12 @@ export function AddressParamsView({
 
       <div className="flex gap-2 text-gray-100">
         <div className="break-all">{address}</div>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground hover:text-white p-0 h-auto"
-          onClick={() => {
-            navigator.clipboard.writeText(address);
-            toast.success("Address copied to clipboard");
-          }}
-        >
-          <Copy className="h-3.5 w-3.5" />
-        </Button>
-
+        <CopyButton text={address} size="3.5" />
         {sdk.provider.chain?.blockExplorers?.default.url && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-white p-0 h-auto"
-            onClick={() =>
-              window.open(
-                `${sdk.provider.chain.blockExplorers?.default.url}/address/${address}`,
-                "_blank"
-              )
-            }
-          >
-            <ExternalLink className="h-3 w-3" />
-          </Button>
+          <ExternalButton
+            url={`${sdk.provider.chain.blockExplorers?.default.url}/address/${address}`}
+            size="3.5"
+          />
         )}
 
         {description &&

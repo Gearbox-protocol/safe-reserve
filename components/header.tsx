@@ -1,13 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui//button";
 import {
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuPortal,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@gearbox-protocol/permissionless-ui";
 import { ConnectKitButton } from "connectkit";
 import { Ellipsis } from "lucide-react";
 import Image from "next/image";

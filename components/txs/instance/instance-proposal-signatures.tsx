@@ -1,9 +1,12 @@
 import { chains } from "@/config/wagmi";
 import { useSafeParams } from "@/hooks";
 import { shortenHash } from "@/utils/format";
-import { Check, Copy, ExternalLink, Plus } from "lucide-react";
+import {
+  CopyButton,
+  ExternalButton,
+} from "@gearbox-protocol/permissionless-ui";
+import { Check, Plus } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { Address } from "viem";
 import { Identicon } from "../identicon";
 
@@ -82,27 +85,11 @@ export function InstanceProposalSignatures({
                       {shortenHash(confirmation)}
                     </span>
                     <div className="flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-                      <button
-                        className="text-gray-400 hover:text-white"
-                        onClick={() => {
-                          navigator.clipboard.writeText(confirmation);
-                          toast.success("Address copied to clipboard");
-                        }}
-                      >
-                        <Copy className="h-3 w-3" />
-                      </button>
+                      <CopyButton text={confirmation} />
                       {chain?.blockExplorers.default.url && (
-                        <button
-                          className="text-gray-400 hover:text-white"
-                          onClick={() =>
-                            window.open(
-                              `${chain?.blockExplorers.default.url}/address/${confirmation}`,
-                              "_blank"
-                            )
-                          }
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                        </button>
+                        <ExternalButton
+                          url={`${chain.blockExplorers.default.url}/address/${confirmation}`}
+                        />
                       )}
                     </div>
                   </div>

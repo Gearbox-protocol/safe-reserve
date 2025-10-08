@@ -1,10 +1,11 @@
-import { Button } from "@/components/ui/button";
 import { SetPriceFeedAction } from "@/core/emergency-actions";
 import { useGetPriceFeedsInfo } from "@/hooks";
+import {
+  CopyButton,
+  ExternalButton,
+} from "@gearbox-protocol/permissionless-ui";
 import { GearboxSDK } from "@gearbox-protocol/sdk";
-import { Copy, ExternalLink } from "lucide-react";
 import { useMemo } from "react";
-import { toast } from "sonner";
 import { formatUnits, zeroAddress } from "viem";
 import { AddressParamsView } from "./address-param";
 
@@ -55,34 +56,14 @@ export function SetPriceFeedParamsView({
         <div>
           <div className="flex gap-2 text-gray-100 font-mono">
             <div className="break-all">{action.params.priceFeed}</div>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground hover:text-white p-0 h-auto"
-              onClick={() => {
-                navigator.clipboard.writeText(action.params.priceFeed);
-                toast.success("Address copied to clipboard");
-              }}
-            >
-              <Copy className="h-3.5 w-3.5" />
-            </Button>
-
+            <CopyButton text={action.params.priceFeed} size="3.5" />
             {sdk.provider.chain?.blockExplorers?.default.url && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground hover:text-white p-0 h-auto"
-                onClick={() =>
-                  window.open(
-                    `${sdk.provider.chain.blockExplorers?.default.url}/address/${action.params.priceFeed}`,
-                    "_blank"
-                  )
-                }
-              >
-                <ExternalLink className="h-3 w-3" />
-              </Button>
+              <ExternalButton
+                url={`${sdk.provider.chain.blockExplorers.default.url}/address/${action.params.priceFeed}`}
+                size="3.5"
+              />
             )}
+
             {queries[1].isLoading ? (
               <div className="h-5 w-1/4 bg-muted rounded animate-pulse" />
             ) : (

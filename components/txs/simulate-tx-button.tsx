@@ -1,14 +1,14 @@
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { FormattedTrace } from "@/components/ui/formatted-trace";
 import { ParsedSignedTx, SignedTx } from "@/core/safe-tx";
 import { useSimulateGovernorTx } from "@/hooks/actions/use-simulate-governor-tx";
 import { useSimulateInstanceTx } from "@/hooks/actions/use-simulate-instance-tx";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@gearbox-protocol/permissionless-ui";
 import { CheckCircle, Eye, Loader2, Play, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

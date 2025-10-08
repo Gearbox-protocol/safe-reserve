@@ -1,12 +1,13 @@
 "use client";
-import { Button } from "@/components/ui/button";
+
 import {
+  Button,
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+  Input,
+} from "@gearbox-protocol/permissionless-ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 

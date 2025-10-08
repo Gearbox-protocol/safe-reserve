@@ -1,18 +1,19 @@
 import { LiquidationSettings } from "@/components/emergency/liquidations-settings";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getLossPolicyState } from "@/utils/state";
 import {
-  TableCellUpdatable,
-  TableEditable,
-} from "@/components/ui/editable-table";
-import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   TableBody,
   TableCell,
+  TableCellUpdatable,
+  TableEditable,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { getLossPolicyState } from "@/utils/state";
+} from "@gearbox-protocol/permissionless-ui";
 import Link from "next/link";
 import { useMemo } from "react";
 import { MarketProps } from "./types";

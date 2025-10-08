@@ -1,20 +1,18 @@
-import { Button } from "@/components/ui/button";
+import { PriceFeed } from "@gearbox-protocol/permissionless";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import {
+  Label,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { PriceFeed } from "@gearbox-protocol/permissionless";
+} from "@gearbox-protocol/permissionless-ui";
 import Link from "next/link";
 import { useState } from "react";
 import { Address } from "viem";

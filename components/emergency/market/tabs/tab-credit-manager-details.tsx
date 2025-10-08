@@ -1,25 +1,27 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  TableCellAsset,
-  TableCellUpdatable,
-  TableEditable,
-} from "@/components/ui/editable-table";
-import {
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { chains } from "@/config/wagmi";
 import { useGetCollateralStatuses } from "@/hooks";
 import { shortenHash } from "@gearbox-protocol/permissionless";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CopyButton,
+  ExternalButton,
+  TableBody,
+  TableCell,
+  TableCellAsset,
+  TableCellUpdatable,
+  TableEditable,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@gearbox-protocol/permissionless-ui";
 import { CreditSuite } from "@gearbox-protocol/sdk";
-import { CirclePause, Copy, ExternalLink } from "lucide-react";
+import { CirclePause } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
-import { toast } from "sonner";
 import { formatUnits } from "viem";
 import { MarketProps } from "./types";
 
@@ -167,34 +169,11 @@ export function CreditManagerDetails({
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {shortenHash(adapter.targetContract, 6)}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-muted-foreground hover:text-white p-0 h-auto"
-                          onClick={() => {
-                            navigator.clipboard.writeText(
-                              adapter.targetContract
-                            );
-                            toast.success("Address copied to clipboard");
-                          }}
-                        >
-                          <Copy className="h-3 w-3" />
-                        </Button>
-
+                        <CopyButton text={adapter.targetContract} />
                         {chain?.blockExplorers.default.url && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-muted-foreground hover:text-white p-0 h-auto"
-                            onClick={() =>
-                              window.open(
-                                `${chain?.blockExplorers.default.url}/address/${adapter.targetContract}`,
-                                "_blank"
-                              )
-                            }
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                          </Button>
+                          <ExternalButton
+                            url={`${chain.blockExplorers.default.url}/address/${adapter.targetContract}`}
+                          />
                         )}
                       </div>
                     </TableCell>
@@ -204,31 +183,11 @@ export function CreditManagerDetails({
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-2">
                         {shortenHash(adapter.address, 6)}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-muted-foreground hover:text-white p-0 h-auto"
-                          onClick={() => {
-                            navigator.clipboard.writeText(adapter.address);
-                            toast.success("Address copied to clipboard");
-                          }}
-                        >
-                          <Copy className="h-3 w-3" />
-                        </Button>
+                        <CopyButton text={adapter.address} />
                         {chain?.blockExplorers.default.url && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-muted-foreground hover:text-white p-0 h-auto"
-                            onClick={() =>
-                              window.open(
-                                `${chain?.blockExplorers.default.url}/address/${adapter.address}`,
-                                "_blank"
-                              )
-                            }
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                          </Button>
+                          <ExternalButton
+                            url={`${chain.blockExplorers.default.url}/address/${adapter.address}`}
+                          />
                         )}
                       </div>
                     </TableCell>

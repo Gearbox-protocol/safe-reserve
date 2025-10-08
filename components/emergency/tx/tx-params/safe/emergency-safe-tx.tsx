@@ -1,9 +1,14 @@
 "use client";
 
 import { InstanceProposalSignatures } from "@/components/txs/instance/instance-proposal-signatures";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { emergencyActionsMap } from "@/core/emergency-actions";
 import { useBuildEmergencySafeTx } from "@/hooks";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@gearbox-protocol/permissionless-ui";
 import { useEffect, useState } from "react";
 import { RenderedParams } from "../rendered-tx-params";
 import { EmergencyTxProps } from "../types";

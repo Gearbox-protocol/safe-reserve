@@ -1,16 +1,22 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/ui/card";
-import { PageLayout } from "@/components/ui/page";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TokenIcon } from "@/components/ui/token-icon";
 import { chains } from "@/config/wagmi";
 import { useGetMarketConfiguratorInfo, useSDK } from "@/hooks";
 import { shortenHash } from "@gearbox-protocol/permissionless";
-import { CirclePause, Copy, ExternalLink } from "lucide-react";
+import {
+  Card,
+  CardTitle,
+  CopyButton,
+  ExternalButton,
+  PageLayout,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  TokenIcon,
+} from "@gearbox-protocol/permissionless-ui";
+import { CirclePause } from "lucide-react";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 import { Address, formatUnits } from "viem";
 import { AssetsTab } from "./tabs/tab-assets";
 import { CreditManagerDetails } from "./tabs/tab-credit-manager-details";
@@ -90,32 +96,12 @@ export function MarketView({
             {shortenHash(marketSuite.pool.pool.address)}
           </div>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-white p-0 h-auto"
-            onClick={() => {
-              navigator.clipboard.writeText(marketSuite.pool.pool.address);
-              toast.success("Address copied to clipboard");
-            }}
-          >
-            <Copy className="h-3.5 w-3.5" />
-          </Button>
-
+          <CopyButton text={marketSuite.pool.pool.address} size="3.5" />
           {chain?.blockExplorers.default.url && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground hover:text-white p-0 h-auto"
-              onClick={() =>
-                window.open(
-                  `${chain?.blockExplorers.default.url}/address/${marketSuite.pool.pool.address}`,
-                  "_blank"
-                )
-              }
-            >
-              <ExternalLink className="h-3 w-3" />
-            </Button>
+            <ExternalButton
+              url={`${chain.blockExplorers.default.url}/address/${marketSuite.pool.pool.address}`}
+              size="3.5"
+            />
           )}
         </div>
       }

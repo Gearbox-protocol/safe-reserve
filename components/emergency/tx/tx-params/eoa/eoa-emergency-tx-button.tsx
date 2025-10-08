@@ -1,12 +1,12 @@
-import { Button } from "@/components/ui/button";
+import { EmergencyTx } from "@/core/emergency-actions";
+import { AdminInfo, useSendEoaEmergencyTx } from "@/hooks";
 import {
+  Button,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { EmergencyTx } from "@/core/emergency-actions";
-import { AdminInfo, useSendEoaEmergencyTx } from "@/hooks";
+} from "@gearbox-protocol/permissionless-ui";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { DownloadTxButton } from "../download-tx-button";

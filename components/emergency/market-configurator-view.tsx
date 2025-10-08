@@ -7,13 +7,15 @@ import {
   useSDK,
 } from "@/hooks";
 import { shortenHash } from "@gearbox-protocol/permissionless";
-import { Copy, ExternalLink } from "lucide-react";
+import {
+  Button,
+  CopyButton,
+  ExternalButton,
+  PageLayout,
+} from "@gearbox-protocol/permissionless-ui";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
 import { Address, isAddress, zeroAddress } from "viem";
-import { Button } from "../ui/button";
-import { PageLayout } from "../ui/page";
 import { MarketCard } from "./market-card";
 import { MarketView } from "./market/market-view";
 
@@ -123,32 +125,12 @@ export function MarketConfiguratorView({
               {chain?.name ?? chainId} · {shortenHash(address)}
             </div>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground hover:text-white p-0 h-auto"
-              onClick={() => {
-                navigator.clipboard.writeText(address);
-                toast.success("Address copied to clipboard");
-              }}
-            >
-              <Copy className="h-3.5 w-3.5" />
-            </Button>
-
+            <CopyButton text={address} size="3.5" />
             {chain?.blockExplorers.default.url && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground hover:text-white p-0 h-auto"
-                onClick={() =>
-                  window.open(
-                    `${chain?.blockExplorers.default.url}/address/${address}`,
-                    "_blank"
-                  )
-                }
-              >
-                <ExternalLink className="h-3 w-3" />
-              </Button>
+              <ExternalButton
+                url={`${chain.blockExplorers.default.url}/address/${address}`}
+                size="3.5"
+              />
             )}
           </div>
         }

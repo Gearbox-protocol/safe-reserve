@@ -1,7 +1,6 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+
+import { Button, Card, Input } from "@gearbox-protocol/permissionless-ui";
 import { Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -32,14 +31,15 @@ export default function AddCid({
           </div>
         </div>
         <div className="flex items-center gap-2 w-full">
-          <Input
-            divClassName="w-full flex-1 min-w-0"
-            placeholder="Enter your ipfs cid..."
-            value={cid}
-            onChange={(e) => {
-              setCid(e.target.value);
-            }}
-          />
+          <div className="w-full">
+            <Input
+              placeholder="Enter your ipfs cid..."
+              value={cid}
+              onChange={(e) => {
+                setCid(e.target.value);
+              }}
+            />
+          </div>
           <Link
             key={`add-cid-${index}`}
             href={`/txs?cids=${updatedCids.join(",")}`}

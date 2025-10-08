@@ -7,7 +7,8 @@ import { ConnectKitProvider } from "connectkit";
 import dynamic from "next/dynamic";
 import { Toaster } from "sonner";
 import { WagmiProvider } from "wagmi";
-import "./globals.css";
+
+import "@gearbox-protocol/permissionless-ui/globals.css";
 
 const queryClient = new QueryClient();
 

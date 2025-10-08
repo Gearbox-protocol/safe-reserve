@@ -1,12 +1,14 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
-import { PageLayout } from "@/components/ui/page";
 import { useCurrentTransactions, useIpfsData, useSafeParams } from "@/hooks";
 import { shortenHash } from "@/utils/format";
-import { Copy, ExternalLink } from "lucide-react";
+import {
+  Card,
+  CopyButton,
+  ExternalButton,
+  PageLayout,
+} from "@gearbox-protocol/permissionless-ui";
 import { useEffect } from "react";
-import { toast } from "sonner";
 import { useAccount, useSwitchChain } from "wagmi";
 import { GovernorTransactionCard } from "./governor/governor-tx-card";
 import { InstanceTxList } from "./instance/instance-tx-list";
@@ -98,27 +100,12 @@ export function ViewTxList({
                     </span>
                     <code className="flex items-center gap-2 text-gray-100">
                       {shortenHash(marketConfigurator)}
-                      <button
-                        className="text-gray-400 hover:text-white"
-                        onClick={() => {
-                          navigator.clipboard.writeText(marketConfigurator);
-                          toast.success("Address copied to clipboard");
-                        }}
-                      >
-                        <Copy className="h-3.5 w-3.5" />
-                      </button>
+                      <CopyButton text={marketConfigurator} size="3.5" />
                       {chain?.blockExplorers?.default?.url && (
-                        <button
-                          className="text-gray-400 hover:text-white"
-                          onClick={() =>
-                            window.open(
-                              `${chain?.blockExplorers?.default.url}/address/${marketConfigurator}`,
-                              "_blank"
-                            )
-                          }
-                        >
-                          <ExternalLink className="h-3.5 w-3.5" />
-                        </button>
+                        <ExternalButton
+                          url={`${chain.blockExplorers.default.url}/address/${marketConfigurator}`}
+                          size="3.5"
+                        />
                       )}
                     </code>
                   </div>
@@ -130,27 +117,12 @@ export function ViewTxList({
                     </span>
                     <code className="flex items-center gap-2 text-gray-100">
                       {shortenHash(instanceManager)}
-                      <button
-                        className="text-gray-400 hover:text-white"
-                        onClick={() => {
-                          navigator.clipboard.writeText(instanceManager);
-                          toast.success("Address copied to clipboard");
-                        }}
-                      >
-                        <Copy className="h-3.5 w-3.5" />
-                      </button>
+                      <CopyButton text={instanceManager} size="3.5" />
                       {chain?.blockExplorers?.default?.url && (
-                        <button
-                          className="text-gray-400 hover:text-white"
-                          onClick={() =>
-                            window.open(
-                              `${chain?.blockExplorers?.default.url}/address/${instanceManager}`,
-                              "_blank"
-                            )
-                          }
-                        >
-                          <ExternalLink className="h-3.5 w-3.5" />
-                        </button>
+                        <ExternalButton
+                          url={`${chain.blockExplorers.default.url}/address/${instanceManager}`}
+                          size="3.5"
+                        />
                       )}
                     </code>
                   </div>
@@ -159,27 +131,12 @@ export function ViewTxList({
                   <span className="min-w-[180px] text-gray-300">Safe:</span>
                   <code className="flex items-center gap-2 text-gray-100">
                     {shortenHash(safe!)}
-                    <button
-                      className="text-gray-400 hover:text-white"
-                      onClick={() => {
-                        navigator.clipboard.writeText(safe!);
-                        toast.success("Address copied to clipboard");
-                      }}
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                    </button>
+                    <CopyButton text={safe!} size="3.5" />
                     {chain?.blockExplorers?.default?.url && (
-                      <button
-                        className="text-gray-400 hover:text-white"
-                        onClick={() =>
-                          window.open(
-                            `${chain?.blockExplorers?.default.url}/address/${safe}`,
-                            "_blank"
-                          )
-                        }
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </button>
+                      <ExternalButton
+                        url={`${chain.blockExplorers.default.url}/address/${safe}`}
+                        size="3.5"
+                      />
                     )}
                   </code>
                 </div>
@@ -187,27 +144,12 @@ export function ViewTxList({
                   <span className="min-w-[180px] text-gray-300">Author:</span>
                   <code className="flex items-center gap-2 text-gray-100">
                     {shortenHash(author!)}
-                    <button
-                      className="text-gray-400 hover:text-white"
-                      onClick={() => {
-                        navigator.clipboard.writeText(author!);
-                        toast.success("Address copied to clipboard");
-                      }}
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                    </button>
+                    <CopyButton text={author!} size="3.5" />
                     {chain?.blockExplorers?.default?.url && (
-                      <button
-                        className="text-gray-400 hover:text-white"
-                        onClick={() =>
-                          window.open(
-                            `${chain?.blockExplorers?.default.url}/address/${author}`,
-                            "_blank"
-                          )
-                        }
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </button>
+                      <ExternalButton
+                        url={`${chain.blockExplorers.default.url}/address/${author}`}
+                        size="3.5"
+                      />
                     )}
                   </code>
                 </div>

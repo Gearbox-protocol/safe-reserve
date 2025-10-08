@@ -1,13 +1,18 @@
-import { Card } from "@/components/ui/card";
+"use client";
+
 import { chains } from "@/config/wagmi";
 import { ParsedSignedTx } from "@/core/safe-tx";
 import { useGetGovernorUpdatableFeeds } from "@/hooks";
 import { MULTISEND_ADDRESS } from "@/utils/constant";
 import { shortenHash } from "@/utils/format";
 import { TimelockTxStatus } from "@/utils/tx-status";
-import { ChevronDown, ChevronUp, Copy, ExternalLink } from "lucide-react";
+import {
+  Card,
+  CopyButton,
+  ExternalButton,
+} from "@gearbox-protocol/permissionless-ui";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 import { Address, zeroAddress } from "viem";
 import { SimulateTxButton } from "../simulate-tx-button";
 import { TransactionCardProps } from "../types";
@@ -118,15 +123,7 @@ export function GovernorTransactionCard({
                   <code className="flex items-center gap-2 text-gray-100">
                     {shortenHash(tx.hash)}
 
-                    <button
-                      className="text-gray-400 hover:text-white"
-                      onClick={() => {
-                        navigator.clipboard.writeText(tx.hash);
-                        toast.success("Address copied to clipboard");
-                      }}
-                    >
-                      <Copy className="h-3 w-3" />
-                    </button>
+                    <CopyButton text={tx.hash} name="Hash" />
                   </code>
                 </div>
               </div>
@@ -166,27 +163,11 @@ export function GovernorTransactionCard({
                             <code className="flex items-center gap-2">
                               <div>{feed}</div>
 
-                              <button
-                                className="text-gray-400 hover:text-white"
-                                onClick={() => {
-                                  navigator.clipboard.writeText(feed);
-                                  toast.success("Address copied to clipboard");
-                                }}
-                              >
-                                <Copy className="h-3 w-3" />
-                              </button>
+                              <CopyButton text={feed} />
                               {chain?.blockExplorers.default.url && (
-                                <button
-                                  className="text-gray-400 hover:text-white"
-                                  onClick={() =>
-                                    window.open(
-                                      `${chain?.blockExplorers.default.url}/address/${feed}`,
-                                      "_blank"
-                                    )
-                                  }
-                                >
-                                  <ExternalLink className="h-3 w-3" />
-                                </button>
+                                <ExternalButton
+                                  url={`${chain.blockExplorers.default.url}/address/${feed}`}
+                                />
                               )}
                             </code>
                           </div>

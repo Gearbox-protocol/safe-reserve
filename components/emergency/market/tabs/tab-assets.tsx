@@ -1,25 +1,29 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@gearbox-protocol/permissionless-ui";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@gearbox-protocol/permissionless-ui";
 import { chains } from "@/config/wagmi";
 import { shortenHash } from "@gearbox-protocol/permissionless";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Address, formatUnits, zeroAddress } from "viem";
-
 import {
   TableCellAsset,
   TableCellUpdatable,
   TableEditable,
-} from "@/components/ui/editable-table";
+} from "@gearbox-protocol/permissionless-ui";
 import {
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@gearbox-protocol/permissionless-ui";
 import { useGetPriceFeeds } from "@/hooks";
 import { PricefeedSelector } from "./selector-pricefeed";
 import { MarketAsset, MarketProps } from "./types";

@@ -1,10 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  output: "export",
   trailingSlash: true,
-  distDir: 'out',
-  basePath: '',
-  assetPrefix: '',
+  distDir: "out",
+  basePath: "",
+  assetPrefix: "",
   experimental: {
     serverComponentsExternalPackages: ["sequelize", "pino", "pino-pretty"],
   },

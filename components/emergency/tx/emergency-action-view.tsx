@@ -1,7 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { PageLayout } from "@/components/ui/page";
 import { chains } from "@/config/wagmi";
 import { EmergencyActions } from "@/core/emergency-actions";
 import {
@@ -11,9 +9,12 @@ import {
   useSDK,
 } from "@/hooks";
 import { shortenHash } from "@gearbox-protocol/permissionless";
-import { Copy, ExternalLink } from "lucide-react";
+import {
+  CopyButton,
+  ExternalButton,
+  PageLayout,
+} from "@gearbox-protocol/permissionless-ui";
 import { useMemo } from "react";
-import { toast } from "sonner";
 import { Address } from "viem";
 import { EmergencyEoaTx } from "./tx-params/eoa/emergency-eoa-tx";
 import { EmergencySafeTx } from "./tx-params/safe/emergency-safe-tx";
@@ -122,33 +123,12 @@ export function EmergencyActionView({
           <div className="text-sm text-muted-foreground break-all">
             {chain?.name ?? chainId} · {shortenHash(marketConfigurator)}
           </div>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-white p-0 h-auto"
-            onClick={() => {
-              navigator.clipboard.writeText(marketConfigurator);
-              toast.success("Address copied to clipboard");
-            }}
-          >
-            <Copy className="h-3.5 w-3.5" />
-          </Button>
-
+          <CopyButton text={marketConfigurator} size="3.5" />
           {chain?.blockExplorers.default.url && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground hover:text-white p-0 h-auto"
-              onClick={() =>
-                window.open(
-                  `${chain?.blockExplorers.default.url}/address/${marketConfigurator}`,
-                  "_blank"
-                )
-              }
-            >
-              <ExternalLink className="h-3 w-3" />
-            </Button>
+            <ExternalButton
+              url={`${chain.blockExplorers.default.url}/address/${marketConfigurator}`}
+              size="3.5"
+            />
           )}
         </div>
       }

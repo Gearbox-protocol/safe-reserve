@@ -1,4 +1,5 @@
-import { Button } from "@/components/ui/button";
+"use client";
+
 import { chains } from "@/config/wagmi";
 import { SignedTx } from "@/core/safe-tx";
 import {
@@ -7,6 +8,7 @@ import {
   useSendInstanceTx,
   useSignTx,
 } from "@/hooks";
+import { Button } from "@gearbox-protocol/permissionless-ui";
 import { useSafeAppsSDK } from "@safe-global/safe-apps-react-sdk";
 import { ExternalLink } from "lucide-react";
 import { useMemo, useState } from "react";

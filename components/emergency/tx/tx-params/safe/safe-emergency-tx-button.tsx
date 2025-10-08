@@ -1,5 +1,4 @@
 import { TransactionInfoDialog } from "@/components/txs/transaction-info-dialog";
-import { Button } from "@/components/ui/button";
 import { EmergencyTx } from "@/core/emergency-actions";
 import { SignedTx } from "@/core/safe-tx";
 import {
@@ -8,6 +7,7 @@ import {
   useSendSafeEmergencyTx,
   useSignEmergencyTx,
 } from "@/hooks";
+import { Button } from "@gearbox-protocol/permissionless-ui";
 import { useSafeAppsSDK } from "@safe-global/safe-apps-react-sdk";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";

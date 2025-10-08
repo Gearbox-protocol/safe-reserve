@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { AccessMode } from "@/core/emergency-actions";
 import { getLossPolicyState } from "@/utils/state";
+import { Button } from "@gearbox-protocol/permissionless-ui";
 import { MarketSuite } from "@gearbox-protocol/sdk";
 import Link from "next/link";
 import { useMemo } from "react";

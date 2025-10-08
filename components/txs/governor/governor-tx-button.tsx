@@ -1,4 +1,5 @@
-import { Button } from "@/components/ui/button";
+"use client";
+
 import { ParsedSignedTx } from "@/core/safe-tx";
 import {
   useIsSafeApp,
@@ -8,6 +9,7 @@ import {
 } from "@/hooks";
 import { formatTimeRemaining } from "@/utils/format";
 import { TimelockTxStatus } from "@/utils/tx-status";
+import { Button } from "@gearbox-protocol/permissionless-ui";
 import { useSafeAppsSDK } from "@safe-global/safe-apps-react-sdk";
 import { useMemo, useState } from "react";
 import { Address, zeroAddress } from "viem";

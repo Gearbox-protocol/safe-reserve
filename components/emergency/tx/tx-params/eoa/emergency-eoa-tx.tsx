@@ -1,7 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { emergencyActionsMap } from "@/core/emergency-actions";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@gearbox-protocol/permissionless-ui";
 import { RenderedParams } from "../rendered-tx-params";
 import { EmergencyTxProps } from "../types";
 import { EoaEmergencyTxButton } from "./eoa-emergency-tx-button";

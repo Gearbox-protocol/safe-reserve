@@ -1,11 +1,16 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGetMarketConfigurators } from "@/hooks";
 import { shortenHash } from "@/utils/format";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  PageLayout,
+} from "@gearbox-protocol/permissionless-ui";
 import Link from "next/link";
 import { Address } from "viem";
-import { PageLayout } from "../ui/page";
 
 export function MarketConfiguratorList({
   onSelect,

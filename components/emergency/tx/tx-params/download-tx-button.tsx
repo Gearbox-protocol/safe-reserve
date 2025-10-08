@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { EmergencyTx } from "@/core/emergency-actions";
 import { useTransactionDownload } from "@/hooks";
+import { Button } from "@gearbox-protocol/permissionless-ui";
 import { Download } from "lucide-react";
 import { useState } from "react";
 import { Address } from "viem";

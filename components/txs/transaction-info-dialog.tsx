@@ -1,11 +1,13 @@
-import { Button } from "@/components/ui/button";
+"use client";
+
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@gearbox-protocol/permissionless-ui";
 import { Info, Play, Wallet } from "lucide-react";
 
 export function TransactionInfoDialog({

@@ -1,24 +1,25 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/ui/card";
+import { chains } from "@/config/wagmi";
+import { shortenHash } from "@gearbox-protocol/permissionless";
 import {
+  Button,
+  Card,
+  CardTitle,
+  CopyButton,
+  ExternalButton,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { chains } from "@/config/wagmi";
-import { shortenHash } from "@gearbox-protocol/permissionless";
+  TokenIcon,
+} from "@gearbox-protocol/permissionless-ui";
 import { MarketSuite } from "@gearbox-protocol/sdk";
-import { Copy, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
-import { toast } from "sonner";
 import { Address, zeroAddress } from "viem";
-import { TokenIcon } from "../ui/token-icon";
 import { LiquidationSettings } from "./liquidations-settings";
 
 export function MarketCard({
@@ -137,32 +138,13 @@ export function MarketCard({
                   <div className="text-muted-foreground text-sm">
                     ({shortenHash(market.pool.pool.address)})
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground hover:text-white p-0 h-auto"
-                    onClick={() => {
-                      navigator.clipboard.writeText(market.pool.pool.address);
-                      toast.success("Address copied to clipboard");
-                    }}
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                  </Button>
 
+                  <CopyButton text={market.pool.pool.address} size="3.5" />
                   {chain?.blockExplorers.default.url && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-muted-foreground hover:text-white p-0 h-auto"
-                      onClick={() =>
-                        window.open(
-                          `${chain?.blockExplorers.default.url}/address/${market.pool.pool.address}`,
-                          "_blank"
-                        )
-                      }
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                    </Button>
+                    <ExternalButton
+                      url={`${chain.blockExplorers.default.url}/address/${market.pool.pool.address}`}
+                      size="3.5"
+                    />
                   )}
                 </div>
               </TableCell>
@@ -214,32 +196,13 @@ export function MarketCard({
                     <div className="text-muted-foreground text-sm">
                       ({shortenHash(cm.creditManager.address)})
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-muted-foreground hover:text-white p-0 h-auto"
-                      onClick={() => {
-                        navigator.clipboard.writeText(cm.creditManager.address);
-                        toast.success("Address copied to clipboard");
-                      }}
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                    </Button>
 
+                    <CopyButton text={cm.creditManager.address} size="3.5" />
                     {chain?.blockExplorers.default.url && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-muted-foreground hover:text-white p-0 h-auto"
-                        onClick={() =>
-                          window.open(
-                            `${chain?.blockExplorers.default.url}/address/${cm.creditManager.address}`,
-                            "_blank"
-                          )
-                        }
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                      </Button>
+                      <ExternalButton
+                        url={`${chain.blockExplorers.default.url}/address/${cm.creditManager.address}`}
+                        size="3.5"
+                      />
                     )}
                   </div>
                 </TableCell>
