@@ -29,7 +29,8 @@ export interface CurrentInstanceTransactions extends CurrentTransactions {
 }
 
 export function useCurrentTransactions(
-  cid: string
+  cid: string,
+  useNonce?: number
 ): CurrentGovernorTransactions | CurrentInstanceTransactions {
   const {
     chainId,
@@ -72,6 +73,7 @@ export function useCurrentTransactions(
     instanceManager,
     batches,
     createdAtBlock,
+    useNonce,
   });
 
   if (type === "instance")

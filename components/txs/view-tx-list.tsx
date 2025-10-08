@@ -9,12 +9,18 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { useAccount, useSwitchChain } from "wagmi";
 import { GovernorTransactionCard } from "./governor/governor-tx-card";
-import { InstanceTransactionCard } from "./instance/instance-tx-card";
+import { InstanceTxList } from "./instance/instance-tx-list";
 
 export type TabType = "queue" | "execute" | "history";
 
-export function ViewTxList({ cid }: { cid: string }) {
-  const currentTransactions = useCurrentTransactions(cid);
+export function ViewTxList({
+  cids,
+  onSelect,
+}: {
+  cids: string[];
+  onSelect: (cids: string[]) => void;
+}) {
+  const currentTransactions = useCurrentTransactions(cids[0]);
 
   const {
     type,
@@ -31,7 +37,7 @@ export function ViewTxList({ cid }: { cid: string }) {
     author,
     isLoading: isLoadingInfo,
     error: errorInfo,
-  } = useIpfsData(cid);
+  } = useIpfsData(cids[0]);
 
   const { threshold } = useSafeParams(chainId, safe);
 
@@ -44,12 +50,8 @@ export function ViewTxList({ cid }: { cid: string }) {
     }
   }, [chain?.id, chainId, switchChain]);
 
-  if (errorTxs) {
-    return <div>Error: {errorTxs.message}</div>;
-  }
-
-  if (errorInfo) {
-    return <div>Error: {errorInfo.message}</div>;
+  if (errorTxs || errorInfo) {
+    return <div>Error: {errorTxs?.message || errorInfo?.message}</div>;
   }
 
   return (
@@ -142,7 +144,7 @@ export function ViewTxList({ cid }: { cid: string }) {
                           className="text-gray-400 hover:text-white"
                           onClick={() =>
                             window.open(
-                              `${chain?.blockExplorers?.default.url}/address/${marketConfigurator}`,
+                              `${chain?.blockExplorers?.default.url}/address/${instanceManager}`,
                               "_blank"
                             )
                           }
@@ -171,7 +173,7 @@ export function ViewTxList({ cid }: { cid: string }) {
                         className="text-gray-400 hover:text-white"
                         onClick={() =>
                           window.open(
-                            `${chain?.blockExplorers?.default.url}/address/${marketConfigurator}`,
+                            `${chain?.blockExplorers?.default.url}/address/${safe}`,
                             "_blank"
                           )
                         }
@@ -199,7 +201,7 @@ export function ViewTxList({ cid }: { cid: string }) {
                         className="text-gray-400 hover:text-white"
                         onClick={() =>
                           window.open(
-                            `${chain?.blockExplorers?.default.url}/address/${marketConfigurator}`,
+                            `${chain?.blockExplorers?.default.url}/address/${author}`,
                             "_blank"
                           )
                         }
@@ -215,11 +217,17 @@ export function ViewTxList({ cid }: { cid: string }) {
               (chainId === chain?.id || !address) &&
               (type === "timelock" ? (
                 <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
+                  {cids.length > 1 && (
+                    <div className="text-sm text-gray-500">
+                      Note: Multiple CIDs with governor transactions are not
+                      supported; showing only the first CID
+                    </div>
+                  )}
                   {txs.map((tx, index) => (
                     <GovernorTransactionCard
                       key={tx.hash}
                       chainId={chainId}
-                      cid={cid}
+                      cid={cids[0]}
                       tx={tx}
                       safeAddress={safe!}
                       governor={currentTransactions.governor!}
@@ -229,21 +237,12 @@ export function ViewTxList({ cid }: { cid: string }) {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
-                  {txs.map((tx, index) => (
-                    <InstanceTransactionCard
-                      key={tx.hash}
-                      chainId={chainId}
-                      cid={cid}
-                      tx={tx}
-                      safeAddress={safe!}
-                      isExecuted={currentTransactions.isExecuted!}
-                      instanceManager={currentTransactions.instanceManager!}
-                      threshold={threshold || 0}
-                      index={index}
-                    />
-                  ))}
-                </div>
+                <InstanceTxList
+                  cids={cids}
+                  onSelect={onSelect}
+                  chainId={chainId}
+                  instanceManager={currentTransactions.instanceManager!}
+                />
               ))}
           </div>
         )}

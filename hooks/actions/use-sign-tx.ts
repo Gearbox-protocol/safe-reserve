@@ -10,18 +10,25 @@ import {
   useWalletClient,
 } from "wagmi";
 
-export function useSignTx(
-  chainId: number,
-  cid: string,
-  safeAddress: Address,
-  onSuccess: (txHash: Hex) => void
-) {
+export function useSignTx({
+  chainId,
+  cid,
+  safeAddress,
+  nonce,
+  onSuccess,
+}: {
+  chainId: number;
+  cid: string;
+  safeAddress: Address;
+  nonce?: number;
+  onSuccess: (txHash: Hex) => void;
+}) {
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient({ chainId });
   const { switchChainAsync } = useSwitchChain();
 
-  const { refetchSigs } = useCurrentTransactions(cid);
+  const { refetchSigs } = useCurrentTransactions(cid, nonce);
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (args: { txHash: Hex }) => {
