@@ -15,6 +15,56 @@ const CLOUDFLARE_ZONE_ID = process.env.CLOUDFLARE_ZONE_ID;
 const GATEWAY_HOSTNAME = "permissionless-safe.gearbox.foundation";
 const IPFS_DEPLOYMENT_FILE = path.join(process.cwd(), "ipfs-deployment.json");
 
+// Networking
+const DEFAULT_TIMEOUT_MS = 15000; // 15s per attempt
+const MAX_RETRIES = 4; // total attempts = MAX_RETRIES + 1
+const INITIAL_BACKOFF_MS = 1000; // 1s
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(
+  input: RequestInfo | URL,
+  init: RequestInit & { timeoutMs?: number } = {}
+): Promise<Response> {
+  const timeoutMs = init.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  let lastError: unknown = null;
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(input, { ...init, signal: controller.signal });
+      clearTimeout(timeout);
+      // Retry on common transient statuses
+      if ([408, 429, 500, 502, 503, 504].includes(res.status)) {
+        lastError = new Error(
+          `Transient HTTP ${res.status}: ${res.statusText}`
+        );
+      } else {
+        return res;
+      }
+    } catch (err) {
+      clearTimeout(timeout);
+      lastError = err;
+    }
+
+    if (attempt < MAX_RETRIES) {
+      const backoff = INITIAL_BACKOFF_MS * Math.pow(2, attempt); // 1s,2s,4s,8s
+      console.warn(
+        `⚠️  Request failed (attempt ${attempt + 1}/$${MAX_RETRIES + 1}). Retrying in ${backoff}ms...`
+      );
+      await sleep(backoff);
+      continue;
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error(String(lastError ?? "Unknown network error"));
+}
+
 interface IPFSDeployment {
   ipfsHash: string;
   uploadDate: string;
@@ -110,13 +160,14 @@ async function createWeb3Gateway(
   console.log(`📝 DNSLink: ${dnslink}`);
 
   try {
-    const response = await fetch(apiUrl, {
+    const response = await fetchWithRetry(apiUrl, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${CLOUDFLARE_WEB3_TOKEN!}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(requestBody),
+      timeoutMs: DEFAULT_TIMEOUT_MS,
     });
 
     let data: CloudflareApiResponse | null = null;
@@ -183,12 +234,13 @@ async function findExistingGateway(): Promise<CloudflareWeb3Gateway | null> {
   const apiUrl = `https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/web3/hostnames`;
 
   try {
-    const response = await fetch(apiUrl, {
+    const response = await fetchWithRetry(apiUrl, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${CLOUDFLARE_WEB3_TOKEN!}`,
         "Content-Type": "application/json",
       },
+      timeoutMs: DEFAULT_TIMEOUT_MS,
     });
 
     let data: CloudflareListResponse | null = null;
@@ -245,13 +297,14 @@ async function updateWeb3Gateway(
   console.log(`📝 New DNSLink: ${dnslink}`);
 
   try {
-    const response = await fetch(apiUrl, {
+    const response = await fetchWithRetry(apiUrl, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${CLOUDFLARE_WEB3_TOKEN!}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(requestBody),
+      timeoutMs: DEFAULT_TIMEOUT_MS,
     });
 
     let data: CloudflareApiResponse | null = null;

@@ -29,7 +29,7 @@ export async function getTxStatus(args: {
     .getBlock()
     .then((block) => Number(block.timestamp));
 
-  if (eta > lastBlockTimestamp + 14 * HOUR_24) {
+  if (lastBlockTimestamp > eta + 14 * HOUR_24) {
     return {
       blockNumber: -1,
       status: TimelockTxStatus.Stale,
