@@ -2,6 +2,7 @@
 
 import { instanceTxsSchema, timelockTxsSchema } from "@/utils/validation";
 import { SafeTx } from "@gearbox-protocol/permissionless";
+import { json_parse } from "@gearbox-protocol/sdk";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 
@@ -70,7 +71,7 @@ async function fetchFromIPFS(cid: string): Promise<unknown> {
         // Handle non-JSON responses (some gateways return plain text)
         const text = await response.text();
         try {
-          return JSON.parse(text);
+          return json_parse(text);
         } catch {
           throw new Error(`Invalid JSON response from ${gateway}`);
         }

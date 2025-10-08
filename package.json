@@ -9,17 +9,17 @@
     "start": "serve out --cors",
     "lint": "next lint",
     "typecheck:ci": "tsc --noEmit",
-    "clear-db": "ts-node scripts/clear-db.ts",
     "publish-ipfs": "tsx script/publish-to-ipfs.ts",
     "set-dns-record": "tsx script/set-dns-record.ts",
     "create-gateway": "tsx script/set-dns-record.ts --create",
     "update-gateway": "tsx script/set-dns-record.ts --update",
-    "deploy-full": "pnpm build && pnpm test && pnpm publish-ipfs && pnpm set-dns-record",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "deploy-full": "pnpm build && pnpm publish-ipfs && pnpm set-dns-record",
+    "deploy-with-test": "pnpm build && pnpm test && pnpm publish-ipfs && pnpm set-dns-record"
   },
   "dependencies": {
-    "@gearbox-protocol/permissionless": "^0.1.15",
+    "@gearbox-protocol/permissionless": "^0.1.18",
     "@gearbox-protocol/sdk": "^9.9.3",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-checkbox": "^1.1.3",
