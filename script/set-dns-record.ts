@@ -12,7 +12,7 @@ dotenv.config({
 // Configuration
 const CLOUDFLARE_WEB3_TOKEN = process.env.CLOUDFLARE_WEB3_TOKEN;
 const CLOUDFLARE_ZONE_ID = process.env.CLOUDFLARE_ZONE_ID;
-const GATEWAY_HOSTNAME = "permissionless-safe.gearbox.foundation";
+const GATEWAY_HOSTNAME = "safe.gearbox.finance";
 const IPFS_DEPLOYMENT_FILE = path.join(process.cwd(), "ipfs-deployment.json");
 
 // Networking
