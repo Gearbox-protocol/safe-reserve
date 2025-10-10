@@ -19,7 +19,7 @@
     "deploy-with-test": "pnpm build && pnpm test && pnpm publish-ipfs && pnpm set-dns-record"
   },
   "dependencies": {
-    "@gearbox-protocol/permissionless": "^0.1.18",
+    "@gearbox-protocol/permissionless": "^0.1.19",
     "@gearbox-protocol/permissionless-ui": "^1.0.7",
     "@gearbox-protocol/sdk": "^9.9.3",
     "@radix-ui/react-alert-dialog": "^1.1.4",
