@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "staging"]
     tags:
       - "v*"
   workflow_dispatch: {}
@@ -44,8 +44,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Full Deploy
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging'
         env:
           PINATA_JWT: ${{ secrets.PINATA_JWT }}
+          GATEWAY_HOSTNAME: ${{ github.ref == 'refs/heads/main' ? 'permissionless-safe.gearbox.foundation' : 'safe.gear-dev.dev' }}
           CLOUDFLARE_WEB3_TOKEN: ${{ secrets.CLOUDFLARE_WEB3_TOKEN }}
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_FINANCE_ZONE_ID }}
           NEXT_PUBLIC_ADDRESS_PROVIDER: ${{ secrets.NEXT_PUBLIC_ADDRESS_PROVIDER }}
@@ -55,12 +57,14 @@ jobs:
         run: pnpm deploy-full
 
       - name: Extract IPFS metadata
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging'
         id: ipfs
         run: |
           IPFS_HASH=$(jq -r .ipfsHash ipfs-deployment.json)
           echo "ipfs_hash=$IPFS_HASH" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub Release and upload assets
+        if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.ipfs.outputs.ipfs_hash }}
