@@ -44,7 +44,7 @@ export function TransactionInfoDialog({
 
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 mt-0.5">
+                  <div className="flex items-center justify-center min-w-8 w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 mt-0.5">
                     <Wallet className="h-4 w-4 text-blue-400" />
                   </div>
                   <div>
@@ -78,7 +78,7 @@ export function TransactionInfoDialog({
               <div className="space-y-3">
                 {!canSend && (
                   <div className="flex items-start gap-3">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 mt-0.5">
+                    <div className="flex items-center justify-center min-w-8 w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 mt-0.5">
                       <Wallet className="h-4 w-4 text-blue-400" />
                     </div>
                     <div>
@@ -93,7 +93,7 @@ export function TransactionInfoDialog({
                 )}
 
                 <div className="flex items-start gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-500/20 border border-green-500/30 mt-0.5">
+                  <div className="flex items-center justify-center min-w-8 w-8 h-8 rounded-full bg-green-500/20 border border-green-500/30 mt-0.5">
                     <Play className="h-4 w-4 text-green-400" />
                   </div>
                   <div>

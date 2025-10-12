@@ -115,7 +115,7 @@ export function GovernorTransactionCard({
       {/* Expanded View */}
       {isExpanded && (
         <div className="border-t border-gray-800 bg-gray-900/30 p-4 ">
-          <div className="grid grid-cols-[1fr_300px] gap-12">
+          <div className="grid grid-cols-[1fr_minmax(300px,max-content)] gap-12 overflow-x-auto">
             <div className="space-y-4">
               <div className="space-y-2">
                 <div className="flex w-full items-center justify-between gap-2">

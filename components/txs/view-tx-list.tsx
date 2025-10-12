@@ -63,7 +63,7 @@ export function ViewTxList({
       // TODO: add cancel button
       // actionButton={}
     >
-      <div className="space-y-6 overflow-y-auto">
+      <div className="space-y-6 overflow-y-auto overflow-x-hidden">
         {isLoadingTxs || isLoadingInfo ? (
           <SkeletonStacks />
         ) : txs.length === 0 ? (

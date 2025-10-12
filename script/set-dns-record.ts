@@ -53,7 +53,7 @@ async function fetchWithRetry(
     if (attempt < MAX_RETRIES) {
       const backoff = INITIAL_BACKOFF_MS * Math.pow(2, attempt); // 1s,2s,4s,8s
       console.warn(
-        `⚠️  Request failed (attempt ${attempt + 1}/$${MAX_RETRIES + 1}). Retrying in ${backoff}ms...`
+        `⚠️  Request failed (attempt ${attempt + 1}/${MAX_RETRIES + 1}). Retrying in ${backoff}ms...`
       );
       await sleep(backoff);
       continue;
