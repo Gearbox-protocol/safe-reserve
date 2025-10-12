@@ -47,7 +47,7 @@ jobs:
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging'
         env:
           PINATA_JWT: ${{ secrets.PINATA_JWT }}
-          GATEWAY_HOSTNAME: ${{ github.ref == 'refs/heads/main' ? 'permissionless-safe.gearbox.foundation' : 'safe.gear-dev.dev' }}
+          GATEWAY_HOSTNAME: "${{ github.ref == 'refs/heads/main' ? 'permissionless-safe.gearbox.foundation' : 'safe.gear-dev.dev' }}"
           CLOUDFLARE_WEB3_TOKEN: ${{ secrets.CLOUDFLARE_WEB3_TOKEN }}
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_FINANCE_ZONE_ID }}
           NEXT_PUBLIC_ADDRESS_PROVIDER: ${{ secrets.NEXT_PUBLIC_ADDRESS_PROVIDER }}
