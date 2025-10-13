@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
 
+import Cloudflare from "cloudflare";
 import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
@@ -11,59 +12,10 @@ dotenv.config({
 
 // Configuration
 const CLOUDFLARE_WEB3_TOKEN = process.env.CLOUDFLARE_WEB3_TOKEN;
-const CLOUDFLARE_ZONE_ID = process.env.CLOUDFLARE_ZONE_ID;
-const GATEWAY_HOSTNAME = "safe.gearbox.finance";
+const CLOUDFLARE_ZONE_ID =
+  process.env.CLOUDFLARE_EXTRACTED_ZONE_ID || process.env.CLOUDFLARE_ZONE_ID;
+const GATEWAY_HOSTNAME = process.env.GATEWAY_HOSTNAME || "safe.gear-dev.dev";
 const IPFS_DEPLOYMENT_FILE = path.join(process.cwd(), "ipfs-deployment.json");
-
-// Networking
-const DEFAULT_TIMEOUT_MS = 15000; // 15s per attempt
-const MAX_RETRIES = 4; // total attempts = MAX_RETRIES + 1
-const INITIAL_BACKOFF_MS = 1000; // 1s
-
-async function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function fetchWithRetry(
-  input: RequestInfo | URL,
-  init: RequestInit & { timeoutMs?: number } = {}
-): Promise<Response> {
-  const timeoutMs = init.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-  let lastError: unknown = null;
-
-  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const res = await fetch(input, { ...init, signal: controller.signal });
-      clearTimeout(timeout);
-      // Retry on common transient statuses
-      if ([408, 429, 500, 502, 503, 504].includes(res.status)) {
-        lastError = new Error(
-          `Transient HTTP ${res.status}: ${res.statusText}`
-        );
-      } else {
-        return res;
-      }
-    } catch (err) {
-      clearTimeout(timeout);
-      lastError = err;
-    }
-
-    if (attempt < MAX_RETRIES) {
-      const backoff = INITIAL_BACKOFF_MS * Math.pow(2, attempt); // 1s,2s,4s,8s
-      console.warn(
-        `⚠️  Request failed (attempt ${attempt + 1}/${MAX_RETRIES + 1}). Retrying in ${backoff}ms...`
-      );
-      await sleep(backoff);
-      continue;
-    }
-  }
-
-  throw lastError instanceof Error
-    ? lastError
-    : new Error(String(lastError ?? "Unknown network error"));
-}
 
 interface IPFSDeployment {
   ipfsHash: string;
@@ -72,36 +24,12 @@ interface IPFSDeployment {
   publicUrl: string;
 }
 
-interface CloudflareWeb3Gateway {
-  id: string;
-  name: string;
-  description: string;
-  status: string;
-  target: string;
-  dnslink: string;
-  created_on: string;
-  modified_on: string;
-}
-
-interface CloudflareApiResponse {
-  success: boolean;
-  errors: Array<{ code: number; message: string }>;
-  messages: string[];
-  result: CloudflareWeb3Gateway;
-}
-
-interface CloudflareListResponse {
-  success: boolean;
-  errors: Array<{ code: number; message: string }>;
-  messages: string[];
-  result: CloudflareWeb3Gateway[];
-}
-
 function validateEnvironmentVariables(): void {
   const missingVars: string[] = [];
 
   if (!CLOUDFLARE_WEB3_TOKEN) missingVars.push("CLOUDFLARE_WEB3_TOKEN");
-  if (!CLOUDFLARE_ZONE_ID) missingVars.push("CLOUDFLARE_ZONE_ID");
+  if (!CLOUDFLARE_ZONE_ID)
+    missingVars.push("CLOUDFLARE_EXTRACTED_ZONE_ID (or CLOUDFLARE_ZONE_ID)");
 
   if (missingVars.length > 0) {
     console.error("❌ Error: Missing required environment variables:");
@@ -110,9 +38,49 @@ function validateEnvironmentVariables(): void {
     });
     console.log("\nPlease set these variables in your .env.local file:");
     console.log("CLOUDFLARE_WEB3_TOKEN=your_api_token_here");
-    console.log("CLOUDFLARE_ZONE_ID=your_zone_id_here");
+    console.log("CLOUDFLARE_EXTRACTED_ZONE_ID=your_zone_id_here");
     process.exit(1);
   }
+}
+
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  let lastError: Error;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+
+      // Don't retry on non-timeout errors
+      if (!error || typeof error !== "object" || !("status" in error)) {
+        throw error;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const status = (error as any).status;
+      if (status !== 504 && status !== 502 && status !== 503) {
+        throw error;
+      }
+
+      if (attempt === maxRetries) {
+        console.error(`❌ Failed after ${maxRetries + 1} attempts`);
+        throw lastError;
+      }
+
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.warn(
+        `⚠️  Attempt ${attempt + 1} failed with ${status} error. Retrying in ${delay}ms...`
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError!;
 }
 
 function loadIPFSDeployment(): IPFSDeployment {
@@ -143,219 +111,10 @@ function loadIPFSDeployment(): IPFSDeployment {
   }
 }
 
-async function createWeb3Gateway(
-  ipfsHash: string
-): Promise<CloudflareWeb3Gateway> {
-  const dnslink = `/ipfs/${ipfsHash}`;
-  const apiUrl = `https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/web3/hostnames`;
-
-  const requestBody = {
-    name: GATEWAY_HOSTNAME,
-    description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - deployed on ${new Date().toISOString()}`,
-    target: "ipfs",
-    dnslink: dnslink,
-  };
-
-  console.log(`🌐 Creating Web3 gateway for ${GATEWAY_HOSTNAME}...`);
-  console.log(`📝 DNSLink: ${dnslink}`);
-
-  try {
-    const response = await fetchWithRetry(apiUrl, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${CLOUDFLARE_WEB3_TOKEN!}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody),
-      timeoutMs: DEFAULT_TIMEOUT_MS,
-    });
-
-    let data: CloudflareApiResponse | null = null;
-    const contentType = response.headers.get("content-type") || "";
-    try {
-      if (contentType.includes("application/json")) {
-        data = (await response.json()) as CloudflareApiResponse;
-      } else {
-        const rawBody = await response.text();
-        console.error(
-          "❌ Unexpected non-JSON response from Cloudflare (create):"
-        );
-        console.error(rawBody);
-        console.error(`  HTTP ${response.status}: ${response.statusText}`);
-        process.exit(1);
-      }
-    } catch (e) {
-      const rawBody = await response.text().catch(() => "<unavailable>");
-      console.error(
-        "❌ Failed to parse Cloudflare response as JSON (create):",
-        e
-      );
-      console.error("Raw body:");
-      console.error(rawBody);
-      process.exit(1);
-    }
-
-    if (!response.ok || !data!.success) {
-      // If hostname already exists (Cloudflare code 1001), fallback to update flow
-      const errorCodes = (data!.errors || []).map((e) => e.code);
-      if (errorCodes.includes(1001)) {
-        console.warn(
-          "ℹ️ Hostname already exists. Falling back to update flow..."
-        );
-        const existingGateway = await findExistingGateway();
-        if (!existingGateway) {
-          console.error(
-            "❌ Hostname reported as existing, but could not be found via list API."
-          );
-          process.exit(1);
-        }
-        return await updateWeb3Gateway(existingGateway.id, ipfsHash);
-      }
-
-      console.error("❌ Error creating Web3 gateway:");
-      if (data!.errors && data!.errors.length > 0) {
-        data!.errors.forEach((error) => {
-          console.error(`  Code ${error.code}: ${error.message}`);
-        });
-      } else {
-        console.error(`  HTTP ${response.status}: ${response.statusText}`);
-      }
-      process.exit(1);
-    }
-
-    return data!.result;
-  } catch (error) {
-    console.error("❌ Error making API request:", error);
-    process.exit(1);
-  }
-}
-
-async function findExistingGateway(): Promise<CloudflareWeb3Gateway | null> {
-  const apiUrl = `https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/web3/hostnames`;
-
-  try {
-    const response = await fetchWithRetry(apiUrl, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${CLOUDFLARE_WEB3_TOKEN!}`,
-        "Content-Type": "application/json",
-      },
-      timeoutMs: DEFAULT_TIMEOUT_MS,
-    });
-
-    let data: CloudflareListResponse | null = null;
-    const contentType = response.headers.get("content-type") || "";
-    try {
-      if (contentType.includes("application/json")) {
-        data = (await response.json()) as CloudflareListResponse;
-      } else {
-        const rawBody = await response.text();
-        console.warn(
-          "⚠️  Unexpected non-JSON response from Cloudflare (list):"
-        );
-        console.warn(rawBody);
-        return null;
-      }
-    } catch (e) {
-      const rawBody = await response.text().catch(() => "<unavailable>");
-      console.warn(
-        "⚠️  Failed to parse Cloudflare response as JSON (list):",
-        e
-      );
-      console.warn("Raw body:");
-      console.warn(rawBody);
-      return null;
-    }
-
-    if (response.ok && data!.success && data!.result) {
-      const existingGateway = data!.result.find(
-        (gateway) => gateway.name === GATEWAY_HOSTNAME
-      );
-      return existingGateway || null;
-    }
-
-    return null;
-  } catch (error) {
-    console.warn("⚠️  Could not check existing gateways:", error);
-    return null;
-  }
-}
-
-async function updateWeb3Gateway(
-  gatewayId: string,
-  ipfsHash: string
-): Promise<CloudflareWeb3Gateway> {
-  const dnslink = `/ipfs/${ipfsHash}`;
-  const apiUrl = `https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/web3/hostnames/${gatewayId}`;
-
-  const requestBody = {
-    description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - updated on ${new Date().toISOString()}`,
-    dnslink: dnslink,
-  };
-
-  console.log(`🔄 Updating Web3 gateway ${GATEWAY_HOSTNAME}...`);
-  console.log(`📝 New DNSLink: ${dnslink}`);
-
-  try {
-    const response = await fetchWithRetry(apiUrl, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${CLOUDFLARE_WEB3_TOKEN!}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody),
-      timeoutMs: DEFAULT_TIMEOUT_MS,
-    });
-
-    let data: CloudflareApiResponse | null = null;
-    const contentType = response.headers.get("content-type") || "";
-    try {
-      if (contentType.includes("application/json")) {
-        data = (await response.json()) as CloudflareApiResponse;
-      } else {
-        const rawBody = await response.text();
-        console.error(
-          "❌ Unexpected non-JSON response from Cloudflare (update):"
-        );
-        console.error(rawBody);
-        console.error(`  HTTP ${response.status}: ${response.statusText}`);
-        process.exit(1);
-      }
-    } catch (e) {
-      const rawBody = await response.text().catch(() => "<unavailable>");
-      console.error(
-        "❌ Failed to parse Cloudflare response as JSON (update):",
-        e
-      );
-      console.error("Raw body:");
-      console.error(rawBody);
-      process.exit(1);
-    }
-
-    if (!response.ok || !data!.success) {
-      console.error("❌ Error updating Web3 gateway:");
-      if (data!.errors && data!.errors.length > 0) {
-        data!.errors.forEach((error) => {
-          console.error(`  Code ${error.code}: ${error.message}`);
-        });
-      } else {
-        console.error(`  HTTP ${response.status}: ${response.statusText}`);
-      }
-      process.exit(1);
-    }
-
-    return data!.result;
-  } catch (error) {
-    console.error("❌ Error making API request:", error);
-    process.exit(1);
-  }
-}
-
 async function main(): Promise<void> {
   console.log("🚀 Cloudflare Web3 Gateway Setup");
   console.log("==================================");
 
-  // Parse command line arguments
   const args = process.argv.slice(2);
   const forceCreate = args.includes("--create") || args.includes("-c");
   const forceUpdate = args.includes("--update") || args.includes("-u");
@@ -380,22 +139,35 @@ async function main(): Promise<void> {
 
   if (forceCreate && forceUpdate) {
     console.error("❌ Error: Cannot specify both --create and --update flags");
-    console.log(
-      "Usage: tsx script/set-dns-record.ts [--create|-c] [--update|-u] [--help|-h]"
-    );
     process.exit(1);
   }
 
-  // Validate environment variables
   validateEnvironmentVariables();
-
-  // Load IPFS deployment info
   const deployment = loadIPFSDeployment();
 
-  // Check if gateway already exists
-  const existingGateway = await findExistingGateway();
+  const cf = new Cloudflare({
+    apiToken: CLOUDFLARE_WEB3_TOKEN,
+    timeout: 60000, // 60 second timeout
+  });
 
-  let gateway: CloudflareWeb3Gateway;
+  const findExistingGateway = async () => {
+    try {
+      return await retryWithBackoff(async () => {
+        const hostnames = await cf.web3.hostnames.list({
+          zone_id: CLOUDFLARE_ZONE_ID!,
+        });
+        return (
+          hostnames.result?.find((h) => h.name === GATEWAY_HOSTNAME) || null
+        );
+      });
+    } catch (error) {
+      console.warn("⚠️  Could not check existing gateways:", error);
+      return null;
+    }
+  };
+
+  const existingGateway = await findExistingGateway();
+  let gateway: Cloudflare.Web3.Hostname;
 
   if (existingGateway) {
     console.log(`🔍 Found existing gateway: ${existingGateway.name}`);
@@ -407,36 +179,85 @@ async function main(): Promise<void> {
       console.error(
         "❌ Error: Gateway already exists but --create flag was specified"
       );
-      console.log("   Use --update flag to update the existing gateway");
       process.exit(1);
     }
 
-    const currentHash = existingGateway.dnslink.replace("/ipfs/", "");
+    const currentHash = existingGateway.dnslink?.replace("/ipfs/", "") || "";
     if (currentHash === deployment.ipfsHash && !forceUpdate) {
       console.log(
         "✅ Gateway is already pointing to the current IPFS hash - no update needed!"
       );
-      console.log("   Use --update flag to force an update anyway");
       return;
     }
 
     console.log("🔄 Updating gateway with new IPFS hash...");
-    gateway = await updateWeb3Gateway(existingGateway.id, deployment.ipfsHash);
+    try {
+      if (!existingGateway.id) {
+        console.error("❌ Error: Existing gateway has no ID");
+        process.exit(1);
+      }
 
-    console.log("✅ Successfully updated Web3 gateway!");
+      gateway = await retryWithBackoff(() =>
+        cf.web3.hostnames.edit(existingGateway.id!, {
+          zone_id: CLOUDFLARE_ZONE_ID!,
+          dnslink: `/ipfs/${deployment.ipfsHash}`,
+          description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - updated on ${new Date().toISOString()}`,
+        })
+      );
+      console.log("✅ Successfully updated Web3 gateway!");
+    } catch (error) {
+      console.error("❌ Error updating Web3 gateway:", error);
+      process.exit(1);
+    }
   } else {
     if (forceUpdate) {
       console.error(
         "❌ Error: No existing gateway found but --update flag was specified"
       );
-      console.log("   Use --create flag to create a new gateway");
       process.exit(1);
     }
 
     console.log("🆕 No existing gateway found - creating new one...");
-    gateway = await createWeb3Gateway(deployment.ipfsHash);
+    try {
+      gateway = await retryWithBackoff(() =>
+        cf.web3.hostnames.create({
+          zone_id: CLOUDFLARE_ZONE_ID!,
+          name: GATEWAY_HOSTNAME,
+          target: "ipfs",
+          dnslink: `/ipfs/${deployment.ipfsHash}`,
+          description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - deployed on ${new Date().toISOString()}`,
+        })
+      );
+      console.log("✅ Successfully created Web3 gateway!");
+    } catch (error) {
+      // Check if it's a Cloudflare API error indicating the hostname already exists
+      const isHostnameExistsError =
+        error instanceof Error && error.message.includes("1001");
 
-    console.log("✅ Successfully created Web3 gateway!");
+      if (isHostnameExistsError) {
+        console.warn(
+          "ℹ️ Hostname already exists. Falling back to update flow..."
+        );
+        const gw = await findExistingGateway();
+        if (!gw || !gw.id) {
+          console.error(
+            "❌ Hostname reported as existing, but could not be found via list API."
+          );
+          process.exit(1);
+        }
+        gateway = await retryWithBackoff(() =>
+          cf.web3.hostnames.edit(gw.id!, {
+            zone_id: CLOUDFLARE_ZONE_ID!,
+            dnslink: `/ipfs/${deployment.ipfsHash}`,
+            description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - updated on ${new Date().toISOString()}`,
+          })
+        );
+        console.log("✅ Successfully updated Web3 gateway!");
+      } else {
+        console.error("❌ Error creating Web3 gateway:", error);
+        process.exit(1);
+      }
+    }
   }
 
   console.log(`📝 Gateway ID: ${gateway.id}`);
@@ -447,16 +268,8 @@ async function main(): Promise<void> {
 
   console.log("\n🎉 Setup complete! Your IPFS content is now accessible at:");
   console.log(`   https://${gateway.name}`);
-
-  console.log(
-    "\n📝 Note: It may take a few minutes for DNS propagation to complete."
-  );
-  console.log(
-    "   The gateway will automatically create the necessary DNS records."
-  );
 }
 
-// Run the script
 if (require.main === module) {
   main().catch((error) => {
     console.error("💥 Unexpected error:", error);
