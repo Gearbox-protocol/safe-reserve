@@ -6,9 +6,12 @@ import * as fs from "fs";
 import * as path from "path";
 
 // Load environment variables
-dotenv.config({
-  path: ".env.local",
-});
+// In CI, env vars are already set; locally they're in .env.local
+if (fs.existsSync(".env.local")) {
+  dotenv.config({
+    path: ".env.local",
+  });
+}
 
 // Configuration
 const CLOUDFLARE_WEB3_TOKEN = process.env.CLOUDFLARE_WEB3_TOKEN;
@@ -43,47 +46,96 @@ function validateEnvironmentVariables(): void {
   }
 }
 
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function retryWithBackoff<T>(
-  fn: () => Promise<T>,
+  operation: () => Promise<T>,
+  operationName: string,
   maxRetries: number = 3,
-  baseDelay: number = 1000
+  initialBackoffMs: number = 1000
 ): Promise<T> {
-  let lastError: Error;
-
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      return await fn();
+      return await operation();
     } catch (error) {
-      lastError = error as Error;
+      const isLastAttempt = attempt === maxRetries - 1;
 
-      // Don't retry on non-timeout errors
-      if (!error || typeof error !== "object" || !("status" in error)) {
+      if (isLastAttempt) {
         throw error;
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const status = (error as any).status;
-      if (status !== 504 && status !== 502 && status !== 503) {
-        throw error;
-      }
-
-      if (attempt === maxRetries) {
-        console.error(`❌ Failed after ${maxRetries + 1} attempts`);
-        throw lastError;
-      }
-
-      const delay = baseDelay * Math.pow(2, attempt);
-      console.warn(
-        `⚠️  Attempt ${attempt + 1} failed with ${status} error. Retrying in ${delay}ms...`
+      const backoffMs = initialBackoffMs * Math.pow(2, attempt);
+      const errorMsg = error instanceof Error ? error.message : "Unknown error";
+      console.log(
+        `   ⚠️  ${operationName} attempt ${attempt + 1}/${maxRetries} failed (${errorMsg}), retrying in ${backoffMs}ms...`
       );
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      await sleep(backoffMs);
     }
   }
 
-  throw lastError!;
+  throw new Error(`All retry attempts failed for ${operationName}`);
 }
 
-function loadIPFSDeployment(): IPFSDeployment {
+async function verifyIPFSAccessibility(ipfsHash: string): Promise<boolean> {
+  console.log(`🔍 Verifying IPFS content accessibility...`);
+
+  const gatewaysToTry = [
+    `https://ipfs.io/ipfs/${ipfsHash}`,
+    `https://${ipfsHash}.ipfs.dweb.link`,
+    // `https://cloudflare-ipfs.com/ipfs/${ipfsHash}`,
+  ];
+
+  const MAX_RETRIES = 3;
+  const INITIAL_BACKOFF_MS = 1000; // Start with 1 second
+  const TIMEOUT_MS = 15000; // 15 second timeout per attempt
+
+  for (const gatewayUrl of gatewaysToTry) {
+    console.log(`   Trying gateway: ${gatewayUrl}`);
+
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+        const response = await fetch(gatewayUrl, {
+          method: "HEAD",
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          console.log(`✅ IPFS content is accessible via: ${gatewayUrl}`);
+          return true;
+        } else if (attempt < MAX_RETRIES - 1) {
+          const backoffMs = INITIAL_BACKOFF_MS * Math.pow(2, attempt);
+          console.log(
+            `   ⚠️  Attempt ${attempt + 1}/${MAX_RETRIES} failed (status ${response.status}), retrying in ${backoffMs}ms...`
+          );
+          await sleep(backoffMs);
+        }
+      } catch (error) {
+        if (attempt < MAX_RETRIES - 1) {
+          const backoffMs = INITIAL_BACKOFF_MS * Math.pow(2, attempt);
+          const errorMsg =
+            error instanceof Error ? error.message : "Unknown error";
+          console.log(
+            `   ⚠️  Attempt ${attempt + 1}/${MAX_RETRIES} failed (${errorMsg}), retrying in ${backoffMs}ms...`
+          );
+          await sleep(backoffMs);
+        } else {
+          console.log(`   ❌ All attempts failed for ${gatewayUrl}`);
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+async function loadIPFSDeployment(): Promise<IPFSDeployment> {
   if (!fs.existsSync(IPFS_DEPLOYMENT_FILE)) {
     console.error(
       `❌ Error: IPFS deployment file not found at ${IPFS_DEPLOYMENT_FILE}`
@@ -104,6 +156,20 @@ function loadIPFSDeployment(): IPFSDeployment {
     }
 
     console.log(`✅ Found IPFS deployment with hash: ${deployment.ipfsHash}`);
+
+    // Verify IPFS content is accessible
+    const isAccessible = await verifyIPFSAccessibility(deployment.ipfsHash);
+
+    if (!isAccessible) {
+      console.error(
+        `❌ Error: IPFS content with hash ${deployment.ipfsHash} is not accessible`
+      );
+      console.log(
+        "Please ensure the content has been properly uploaded and pinned to IPFS"
+      );
+      process.exit(1);
+    }
+
     return deployment;
   } catch (error) {
     console.error("❌ Error reading IPFS deployment file:", error);
@@ -143,23 +209,23 @@ async function main(): Promise<void> {
   }
 
   validateEnvironmentVariables();
-  const deployment = loadIPFSDeployment();
+  const deployment = await loadIPFSDeployment();
 
   const cf = new Cloudflare({
     apiToken: CLOUDFLARE_WEB3_TOKEN,
-    timeout: 60000, // 60 second timeout
+    timeout: 60000, // 200 second timeout
   });
 
   const findExistingGateway = async () => {
     try {
-      return await retryWithBackoff(async () => {
-        const hostnames = await cf.web3.hostnames.list({
-          zone_id: CLOUDFLARE_ZONE_ID!,
-        });
-        return (
-          hostnames.result?.find((h) => h.name === GATEWAY_HOSTNAME) || null
-        );
-      });
+      const hostnames = await retryWithBackoff(
+        () =>
+          cf.web3.hostnames.list({
+            zone_id: CLOUDFLARE_ZONE_ID!,
+          }),
+        "List Web3 hostnames"
+      );
+      return hostnames.result?.find((h) => h.name === GATEWAY_HOSTNAME) || null;
     } catch (error) {
       console.warn("⚠️  Could not check existing gateways:", error);
       return null;
@@ -170,6 +236,7 @@ async function main(): Promise<void> {
   let gateway: Cloudflare.Web3.Hostname;
 
   if (existingGateway) {
+    console.log(existingGateway);
     console.log(`🔍 Found existing gateway: ${existingGateway.name}`);
     console.log(`   Current DNSLink: ${existingGateway.dnslink}`);
     console.log(`   Status: ${existingGateway.status}`);
@@ -197,12 +264,14 @@ async function main(): Promise<void> {
         process.exit(1);
       }
 
-      gateway = await retryWithBackoff(() =>
-        cf.web3.hostnames.edit(existingGateway.id!, {
-          zone_id: CLOUDFLARE_ZONE_ID!,
-          dnslink: `/ipfs/${deployment.ipfsHash}`,
-          description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - updated on ${new Date().toISOString()}`,
-        })
+      gateway = await retryWithBackoff(
+        () =>
+          cf.web3.hostnames.edit(existingGateway.id!, {
+            zone_id: CLOUDFLARE_ZONE_ID!,
+            dnslink: `/ipfs/${deployment.ipfsHash}`,
+            description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - updated on ${new Date().toISOString()}`,
+          }),
+        "Update Web3 gateway"
       );
       console.log("✅ Successfully updated Web3 gateway!");
     } catch (error) {
@@ -219,14 +288,16 @@ async function main(): Promise<void> {
 
     console.log("🆕 No existing gateway found - creating new one...");
     try {
-      gateway = await retryWithBackoff(() =>
-        cf.web3.hostnames.create({
-          zone_id: CLOUDFLARE_ZONE_ID!,
-          name: GATEWAY_HOSTNAME,
-          target: "ipfs",
-          dnslink: `/ipfs/${deployment.ipfsHash}`,
-          description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - deployed on ${new Date().toISOString()}`,
-        })
+      gateway = await retryWithBackoff(
+        () =>
+          cf.web3.hostnames.create({
+            zone_id: CLOUDFLARE_ZONE_ID!,
+            name: GATEWAY_HOSTNAME,
+            target: "ipfs",
+            dnslink: `/ipfs/${deployment.ipfsHash}`,
+            description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - deployed on ${new Date().toISOString()}`,
+          }),
+        "Create Web3 gateway"
       );
       console.log("✅ Successfully created Web3 gateway!");
     } catch (error) {
@@ -245,12 +316,14 @@ async function main(): Promise<void> {
           );
           process.exit(1);
         }
-        gateway = await retryWithBackoff(() =>
-          cf.web3.hostnames.edit(gw.id!, {
-            zone_id: CLOUDFLARE_ZONE_ID!,
-            dnslink: `/ipfs/${deployment.ipfsHash}`,
-            description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - updated on ${new Date().toISOString()}`,
-          })
+        gateway = await retryWithBackoff(
+          () =>
+            cf.web3.hostnames.edit(gw.id!, {
+              zone_id: CLOUDFLARE_ZONE_ID!,
+              dnslink: `/ipfs/${deployment.ipfsHash}`,
+              description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - updated on ${new Date().toISOString()}`,
+            }),
+          "Update Web3 gateway (fallback)"
         );
         console.log("✅ Successfully updated Web3 gateway!");
       } else {
