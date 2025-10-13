@@ -12,7 +12,7 @@ dotenv.config({
 
 // Configuration
 const CLOUDFLARE_WEB3_TOKEN = process.env.CLOUDFLARE_WEB3_TOKEN;
-const CLOUDFLARE_ZONE_ID = process.env.CLOUDFLARE_ZONE_ID;
+const CLOUDFLARE_ZONE_ID = process.env.CLOUDFLARE_EXTRACTED_ZONE_ID;
 const GATEWAY_HOSTNAME = process.env.GATEWAY_HOSTNAME || "safe.gear-dev.dev";
 const IPFS_DEPLOYMENT_FILE = path.join(process.cwd(), "ipfs-deployment.json");
 
