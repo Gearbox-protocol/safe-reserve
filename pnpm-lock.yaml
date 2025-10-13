@@ -15,8 +15,8 @@ importers:
         specifier: ^0.1.19
         version: 0.1.19(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(viem-deal@2.0.4(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)))(zod@3.25.76)
       '@gearbox-protocol/permissionless-ui':
-        specifier: ^1.0.7
-        version: 1.0.7(@babel/core@7.28.4)(@tanstack/query-core@5.87.1)(@tanstack/react-query@5.87.1(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(bufferutil@4.0.9)(react-is@18.3.1)(tailwindcss@3.4.17)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
+        specifier: ^1.1.2
+        version: 1.1.2(@babel/core@7.28.4)(@tanstack/query-core@5.87.1)(@tanstack/react-query@5.87.1(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(bufferutil@4.0.9)(react-is@18.3.1)(tailwindcss@3.4.17)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
       '@gearbox-protocol/sdk':
         specifier: ^9.9.3
         version: 9.9.3(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
@@ -732,8 +732,8 @@ packages:
   '@gearbox-protocol/integrations-v3@1.42.0-abi.5':
     resolution: {integrity: sha512-WTaAqCxLrGkKuBzq2wMGXz7ll+W4wDXMDnFs8aH2duXMvyYPovuDZL/7LlmqZstloKNAx9LnXqIC8eekUKiC0w==}
 
-  '@gearbox-protocol/permissionless-ui@1.0.7':
-    resolution: {integrity: sha512-9GgMO/qaSFiMasWlZjmmL9bCVwaqoh2CcUchqisTQJj69B5A9TGRcXunGqlGWYGl4+/PWODV1qb0qtbnUP2OLw==}
+  '@gearbox-protocol/permissionless-ui@1.1.2':
+    resolution: {integrity: sha512-heNHmAxKiFi/kytkKndc1IyNTLWtyn10nGoYFb3Hwf3n768vhxXXh0psVat4vIEnhFW1mjpxO2KF+UbTwUBgPg==}
 
   '@gearbox-protocol/permissionless@0.1.19':
     resolution: {integrity: sha512-zFdrE/DfZGIGE/41NNYZsZmqm+w/4xQ6aWMHvIvn/sW61YIpFgqkAyIY35+zUw8ut9Q4aICoCfsFudxvySOQiA==}
@@ -6081,7 +6081,7 @@ snapshots:
 
   '@gearbox-protocol/integrations-v3@1.42.0-abi.5': {}
 
-  '@gearbox-protocol/permissionless-ui@1.0.7(@babel/core@7.28.4)(@tanstack/query-core@5.87.1)(@tanstack/react-query@5.87.1(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(bufferutil@4.0.9)(react-is@18.3.1)(tailwindcss@3.4.17)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)':
+  '@gearbox-protocol/permissionless-ui@1.1.2(@babel/core@7.28.4)(@tanstack/query-core@5.87.1)(@tanstack/react-query@5.87.1(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(bufferutil@4.0.9)(react-is@18.3.1)(tailwindcss@3.4.17)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)':
     dependencies:
       '@radix-ui/react-alert-dialog': 1.1.15(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-checkbox': 1.3.3(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

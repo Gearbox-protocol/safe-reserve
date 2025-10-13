@@ -78,7 +78,12 @@ export function GovernorTransactionCard({
         <div className="flex items-center gap-4">
           <span className="text-gray-400">{tx.calls.length} actions</span>
           <span className="text-gray-400">
-            {tx.signedBy.length} / {Number(threshold)}
+            {[TimelockTxStatus.Queued, TimelockTxStatus.Executed].includes(
+              tx.status
+            )
+              ? Number(threshold)
+              : tx.signedBy.length}{" "}
+            / {Number(threshold)}
           </span>
 
           {/* Only show simulation button for non-queued and ready transactions */}

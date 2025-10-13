@@ -76,7 +76,8 @@ export function InstanceTransactionCard({
         <div className="flex items-center gap-4">
           <span className="text-gray-400">{tx.calls.length} actions</span>
           <span className="text-gray-400">
-            {tx.signedBy.length} / {Number(threshold)}
+            {isExecuted ? Number(threshold) : tx.signedBy.length} /{" "}
+            {Number(threshold)}
           </span>
 
           {/* Only show simulation button for non-executed transactions */}

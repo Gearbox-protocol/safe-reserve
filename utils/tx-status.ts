@@ -29,13 +29,6 @@ export async function getTxStatus(args: {
     .getBlock()
     .then((block) => Number(block.timestamp));
 
-  if (lastBlockTimestamp > eta + 14 * HOUR_24) {
-    return {
-      blockNumber: -1,
-      status: TimelockTxStatus.Stale,
-    };
-  }
-
   const timeLockContract = new TimeLockContract(timelock, publicClient);
 
   const [etaBlock, staleBlock] = await Promise.all([
@@ -133,6 +126,13 @@ export async function getTxStatus(args: {
   if (status === TimelockTxStatus.Queued) {
     if (eta <= lastBlockTimestamp) {
       status = TimelockTxStatus.Ready;
+    }
+
+    if (lastBlockTimestamp > eta + 14 * HOUR_24) {
+      return {
+        blockNumber: -1,
+        status: TimelockTxStatus.Stale,
+      };
     }
   }
 

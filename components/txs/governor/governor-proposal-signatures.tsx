@@ -1,15 +1,11 @@
 import { chains } from "@/config/wagmi";
 import { useSafeParams } from "@/hooks";
-import { shortenHash } from "@/utils/format";
 import { TimelockTxStatus } from "@/utils/tx-status";
 import {
-  CopyButton,
-  ExternalButton,
+  ConfirmationItem,
+  VerticalTimeline,
 } from "@gearbox-protocol/permissionless-ui";
-import { Check, Plus, X } from "lucide-react";
-import { useState } from "react";
 import { Address } from "viem";
-import { Identicon } from "../identicon";
 
 interface ProposalSignaturesProps {
   chainId: number;
@@ -25,203 +21,118 @@ export function GovernorProposalSignatures({
   status,
 }: ProposalSignaturesProps) {
   const chain = chains.find(({ id }) => id === chainId);
-  const [showAll, setShowAll] = useState(true);
   const { threshold } = useSafeParams(chainId, safeAddress);
 
   return (
-    <div className="relative min-w-[300px]">
-      {/* Vertical Timeline Line */}
-      <div className="absolute left-[11px] top-[2px] bottom-[20px] w-[2px] h-[calc(100% - 20px)] bg-gray-800" />
-
-      <div className="space-y-6">
-        {/* Created Stage */}
-        <div className="relative flex items-center">
-          <div className="absolute left-[2px] flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
-            <Plus className="h-3 w-3 text-black" />
-          </div>
-          <span className="ml-10 text-white">Created</span>
-        </div>
-
-        {/* Queue confirmations Stage */}
-        <div className="space-y-4">
-          <div className="relative flex items-center">
-            <div
-              className={`absolute left-[2px] flex h-5 w-5 items-center justify-center rounded-full ${
-                status !== TimelockTxStatus.NotFound || signers.length > 0
-                  ? "bg-green-500"
-                  : "border-2 border-gray-600 bg-transparent"
-              }`}
-            >
-              {(status !== TimelockTxStatus.NotFound || signers.length > 0) && (
-                <Check className="h-3 w-3 text-black" />
-              )}
-            </div>
-            <span className="ml-10 text-white">
-              Confirmations (
-              {[
-                TimelockTxStatus.NotFound,
-                TimelockTxStatus.Ready,
-                TimelockTxStatus.Stale,
-                TimelockTxStatus.Canceled,
-              ].includes(status)
-                ? signers.length
-                : threshold}{" "}
-              of {threshold})
-            </span>
-          </div>
-
-          {[TimelockTxStatus.NotFound, TimelockTxStatus.Queued].includes(
+    <VerticalTimeline
+      steps={[
+        {
+          type: "default",
+          status: "success",
+          title: "Created",
+        },
+        {
+          type: "default",
+          status:
+            status !== TimelockTxStatus.NotFound || signers.length > 0
+              ? "success"
+              : "pending",
+          title: `Confirmations (${
+            [TimelockTxStatus.Queued, TimelockTxStatus.Executed].includes(
+              status
+            )
+              ? threshold
+              : signers.length
+          } of ${threshold})`,
+        },
+        {
+          type: "extention",
+          status:
+            [
+              TimelockTxStatus.NotFound,
+              TimelockTxStatus.Queued,
+              TimelockTxStatus.Canceled,
+            ].includes(status) && signers.length > 0
+              ? "success"
+              : "not-started",
+          children: signers.map((confirmation, index) => (
+            <ConfirmationItem
+              key={index}
+              confirmation={confirmation}
+              explorerUrl={
+                chain?.blockExplorers.default.url
+                  ? `${chain.blockExplorers.default.url}/address/${confirmation}`
+                  : undefined
+              }
+            />
+          )),
+        },
+        {
+          type: "default",
+          status:
+            status !== TimelockTxStatus.NotFound
+              ? "success"
+              : signers.length > 0
+                ? "pending"
+                : "not-started",
+          title: "Queued",
+        },
+        {
+          type: "default",
+          status: [TimelockTxStatus.Ready, TimelockTxStatus.Executed].includes(
             status
-          ) && (
-            <div className="space-y-2">
-              {signers.length > 0 && (
-                <div className="relative flex items-center">
-                  <div className="absolute left-[8px] h-2 w-2 rounded-full bg-green-500" />
-                  <button
-                    onClick={() => setShowAll(!showAll)}
-                    className="ml-10 text-green-500 hover:underline"
-                  >
-                    {showAll ? "Hide all" : "Show all"}
-                  </button>
-                </div>
-              )}
-
-              {showAll &&
-                signers.map((confirmation, index) => (
-                  <div key={index} className="group relative flex items-center">
-                    <div className="absolute left-[8px] h-2 w-2 rounded-full bg-green-500" />
-                    <div className="ml-10 flex items-center gap-2">
-                      <Identicon address={confirmation} size={32} />
-                      <span className="text-white">
-                        {shortenHash(confirmation)}
-                      </span>
-                      <CopyButton text={confirmation} />
-                      {chain?.blockExplorers.default.url && (
-                        <ExternalButton
-                          url={`${chain.blockExplorers.default.url}/address/${confirmation}`}
-                        />
-                      )}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          )}
-        </div>
-
-        {(status !== TimelockTxStatus.NotFound || signers.length > 0) && (
-          <div className="relative flex items-center">
-            <div
-              className={`absolute left-[2px] flex h-5 w-5 items-center justify-center rounded-full ${
-                status !== TimelockTxStatus.NotFound
-                  ? "bg-green-500"
-                  : "border-2 border-gray-600 bg-transparent"
-              }`}
-            >
-              {status !== TimelockTxStatus.NotFound && (
-                <Check className="h-3 w-3 text-black" />
-              )}
-            </div>
-            <span className="ml-10 text-white">Queued</span>
-          </div>
-        )}
-
-        {/* Execute confirmations Stage */}
-        {[TimelockTxStatus.Ready, TimelockTxStatus.Executed].includes(
-          status
-        ) && (
-          <div className="space-y-4">
-            <div className="relative flex items-center">
-              <div
-                className={`absolute left-[2px] flex h-5 w-5 items-center justify-center rounded-full ${
-                  status === TimelockTxStatus.Executed || signers.length > 0
-                    ? "bg-green-500"
-                    : "border-2 border-gray-600 bg-transparent"
-                }`}
-              >
-                {(status === TimelockTxStatus.Executed ||
-                  signers.length > 0) && (
-                  <Check className="h-3 w-3 text-black" />
-                )}
-              </div>
-              <span className="ml-10 text-white">
-                Confirmations (
-                {status === TimelockTxStatus.Ready ? signers.length : threshold}{" "}
-                of {threshold})
-              </span>
-            </div>
-
-            <div className="space-y-2">
-              {signers.length > 0 && (
-                <div className="relative flex items-center">
-                  <div className="absolute left-[8px] h-2 w-2 rounded-full bg-green-500" />
-                  <button
-                    onClick={() => setShowAll(!showAll)}
-                    className="ml-10 text-green-500 hover:underline"
-                  >
-                    {showAll ? "Hide all" : "Show all"}
-                  </button>
-                </div>
-              )}
-
-              {showAll &&
-                signers.map((confirmation, index) => (
-                  <div key={index} className="group relative flex items-center">
-                    <div className="absolute left-[8px] h-2 w-2 rounded-full bg-green-500" />
-                    <div className="ml-10 flex items-center gap-2">
-                      <Identicon address={confirmation} size={32} />
-                      <span className="text-white">
-                        {shortenHash(confirmation)}
-                      </span>
-                      <div className="flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-                        <CopyButton text={confirmation} />
-                        {chain?.blockExplorers.default.url && (
-                          <ExternalButton
-                            url={`${chain.blockExplorers.default.url}/address/${confirmation}`}
-                          />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
-
-        {([
-          TimelockTxStatus.Stale,
-          TimelockTxStatus.Canceled,
-          TimelockTxStatus.Executed,
-        ].includes(status) ||
-          (status === TimelockTxStatus.Ready && signers.length > 0)) && (
-          <div className="relative flex items-center">
-            <div
-              className={`absolute left-[2px] flex h-5 w-5 items-center justify-center rounded-full ${
-                status === TimelockTxStatus.Executed
-                  ? "bg-green-500"
-                  : status === TimelockTxStatus.Stale ||
-                      status === TimelockTxStatus.Canceled
-                    ? "bg-red-500"
-                    : "border-2 border-gray-600 bg-transparent"
-              }`}
-            >
-              {status === TimelockTxStatus.Executed && (
-                <Check className="h-3 w-3 text-black" />
-              )}
-              {(status === TimelockTxStatus.Stale ||
-                status === TimelockTxStatus.Canceled) && (
-                <X className="h-3 w-3 text-black" />
-              )}
-            </div>
-            <span className="ml-10 text-white">
-              {status === TimelockTxStatus.Stale
-                ? "Skipped"
-                : status === TimelockTxStatus.Canceled
-                  ? "Canceled"
-                  : " Executed"}
-            </span>
-          </div>
-        )}
-      </div>
-    </div>
+          )
+            ? status === TimelockTxStatus.Executed || signers.length > 0
+              ? "success"
+              : "pending"
+            : "not-started",
+          title: `Confirmations (
+                ${status === TimelockTxStatus.Ready ? signers.length : threshold} of ${threshold})`,
+        },
+        {
+          type: "extention",
+          status:
+            [TimelockTxStatus.Ready, TimelockTxStatus.Executed].includes(
+              status
+            ) && signers.length > 0
+              ? "success"
+              : "not-started",
+          children: signers.map((confirmation, index) => (
+            <ConfirmationItem
+              key={index}
+              confirmation={confirmation}
+              explorerUrl={
+                chain?.blockExplorers.default.url
+                  ? `${chain.blockExplorers.default.url}/address/${confirmation}`
+                  : undefined
+              }
+            />
+          )),
+        },
+        {
+          type: "default",
+          status:
+            [
+              TimelockTxStatus.Stale,
+              TimelockTxStatus.Canceled,
+              TimelockTxStatus.Executed,
+            ].includes(status) ||
+            (status === TimelockTxStatus.Ready && signers.length > 0)
+              ? status === TimelockTxStatus.Executed
+                ? "success"
+                : status === TimelockTxStatus.Stale ||
+                    status === TimelockTxStatus.Canceled
+                  ? "error"
+                  : "pending"
+              : "not-started",
+          title:
+            status === TimelockTxStatus.Stale
+              ? "Skipped"
+              : status === TimelockTxStatus.Canceled
+                ? "Canceled"
+                : "Executed",
+        },
+      ]}
+    />
   );
 }
