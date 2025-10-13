@@ -12,7 +12,8 @@ dotenv.config({
 
 // Configuration
 const CLOUDFLARE_WEB3_TOKEN = process.env.CLOUDFLARE_WEB3_TOKEN;
-const CLOUDFLARE_ZONE_ID = process.env.CLOUDFLARE_EXTRACTED_ZONE_ID;
+const CLOUDFLARE_ZONE_ID =
+  process.env.CLOUDFLARE_EXTRACTED_ZONE_ID || process.env.CLOUDFLARE_ZONE_ID;
 const GATEWAY_HOSTNAME = process.env.GATEWAY_HOSTNAME || "safe.gear-dev.dev";
 const IPFS_DEPLOYMENT_FILE = path.join(process.cwd(), "ipfs-deployment.json");
 
@@ -27,7 +28,8 @@ function validateEnvironmentVariables(): void {
   const missingVars: string[] = [];
 
   if (!CLOUDFLARE_WEB3_TOKEN) missingVars.push("CLOUDFLARE_WEB3_TOKEN");
-  if (!CLOUDFLARE_ZONE_ID) missingVars.push("CLOUDFLARE_ZONE_ID");
+  if (!CLOUDFLARE_ZONE_ID)
+    missingVars.push("CLOUDFLARE_EXTRACTED_ZONE_ID (or CLOUDFLARE_ZONE_ID)");
 
   if (missingVars.length > 0) {
     console.error("❌ Error: Missing required environment variables:");
@@ -36,9 +38,49 @@ function validateEnvironmentVariables(): void {
     });
     console.log("\nPlease set these variables in your .env.local file:");
     console.log("CLOUDFLARE_WEB3_TOKEN=your_api_token_here");
-    console.log("CLOUDFLARE_ZONE_ID=your_zone_id_here");
+    console.log("CLOUDFLARE_EXTRACTED_ZONE_ID=your_zone_id_here");
     process.exit(1);
   }
+}
+
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  let lastError: Error;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+
+      // Don't retry on non-timeout errors
+      if (!error || typeof error !== "object" || !("status" in error)) {
+        throw error;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const status = (error as any).status;
+      if (status !== 504 && status !== 502 && status !== 503) {
+        throw error;
+      }
+
+      if (attempt === maxRetries) {
+        console.error(`❌ Failed after ${maxRetries + 1} attempts`);
+        throw lastError;
+      }
+
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.warn(
+        `⚠️  Attempt ${attempt + 1} failed with ${status} error. Retrying in ${delay}ms...`
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError!;
 }
 
 function loadIPFSDeployment(): IPFSDeployment {
@@ -105,14 +147,19 @@ async function main(): Promise<void> {
 
   const cf = new Cloudflare({
     apiToken: CLOUDFLARE_WEB3_TOKEN,
+    timeout: 60000, // 60 second timeout
   });
 
   const findExistingGateway = async () => {
     try {
-      const hostnames = await cf.web3.hostnames.list({
-        zone_id: CLOUDFLARE_ZONE_ID!,
+      return await retryWithBackoff(async () => {
+        const hostnames = await cf.web3.hostnames.list({
+          zone_id: CLOUDFLARE_ZONE_ID!,
+        });
+        return (
+          hostnames.result?.find((h) => h.name === GATEWAY_HOSTNAME) || null
+        );
       });
-      return hostnames.result?.find((h) => h.name === GATEWAY_HOSTNAME) || null;
     } catch (error) {
       console.warn("⚠️  Could not check existing gateways:", error);
       return null;
@@ -150,11 +197,13 @@ async function main(): Promise<void> {
         process.exit(1);
       }
 
-      gateway = await cf.web3.hostnames.edit(existingGateway.id, {
-        zone_id: CLOUDFLARE_ZONE_ID!,
-        dnslink: `/ipfs/${deployment.ipfsHash}`,
-        description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - updated on ${new Date().toISOString()}`,
-      });
+      gateway = await retryWithBackoff(() =>
+        cf.web3.hostnames.edit(existingGateway.id!, {
+          zone_id: CLOUDFLARE_ZONE_ID!,
+          dnslink: `/ipfs/${deployment.ipfsHash}`,
+          description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - updated on ${new Date().toISOString()}`,
+        })
+      );
       console.log("✅ Successfully updated Web3 gateway!");
     } catch (error) {
       console.error("❌ Error updating Web3 gateway:", error);
@@ -170,13 +219,15 @@ async function main(): Promise<void> {
 
     console.log("🆕 No existing gateway found - creating new one...");
     try {
-      gateway = await cf.web3.hostnames.create({
-        zone_id: CLOUDFLARE_ZONE_ID!,
-        name: GATEWAY_HOSTNAME,
-        target: "ipfs",
-        dnslink: `/ipfs/${deployment.ipfsHash}`,
-        description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - deployed on ${new Date().toISOString()}`,
-      });
+      gateway = await retryWithBackoff(() =>
+        cf.web3.hostnames.create({
+          zone_id: CLOUDFLARE_ZONE_ID!,
+          name: GATEWAY_HOSTNAME,
+          target: "ipfs",
+          dnslink: `/ipfs/${deployment.ipfsHash}`,
+          description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - deployed on ${new Date().toISOString()}`,
+        })
+      );
       console.log("✅ Successfully created Web3 gateway!");
     } catch (error) {
       // Check if it's a Cloudflare API error indicating the hostname already exists
@@ -194,11 +245,13 @@ async function main(): Promise<void> {
           );
           process.exit(1);
         }
-        gateway = await cf.web3.hostnames.edit(gw.id, {
-          zone_id: CLOUDFLARE_ZONE_ID!,
-          dnslink: `/ipfs/${deployment.ipfsHash}`,
-          description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - updated on ${new Date().toISOString()}`,
-        });
+        gateway = await retryWithBackoff(() =>
+          cf.web3.hostnames.edit(gw.id!, {
+            zone_id: CLOUDFLARE_ZONE_ID!,
+            dnslink: `/ipfs/${deployment.ipfsHash}`,
+            description: `IPFS DNSLink gateway for Gearbox Permissionless Safe - updated on ${new Date().toISOString()}`,
+          })
+        );
         console.log("✅ Successfully updated Web3 gateway!");
       } else {
         console.error("❌ Error creating Web3 gateway:", error);
