@@ -79,7 +79,7 @@ export function EmergencySafeTx({
             </div>
           )
         ) : (
-          <div className="grid grid-cols-[1fr_minmax(300px,max-content)] gap-12">
+          <div className="gridgrid-cols-[1fr_minmax(300px,max-content)] gap-12 overflow-x-auto">
             {Object.keys(emergencyTx.action.params ?? {}).length > 0 && (
               <div className="border-t border-gray-800 pt-3">
                 <div className="font-semibold text-gray-200 mb-2 text-lg">

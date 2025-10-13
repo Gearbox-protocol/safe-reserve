@@ -30,7 +30,7 @@ export function InstanceProposalSignatures({
   const { threshold } = useSafeParams(chainId, safeAddress);
 
   return (
-    <div className="relative w-[400px]">
+    <div className="relative min-w-[300px]">
       {/* Vertical Timeline Line */}
       <div className="absolute left-[11px] top-[2px] bottom-[20px] w-[2px] h-[calc(100% - 20px)] bg-gray-800" />
 
