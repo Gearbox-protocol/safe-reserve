@@ -4,11 +4,22 @@ import {
   InstanceManagerContract,
   ParsedCall,
 } from "@gearbox-protocol/permissionless";
-import { simulateWithPriceUpdates } from "@gearbox-protocol/sdk";
+import {
+  AddressMap,
+  json_stringify,
+  simulateWithPriceUpdates,
+} from "@gearbox-protocol/sdk";
 import { iVersionAbi } from "@gearbox-protocol/sdk/abi";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { Address, erc20Abi, hexToString, isAddress, PublicClient } from "viem";
+import {
+  Address,
+  erc20Abi,
+  hexToString,
+  isAddress,
+  parseAbi,
+  PublicClient,
+} from "viem";
 import { usePublicClient } from "wagmi";
 import { useSDK } from "../use-sdk";
 
@@ -41,10 +52,11 @@ export function useGetInstanceCallMeta(
 ) {
   const publicClient = usePublicClient({ chainId });
 
-  const [fnName, token, priceFeed] = useMemo(() => {
+  const [fnName, token, priceFeed, setLimiterCalls] = useMemo(() => {
     let fnName;
     let token;
     let priceFeed;
+    let setLimiterCalls;
 
     try {
       const match = parsedCall.args.data.match(/^(\w+)\((\{[\s\S]*\})\)$/);
@@ -60,6 +72,25 @@ export function useGetInstanceCallMeta(
           if ("priceFeed" in parsed && typeof parsed.priceFeed === "string") {
             priceFeed = parsed.priceFeed;
           }
+
+          if (
+            parsedCall.args.data.startsWith("configurePriceFeeds") &&
+            "calls" in parsed &&
+            Array.isArray(parsed.calls)
+          ) {
+            if (
+              parsed.calls.every(
+                (call) =>
+                  call.functionName === "setLimiter" &&
+                  "lowerBound" in call.args
+              )
+            ) {
+              setLimiterCalls = parsed.calls.map((call) => ({
+                priceFeed: call.target,
+                lowerBound: BigInt(Math.floor(call.args.lowerBound * 1e18)),
+              })) as { priceFeed: Address; lowerBound: bigint }[];
+            }
+          }
         }
       }
     } catch {}
@@ -68,6 +99,7 @@ export function useGetInstanceCallMeta(
       fnName,
       token && isAddress(token) ? token : undefined,
       priceFeed && isAddress(priceFeed) ? priceFeed : undefined,
+      setLimiterCalls,
     ];
   }, [parsedCall]);
 
@@ -89,6 +121,69 @@ export function useGetInstanceCallMeta(
       });
     },
     enabled: !!publicClient,
+    retry: 3,
+  });
+
+  const {
+    data: priceFeedDeviations,
+    isLoading: isLoadingDeviations,
+    error: errorDeviations,
+  } = useQuery({
+    queryKey: ["deviation", json_stringify(setLimiterCalls)],
+    queryFn: async () => {
+      if (!publicClient || !setLimiterCalls) return null;
+
+      // Get current lower bounds from all price feeds
+      const currentLowerBounds = await publicClient.multicall({
+        allowFailure: false,
+        contracts: setLimiterCalls.map((call) => ({
+          abi: parseAbi([
+            "function lowerBound() external view returns (uint256)",
+          ]),
+          address: call.priceFeed,
+          functionName: "lowerBound",
+        })),
+      });
+
+      const values = await publicClient.multicall({
+        allowFailure: false,
+        contracts: setLimiterCalls.map((call) => ({
+          abi: parseAbi([
+            "function getLPExchangeRate() external view returns (uint256)",
+          ]),
+          address: call.priceFeed,
+          functionName: "getLPExchangeRate",
+        })),
+      });
+
+      // Create price feed => deviation mapping
+      const priceFeedDeviationMap = new AddressMap<{
+        fromValue: number;
+        fromBound: number;
+      }>();
+
+      setLimiterCalls.forEach((call, index) => {
+        const currentLowerBound = currentLowerBounds[index];
+        const value = values[index];
+        const fromValue =
+          Math.floor(
+            Number((10_000n * (value - currentLowerBound)) / currentLowerBound)
+          ) / 10_000;
+
+        const fromBound =
+          Math.floor(
+            Number(
+              (10_000n * (call.lowerBound - currentLowerBound)) /
+                currentLowerBound
+            )
+          ) / 10_000;
+
+        priceFeedDeviationMap.upsert(call.priceFeed, { fromValue, fromBound });
+      });
+
+      return priceFeedDeviationMap;
+    },
+    enabled: !!publicClient && !!setLimiterCalls,
     retry: 3,
   });
 
@@ -157,11 +252,13 @@ export function useGetInstanceCallMeta(
       !!priceFeed && !!latestRoundData ? latestRoundData.price[0] : undefined,
     priceFeedType:
       !!priceFeed && !!latestRoundData ? latestRoundData.type : undefined,
+    priceFeedDeviations: priceFeedDeviations || undefined,
     isLoading:
       (!!token && isLoadingSymbol) ||
       (!!priceFeed && isLoadingLatestRoundData) ||
-      ((!!token || !!priceFeed) && isLoading),
-    error: errorSymbol || errorLatestRoundData || error,
+      ((!!token || !!priceFeed) && isLoading) ||
+      (!!setLimiterCalls && isLoadingDeviations),
+    error: errorSymbol || errorLatestRoundData || error || errorDeviations,
   };
 }
 

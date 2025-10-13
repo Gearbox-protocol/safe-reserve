@@ -44,6 +44,35 @@ export function InstanceProposalCall({
           parsedWithMeta.priceFeed = `${parsedWithMeta.priceFeed} [${callMeta.priceFeedType ?? "unknown"} feed with ${convertToUsd(callMeta.latestRoundData?.[1]) ?? "loading..."} price]`;
         }
 
+        if (
+          callMeta.priceFeedDeviations !== undefined &&
+          parsedCall.args.data.startsWith("configurePriceFeeds") &&
+          "calls" in parsedWithMeta &&
+          Array.isArray(parsedWithMeta.calls)
+        ) {
+          if (
+            parsedWithMeta.calls.every(
+              (call) =>
+                call.functionName === "setLimiter" && "lowerBound" in call.args
+            )
+          ) {
+            parsedWithMeta.calls = parsedWithMeta.calls.map((call) => {
+              const deviation = callMeta.priceFeedDeviations?.get(call.target);
+
+              if (deviation !== undefined) {
+                return {
+                  ...call,
+                  args: {
+                    ...call.args,
+                    lowerBound: `${call.args.lowerBound} [${(deviation.fromValue * 100).toFixed(2)}% deviation from value, ${(deviation.fromBound * 100).toFixed(2)}% deviation from current bound]`,
+                  },
+                };
+              }
+              return call;
+            });
+          }
+        }
+
         return (
           <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
             {json_stringify(parsedWithMeta)}
@@ -78,7 +107,7 @@ export function InstanceProposalCall({
       }
       return String(parsed);
     },
-    [callMeta]
+    [callMeta, parsedCall.args.data]
   );
 
   const isDecoded = !parsedCall.functionName.startsWith("Unknown function");
