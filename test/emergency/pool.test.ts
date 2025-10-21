@@ -1,12 +1,12 @@
 import { emergencyActionsMap } from "@/core/emergency-actions";
 import { impersonateAndSendTxs } from "@/utils/test/send-txs";
-import { MarketConfiguratorContract } from "@gearbox-protocol/permissionless";
 import { GearboxSDK, MarketSuite } from "@gearbox-protocol/sdk";
 import {
   iPoolQuotaKeeperV310Abi,
   iPoolV310Abi,
 } from "@gearbox-protocol/sdk/abi";
 import { detectChain } from "@gearbox-protocol/sdk/dev";
+import { MarketConfiguratorContract } from "@gearbox-protocol/sdk/permissionless";
 import { config as dotenvConfig } from "dotenv";
 import {
   Address,

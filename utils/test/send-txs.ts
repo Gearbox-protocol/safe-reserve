@@ -1,5 +1,5 @@
-import { SafeTx } from "@gearbox-protocol/permissionless";
 import { RawTx } from "@gearbox-protocol/sdk";
+import { SafeTx } from "@gearbox-protocol/sdk/permissionless";
 import {
   Address,
   createWalletClient,

@@ -1,6 +1,5 @@
 import { chains } from "@/config/wagmi";
 import { useGetCollateralStatuses } from "@/hooks";
-import { shortenHash } from "@gearbox-protocol/permissionless";
 import {
   Button,
   Card,
@@ -20,6 +19,7 @@ import {
   TableRow,
 } from "@gearbox-protocol/permissionless-ui";
 import { CreditSuite } from "@gearbox-protocol/sdk";
+import { shortenHash } from "@gearbox-protocol/sdk/permissionless";
 import { CirclePause } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";

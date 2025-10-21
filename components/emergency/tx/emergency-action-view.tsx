@@ -9,12 +9,12 @@ import {
   useGetMarketConfiguratorInfo,
   useSDK,
 } from "@/hooks";
-import { shortenHash } from "@gearbox-protocol/permissionless";
 import {
   CopyButton,
   ExternalButton,
   PageLayout,
 } from "@gearbox-protocol/permissionless-ui";
+import { shortenHash } from "@gearbox-protocol/sdk/permissionless";
 import { useMemo } from "react";
 import { Address } from "viem";
 import { EmergencyEoaTx } from "./tx-params/eoa/emergency-eoa-tx";

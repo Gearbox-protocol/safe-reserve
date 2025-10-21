@@ -8,7 +8,7 @@ import {
   decodeMultisendTransactions,
   getReserveMultisigBatch,
 } from "@/utils/multisend";
-import { convertRawTxToSafeMultisigTx } from "@gearbox-protocol/permissionless";
+import { convertRawTxToSafeMultisigTx } from "@gearbox-protocol/sdk/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Address, Hex } from "viem";

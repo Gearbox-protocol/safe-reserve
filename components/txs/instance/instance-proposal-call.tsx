@@ -1,8 +1,8 @@
 import { Call } from "@/core/safe-tx";
 import { useDecodeInstanceCall, useGetInstanceCallMeta } from "@/hooks";
-import { Addresses, deepJsonParse } from "@gearbox-protocol/permissionless";
 import { Skeleton } from "@gearbox-protocol/permissionless-ui";
 import { json_stringify } from "@gearbox-protocol/sdk";
+import { Addresses, deepJsonParse } from "@gearbox-protocol/sdk/permissionless";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Address, formatUnits } from "viem";

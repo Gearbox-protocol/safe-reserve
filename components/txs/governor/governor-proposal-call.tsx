@@ -1,7 +1,7 @@
 import { Call } from "@/core/safe-tx";
 import { useDecodeGovernorCall } from "@/hooks";
-import { deepJsonParse } from "@gearbox-protocol/permissionless";
 import { json_stringify } from "@gearbox-protocol/sdk";
+import { deepJsonParse } from "@gearbox-protocol/sdk/permissionless";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { Address } from "viem";

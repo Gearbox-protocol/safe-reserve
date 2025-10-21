@@ -1,4 +1,4 @@
-import { iMarketConfiguratorAbi } from "@gearbox-protocol/permissionless";
+import { iMarketConfiguratorV310Abi } from "@gearbox-protocol/sdk/abi/310/generated";
 import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 import { usePublicClient } from "wagmi";
@@ -22,12 +22,12 @@ export function useGetMarketConfiguratorInfo({
         contracts: [
           {
             address,
-            abi: iMarketConfiguratorAbi,
+            abi: iMarketConfiguratorV310Abi,
             functionName: "curatorName",
           },
           {
             address,
-            abi: iMarketConfiguratorAbi,
+            abi: iMarketConfiguratorV310Abi,
             functionName: "emergencyAdmin",
           },
         ],

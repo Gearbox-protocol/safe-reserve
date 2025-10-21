@@ -1,4 +1,4 @@
-import { MarketConfiguratorContract } from "@gearbox-protocol/permissionless";
+import { MarketConfiguratorContract } from "@gearbox-protocol/sdk/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { Address, zeroAddress } from "viem";
 import { usePublicClient } from "wagmi";

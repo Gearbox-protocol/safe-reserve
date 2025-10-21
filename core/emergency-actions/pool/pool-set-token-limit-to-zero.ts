@@ -1,6 +1,6 @@
 import { iPoolEmergencyConfigureActionsAbi } from "@/abi";
 import { addressSchema } from "@/utils/validation";
-import { createCallData } from "@gearbox-protocol/permissionless";
+import { createCallData } from "@gearbox-protocol/sdk/permissionless";
 import { Address } from "viem";
 import { z } from "zod";
 import { BaseEmergencyAction, EmergencyActionData } from "../types";

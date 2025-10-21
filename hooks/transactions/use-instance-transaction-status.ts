@@ -3,7 +3,7 @@
 import { useSafeAddress, useSafeParams } from "@/hooks";
 import { getReserveMultisigBatch } from "@/utils/multisend";
 import { executedSafeTxs } from "@/utils/tx-status";
-import { SafeTx } from "@gearbox-protocol/permissionless";
+import { SafeTx } from "@gearbox-protocol/sdk/permissionless";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { Address, Hex } from "viem";

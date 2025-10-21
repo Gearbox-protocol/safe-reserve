@@ -1,5 +1,5 @@
 import { Call } from "@/core/safe-tx";
-import { GovernorContract } from "@gearbox-protocol/permissionless";
+import { GovernorContract } from "@gearbox-protocol/sdk/permissionless";
 import { Address, PublicClient } from "viem";
 import { usePublicClient } from "wagmi";
 

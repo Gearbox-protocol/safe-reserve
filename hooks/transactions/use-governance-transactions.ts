@@ -8,7 +8,7 @@ import {
   getReserveMultisigBatch,
 } from "@/utils/multisend";
 import { getTxStatus, TimelockTxStatus } from "@/utils/tx-status";
-import { SafeTx } from "@gearbox-protocol/permissionless";
+import { SafeTx } from "@gearbox-protocol/sdk/permissionless";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { Address, encodeAbiParameters, Hex, keccak256 } from "viem";
 import { usePublicClient } from "wagmi";

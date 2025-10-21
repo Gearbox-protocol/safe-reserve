@@ -4,7 +4,7 @@ import { useDecodeInstanceCalls, useSafeParams } from "@/hooks";
 import { useSafeSignature } from "@/hooks/actions/use-safe-signature";
 import { getMulticall3Params } from "@/utils/multicall3";
 import { getPriceFeedFromInstanceParsedCall } from "@/utils/parsed-call-utils";
-import { getPriceUpdateTx } from "@gearbox-protocol/permissionless";
+import { getPriceUpdateTx } from "@gearbox-protocol/sdk/permissionless";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Address, encodeFunctionData, Hex } from "viem";

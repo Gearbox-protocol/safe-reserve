@@ -7,7 +7,7 @@ import {
   decodeMultisendTransactions,
   getReserveMultisigBatch,
 } from "@/utils/multisend";
-import { SafeTx } from "@gearbox-protocol/permissionless";
+import { SafeTx } from "@gearbox-protocol/sdk/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { Address, Hex } from "viem";
 import { usePublicClient } from "wagmi";

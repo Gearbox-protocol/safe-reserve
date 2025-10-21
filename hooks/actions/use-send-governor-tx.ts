@@ -7,7 +7,7 @@ import { TimelockTxStatus } from "@/utils/tx-status";
 import {
   getCallsTouchedPriceFeeds,
   getPriceUpdateTx,
-} from "@gearbox-protocol/permissionless";
+} from "@gearbox-protocol/sdk/permissionless";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Address, encodeFunctionData, Hex } from "viem";

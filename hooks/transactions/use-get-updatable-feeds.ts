@@ -2,7 +2,7 @@ import { ParsedSignedTx, SignedTx } from "@/core/safe-tx";
 import {
   getCallsTouchedUpdatablePriceFeeds,
   ParsedCall,
-} from "@gearbox-protocol/permissionless";
+} from "@gearbox-protocol/sdk/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 import { usePublicClient } from "wagmi";

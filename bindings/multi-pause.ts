@@ -1,6 +1,6 @@
 import { MultiPauseAbi } from "@/abi";
-import { BaseContract } from "@gearbox-protocol/permissionless";
 import { RawTx } from "@gearbox-protocol/sdk";
+import { BaseContract } from "@gearbox-protocol/sdk/permissionless";
 import { type Address, type PublicClient } from "viem";
 
 const abi = MultiPauseAbi;

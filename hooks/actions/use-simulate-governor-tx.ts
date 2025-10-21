@@ -1,7 +1,7 @@
 import { ParsedSignedTx } from "@/core/safe-tx";
 import { useDecodeGovernorCalls } from "@/hooks";
 import { TimelockTxStatus } from "@/utils/tx-status";
-import { getCallsTouchedPriceFeeds } from "@gearbox-protocol/permissionless";
+import { getCallsTouchedPriceFeeds } from "@gearbox-protocol/sdk/permissionless";
 import { Address } from "viem";
 import { useBaseSimulateTx } from "./use-base-simulate-tx";
 

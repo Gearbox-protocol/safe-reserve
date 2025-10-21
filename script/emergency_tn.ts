@@ -1,5 +1,5 @@
 import { sendTxs } from "@/utils/test/send-txs";
-import { SafeTx } from "@gearbox-protocol/permissionless";
+import { SafeTx } from "@gearbox-protocol/sdk/permissionless";
 import { config } from "dotenv";
 import { readFileSync } from "fs";
 import {

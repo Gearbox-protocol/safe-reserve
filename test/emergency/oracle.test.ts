@@ -1,14 +1,14 @@
 import { emergencyActionsMap } from "@/core/emergency-actions";
 import { impersonateAndSendTxs } from "@/utils/test/send-txs";
+import { GearboxSDK, MarketSuite } from "@gearbox-protocol/sdk";
+import { detectChain } from "@gearbox-protocol/sdk/dev";
 import {
   Addresses,
   getPriceUpdateTx,
   MarketConfiguratorContract,
   PriceFeed,
   PriceFeedStoreContract,
-} from "@gearbox-protocol/permissionless";
-import { GearboxSDK, MarketSuite } from "@gearbox-protocol/sdk";
-import { detectChain } from "@gearbox-protocol/sdk/dev";
+} from "@gearbox-protocol/sdk/permissionless";
 import { config as dotenvConfig } from "dotenv";
 import {
   Address,

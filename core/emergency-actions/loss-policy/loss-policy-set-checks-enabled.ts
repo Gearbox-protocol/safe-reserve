@@ -1,6 +1,6 @@
 import { addressSchema } from "@/utils/validation";
-import { createCallData } from "@gearbox-protocol/permissionless";
-import { iLossPolicyV310Abi } from "@gearbox-protocol/sdk/abi";
+import { iLossPolicyV310Abi } from "@gearbox-protocol/sdk/abi/310/generated";
+import { createCallData } from "@gearbox-protocol/sdk/permissionless";
 import { Address } from "viem";
 import { z } from "zod";
 import { BaseEmergencyAction, EmergencyActionData } from "../types";

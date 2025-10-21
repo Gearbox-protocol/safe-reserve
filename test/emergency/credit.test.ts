@@ -1,6 +1,5 @@
 import { emergencyActionsMap } from "@/core/emergency-actions";
 import { impersonateAndSendTxs } from "@/utils/test/send-txs";
-import { MarketConfiguratorContract } from "@gearbox-protocol/permissionless";
 import { CreditSuite, GearboxSDK } from "@gearbox-protocol/sdk";
 import {
   iCreditConfiguratorV310Abi,
@@ -9,6 +8,7 @@ import {
   iMarketConfiguratorV310Abi,
 } from "@gearbox-protocol/sdk/abi";
 import { detectChain } from "@gearbox-protocol/sdk/dev";
+import { MarketConfiguratorContract } from "@gearbox-protocol/sdk/permissionless";
 import { config as dotenvConfig } from "dotenv";
 import {
   Address,

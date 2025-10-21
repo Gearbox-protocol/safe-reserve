@@ -1,9 +1,9 @@
 import { Call, SignedTx } from "@/core/safe-tx";
+import { json_parse } from "@gearbox-protocol/sdk";
 import {
   convertQueueBatchToExecuteTx,
   SafeTx,
-} from "@gearbox-protocol/permissionless";
-import { json_parse } from "@gearbox-protocol/sdk";
+} from "@gearbox-protocol/sdk/permissionless";
 import {
   Address,
   decodeFunctionData,

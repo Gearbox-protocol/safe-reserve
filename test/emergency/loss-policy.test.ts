@@ -1,9 +1,9 @@
 import { AccessMode, emergencyActionsMap } from "@/core/emergency-actions";
 import { getLossPolicyState } from "@/utils/state";
 import { impersonateAndSendTxs } from "@/utils/test/send-txs";
-import { MarketConfiguratorContract } from "@gearbox-protocol/permissionless";
 import { GearboxSDK, MarketSuite } from "@gearbox-protocol/sdk";
 import { detectChain } from "@gearbox-protocol/sdk/dev";
+import { MarketConfiguratorContract } from "@gearbox-protocol/sdk/permissionless";
 import { config as dotenvConfig } from "dotenv";
 import {
   Address,

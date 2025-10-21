@@ -1,9 +1,7 @@
 import { safeAbi } from "@/abi";
 import { EmergencyActionsType } from "@/core/emergency-actions";
-import {
-  iMarketConfiguratorAbi,
-  MarketConfiguratorContract,
-} from "@gearbox-protocol/permissionless";
+import { iMarketConfiguratorV310Abi } from "@gearbox-protocol/sdk/abi/310/generated";
+import { MarketConfiguratorContract } from "@gearbox-protocol/sdk/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { Address, PublicClient, zeroAddress } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
@@ -138,7 +136,7 @@ export function useGetEmergencyAdminInfo({
 
       const emergencyAdmin = await publicClient.readContract({
         address: marketConfigurator,
-        abi: iMarketConfiguratorAbi,
+        abi: iMarketConfiguratorV310Abi,
         functionName: "emergencyAdmin",
       });
 

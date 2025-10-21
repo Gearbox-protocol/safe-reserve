@@ -1,8 +1,8 @@
 "use client";
 
 import { instanceTxsSchema, timelockTxsSchema } from "@/utils/validation";
-import { SafeTx } from "@gearbox-protocol/permissionless";
 import { json_parse } from "@gearbox-protocol/sdk";
+import { SafeTx } from "@gearbox-protocol/sdk/permissionless";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 

@@ -3,7 +3,7 @@ import {
   BaseContract,
   getBlockNumberByTimestamp,
   TimeLockContract,
-} from "@gearbox-protocol/permissionless";
+} from "@gearbox-protocol/sdk/permissionless";
 import { Address, Hash, Hex, PublicClient } from "viem";
 import { HOUR_24 } from "./constant";
 

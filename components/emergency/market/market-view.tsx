@@ -2,7 +2,6 @@
 
 import { chains } from "@/config/wagmi";
 import { useGetMarketConfiguratorInfo, useSDK } from "@/hooks";
-import { shortenHash } from "@gearbox-protocol/permissionless";
 import {
   Card,
   CardTitle,
@@ -15,6 +14,7 @@ import {
   TabsTrigger,
   TokenIcon,
 } from "@gearbox-protocol/permissionless-ui";
+import { shortenHash } from "@gearbox-protocol/sdk/permissionless";
 import { CirclePause } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Address, formatUnits } from "viem";

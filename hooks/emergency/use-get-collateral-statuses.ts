@@ -2,7 +2,7 @@ import { CreditSuite } from "@gearbox-protocol/sdk";
 import {
   iCreditFacadeV310Abi,
   iCreditManagerV310Abi,
-} from "@gearbox-protocol/sdk/abi";
+} from "@gearbox-protocol/sdk/abi/310/generated";
 import { useQuery } from "@tanstack/react-query";
 import { usePublicClient } from "wagmi";
 

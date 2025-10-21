@@ -1,7 +1,6 @@
 "use client";
 
 import { chains } from "@/config/wagmi";
-import { shortenHash } from "@gearbox-protocol/permissionless";
 import {
   Button,
   Card,
@@ -17,6 +16,7 @@ import {
   TokenIcon,
 } from "@gearbox-protocol/permissionless-ui";
 import { MarketSuite } from "@gearbox-protocol/sdk";
+import { shortenHash } from "@gearbox-protocol/sdk/permissionless";
 import Link from "next/link";
 import { useMemo } from "react";
 import { Address, zeroAddress } from "viem";

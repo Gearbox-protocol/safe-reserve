@@ -1,7 +1,7 @@
 import {
   Addresses,
   PriceFeedStoreContract,
-} from "@gearbox-protocol/permissionless";
+} from "@gearbox-protocol/sdk/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 import { usePublicClient } from "wagmi";

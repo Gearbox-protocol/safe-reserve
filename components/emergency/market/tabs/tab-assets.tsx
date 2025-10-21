@@ -2,7 +2,6 @@
 
 import { chains } from "@/config/wagmi";
 import { useGetPriceFeeds } from "@/hooks";
-import { shortenHash } from "@gearbox-protocol/permissionless";
 import {
   Button,
   Card,
@@ -19,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@gearbox-protocol/permissionless-ui";
+import { shortenHash } from "@gearbox-protocol/sdk/permissionless";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Address, formatUnits, zeroAddress } from "viem";

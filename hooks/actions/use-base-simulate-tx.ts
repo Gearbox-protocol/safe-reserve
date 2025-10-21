@@ -122,7 +122,7 @@ export function useBaseSimulateTx(config: SimulationConfig) {
           ? undefined
           : await (async () => {
               const { getPriceUpdateTx } = await import(
-                "@gearbox-protocol/permissionless"
+                "@gearbox-protocol/sdk/permissionless"
               );
               return getPriceUpdateTx({
                 client: publicClient,

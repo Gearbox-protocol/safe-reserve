@@ -1,5 +1,5 @@
 import { EmergencyTx } from "@/core/emergency-actions";
-import { getPriceUpdateTx } from "@gearbox-protocol/permissionless";
+import { getPriceUpdateTx } from "@gearbox-protocol/sdk/permissionless";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {

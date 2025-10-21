@@ -1,4 +1,3 @@
-import { PriceFeed } from "@gearbox-protocol/permissionless";
 import {
   Button,
   Dialog,
@@ -13,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@gearbox-protocol/permissionless-ui";
+import { PriceFeed } from "@gearbox-protocol/sdk/permissionless";
 import Link from "next/link";
 import { useState } from "react";
 import { Address } from "viem";

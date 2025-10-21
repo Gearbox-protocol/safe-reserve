@@ -6,13 +6,13 @@ import {
   useGetMultipause,
   useSDK,
 } from "@/hooks";
-import { shortenHash } from "@gearbox-protocol/permissionless";
 import {
   Button,
   CopyButton,
   ExternalButton,
   PageLayout,
 } from "@gearbox-protocol/permissionless-ui";
+import { shortenHash } from "@gearbox-protocol/sdk/permissionless";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Address, isAddress, zeroAddress } from "viem";

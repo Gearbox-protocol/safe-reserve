@@ -1,4 +1,4 @@
-import { MarketConfiguratorContract } from "@gearbox-protocol/permissionless";
+import { MarketConfiguratorContract } from "@gearbox-protocol/sdk/permissionless";
 import { RawTx } from "@gearbox-protocol/sdk";
 import { z } from "zod";
 import { EmergencyActions } from ".";

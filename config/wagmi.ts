@@ -1,4 +1,4 @@
-import { ArchiveTransport } from "@gearbox-protocol/permissionless";
+import { ArchiveTransport } from "@gearbox-protocol/sdk/permissionless";
 import { getDefaultConfig } from "connectkit";
 import { Chain, defineChain, Transport } from "viem";
 import { createConfig, http } from "wagmi";

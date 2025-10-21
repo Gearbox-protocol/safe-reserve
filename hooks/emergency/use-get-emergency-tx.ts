@@ -2,7 +2,7 @@ import {
   EmergencyActions,
   emergencyActionsMap,
 } from "@/core/emergency-actions";
-import { MarketConfiguratorContract } from "@gearbox-protocol/permissionless";
+import { MarketConfiguratorContract } from "@gearbox-protocol/sdk/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 import { usePublicClient } from "wagmi";

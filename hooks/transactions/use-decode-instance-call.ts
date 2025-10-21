@@ -1,15 +1,15 @@
 import { Call } from "@/core/safe-tx";
 import {
-  deepJsonParse,
-  InstanceManagerContract,
-  ParsedCall,
-} from "@gearbox-protocol/permissionless";
-import {
   AddressMap,
   json_stringify,
   simulateWithPriceUpdates,
 } from "@gearbox-protocol/sdk";
-import { iVersionAbi } from "@gearbox-protocol/sdk/abi";
+import { iVersionAbi } from "@gearbox-protocol/sdk/abi/iVersion";
+import {
+  deepJsonParse,
+  InstanceManagerContract,
+  ParsedCall,
+} from "@gearbox-protocol/sdk/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import {

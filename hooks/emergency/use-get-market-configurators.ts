@@ -2,7 +2,7 @@ import { ADDRESS_PROVIDER, chains } from "@/config/wagmi";
 import {
   AddressProviderContract,
   MarketConfiguratorFactoryContract,
-} from "@gearbox-protocol/permissionless";
+} from "@gearbox-protocol/sdk/permissionless";
 import { useQueries } from "@tanstack/react-query";
 import { isAddress } from "viem";
 import { useConfig } from "wagmi";
