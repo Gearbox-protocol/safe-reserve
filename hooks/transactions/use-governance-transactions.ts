@@ -19,6 +19,7 @@ export function useGovernanceTransactions({
   marketConfigurator,
   eta,
   queueBatches,
+  updatableFeeds,
   createdAtBlock,
 }: {
   cid: string;
@@ -26,6 +27,7 @@ export function useGovernanceTransactions({
   marketConfigurator?: Address;
   eta?: number;
   queueBatches?: SafeTx[][];
+  updatableFeeds?: Address[][];
   createdAtBlock?: number;
 }): {
   txs: ParsedSignedTx[];
@@ -228,6 +230,7 @@ export function useGovernanceTransactions({
             queueBlock: statuses[index].data?.blockNumber ?? -1,
             eta,
             fetchStatus: statuses[index].refetch,
+            updatableFeeds: updatableFeeds?.[index],
           }))
         : [],
     safe: safeAddress,

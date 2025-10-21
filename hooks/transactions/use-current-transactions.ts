@@ -1,6 +1,6 @@
 "use client";
 
-import { ParsedSignedTx, SignedTx } from "@/core/safe-tx";
+import { ExtendedSignedTx, ParsedSignedTx } from "@/core/safe-tx";
 import { useIpfsData } from "@/hooks";
 import { Address, Hex } from "viem";
 import { useGovernanceTransactions } from "./use-governance-transactions";
@@ -8,6 +8,7 @@ import { useInstanceTransactions } from "./use-instance-transactions";
 
 interface CurrentTransactions {
   safe?: Address;
+  updatableFeeds?: Address[][];
   isLoading: boolean;
   error: Error | null;
   refetchSigs: () => Promise<unknown>;
@@ -23,7 +24,7 @@ export interface CurrentGovernorTransactions extends CurrentTransactions {
 export interface CurrentInstanceTransactions extends CurrentTransactions {
   type: "instance";
 
-  txs: SignedTx[];
+  txs: ExtendedSignedTx[];
   isExecuted?: boolean;
   executedTxHash?: Hex;
   instanceManager?: Address;
@@ -36,11 +37,12 @@ export function useCurrentTransactions(
   const {
     chainId,
     type,
-    marketConfigurator,
     eta,
-    batches,
-    instanceManager,
     createdAtBlock,
+    batches,
+    updatableFeeds,
+    marketConfigurator,
+    instanceManager,
     isLoading: isLoadingIpfsData,
     error: errorIpfsData,
   } = useIpfsData(cid);
@@ -82,6 +84,7 @@ export function useCurrentTransactions(
     return {
       type,
       txs: instanceTxs,
+      updatableFeeds,
       safe: instanceSafe,
       isExecuted,
       instanceManager,
@@ -94,6 +97,7 @@ export function useCurrentTransactions(
   return {
     type: "timelock",
     txs: governorTxs,
+    updatableFeeds,
     safe: governorSafe,
     governor,
     isLoading: isLoadingIpfsData || isLoadingGovernorTxs,

@@ -1,7 +1,7 @@
 "use client";
 
 import { chains } from "@/config/wagmi";
-import { SignedTx } from "@/core/safe-tx";
+import { ExtendedSignedTx } from "@/core/safe-tx";
 import { useGetInstanceUpdatableFeeds, useSafeParams, useSDK } from "@/hooks";
 import { MULTISEND_ADDRESS } from "@/utils/constant";
 import { shortenHash } from "@/utils/format";
@@ -20,7 +20,7 @@ import { InstanceProposalSignatures } from "./instance-proposal-signatures";
 import { InstanceButtonTx } from "./instance-tx-button";
 
 interface InstanceTransactionCardProps extends TransactionCardProps {
-  tx: SignedTx;
+  tx: ExtendedSignedTx;
   isExecuted: boolean;
   executedTxHash?: Hex;
   instanceManager: Address;

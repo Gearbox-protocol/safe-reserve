@@ -1,7 +1,7 @@
 "use client";
 
 import { chains } from "@/config/wagmi";
-import { SignedTx } from "@/core/safe-tx";
+import { ExtendedSignedTx } from "@/core/safe-tx";
 import {
   useIsSafeApp,
   useSafeParams,
@@ -19,7 +19,7 @@ import { TransactionInfoDialog } from "../transaction-info-dialog";
 interface ButtonTxProps {
   cid: string;
   chainId: number;
-  tx: SignedTx;
+  tx: ExtendedSignedTx;
   safeAddress: Address;
   instanceManager: Address;
   isExecuted: boolean;

@@ -43,7 +43,8 @@ export function useSendGovernorTx(
   } = useSafeSignature(chainId, tx.hash);
 
   const parsedCalls = useDecodeGovernorCalls(chainId, governor, tx.calls);
-  const priceFeeds = getCallsTouchedPriceFeeds(parsedCalls);
+  const priceFeeds =
+    tx.updatableFeeds ?? getCallsTouchedPriceFeeds(parsedCalls);
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async () => {

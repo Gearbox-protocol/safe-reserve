@@ -1,5 +1,5 @@
 import { safeAbi } from "@/abi";
-import { SignedTx } from "@/core/safe-tx";
+import { ExtendedSignedTx } from "@/core/safe-tx";
 import { useDecodeInstanceCalls, useSafeParams } from "@/hooks";
 import { useSafeSignature } from "@/hooks/actions/use-safe-signature";
 import { getMulticall3Params } from "@/utils/multicall3";
@@ -19,7 +19,7 @@ export function useSendInstanceTx(
   chainId: number,
   safeAddress: Address,
   instanceManager: Address,
-  tx: SignedTx,
+  tx: ExtendedSignedTx,
   onSuccess?: (txHash: Hex) => void
 ) {
   const { address } = useAccount();
@@ -45,9 +45,11 @@ export function useSendInstanceTx(
     instanceManager,
     tx.calls
   );
-  const priceFeeds = parsedCalls
-    .map(getPriceFeedFromInstanceParsedCall)
-    .filter((priceFeed) => priceFeed !== undefined) as Address[];
+  const priceFeeds =
+    tx.updatableFeeds ??
+    (parsedCalls
+      .map(getPriceFeedFromInstanceParsedCall)
+      .filter((priceFeed) => priceFeed !== undefined) as Address[]);
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async () => {

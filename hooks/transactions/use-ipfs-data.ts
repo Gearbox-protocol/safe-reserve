@@ -9,6 +9,8 @@ import { Address } from "viem";
 interface IpfsTxs {
   chainId: number;
   author: Address;
+
+  updatableFeeds?: Address[][];
 }
 
 export interface TimelockTxs extends IpfsTxs {
@@ -96,6 +98,7 @@ function getTypedIPFSData(ipfsData: TimelockTxs | InstanceTxs | undefined) {
       marketConfigurator: ipfsData?.marketConfigurator,
       createdAtBlock: ipfsData?.createdAtBlock,
       batches: ipfsData?.queueBatches,
+      updatableFeeds: ipfsData?.updatableFeeds,
     };
   else
     return {
@@ -105,6 +108,7 @@ function getTypedIPFSData(ipfsData: TimelockTxs | InstanceTxs | undefined) {
       instanceManager: ipfsData?.instanceManager,
       batches: ipfsData?.batches,
       createdAtBlock: ipfsData?.createdAtBlock,
+      updatableFeeds: ipfsData?.updatableFeeds,
     };
 }
 
@@ -114,10 +118,12 @@ export function useIpfsData(cid: string): {
   author?: Address;
 
   eta?: number;
-  marketConfigurator?: Address;
   createdAtBlock?: number;
-  batches?: SafeTx[][];
 
+  batches?: SafeTx[][];
+  updatableFeeds?: Address[][];
+
+  marketConfigurator?: Address;
   instanceManager?: Address;
 
   isLoading: boolean;
@@ -162,11 +168,13 @@ export function useMultipleIpfsData(cids: string[]): {
     author?: Address;
 
     eta?: number;
-    marketConfigurator?: Address;
     createdAtBlock?: number;
+
     batches?: SafeTx[][];
+    updatableFeeds?: Address[][];
 
     instanceManager?: Address;
+    marketConfigurator?: Address;
   }[];
 
   isLoading: boolean;

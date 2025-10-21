@@ -21,8 +21,11 @@ export interface SignedTx {
   signedBy: Address[];
   calls: Call[];
 }
+export interface ExtendedSignedTx extends SignedTx {
+  updatableFeeds?: Address[];
+}
 
-export interface ParsedSignedTx extends SignedTx {
+export interface ParsedSignedTx extends ExtendedSignedTx {
   queueBlock: number;
   status: TimelockTxStatus;
   fetchStatus: () => Promise<unknown>;

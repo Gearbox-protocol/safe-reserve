@@ -16,7 +16,9 @@ export function useSimulateGovernorTx(
   const priceFeeds = getCallsTouchedPriceFeeds(parsedCalls);
 
   // For queue transactions, we don't need price feeds
-  const effectivePriceFeeds = isQueueTx ? [] : priceFeeds;
+  const effectivePriceFeeds = isQueueTx
+    ? []
+    : (tx.updatableFeeds ?? priceFeeds);
 
   return useBaseSimulateTx({
     chainId,

@@ -1,5 +1,5 @@
 import { FormattedTrace } from "@/components/ui/formatted-trace";
-import { ParsedSignedTx, SignedTx } from "@/core/safe-tx";
+import { ExtendedSignedTx, ParsedSignedTx } from "@/core/safe-tx";
 import { useSimulateGovernorTx } from "@/hooks/actions/use-simulate-governor-tx";
 import { useSimulateInstanceTx } from "@/hooks/actions/use-simulate-instance-tx";
 import {
@@ -16,7 +16,7 @@ import { Address } from "viem";
 
 interface SimulateTxButtonProps {
   chainId: number;
-  tx: SignedTx | ParsedSignedTx;
+  tx: ExtendedSignedTx | ParsedSignedTx;
   safeAddress: Address;
   governor: Address;
   instanceManager: Address;
@@ -64,7 +64,7 @@ function InstanceSimulateTxButton({
   instanceManager,
 }: {
   chainId: number;
-  tx: SignedTx;
+  tx: ExtendedSignedTx;
   safeAddress: Address;
   instanceManager: Address;
 }) {

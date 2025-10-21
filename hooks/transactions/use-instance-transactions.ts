@@ -1,7 +1,7 @@
 "use client";
 
 import { safeAbi } from "@/abi";
-import { SignedTx } from "@/core/safe-tx";
+import { ExtendedSignedTx, SignedTx } from "@/core/safe-tx";
 import { useSafeAddress, useSafeParams } from "@/hooks";
 import {
   decodeMultisendTransactions,
@@ -17,18 +17,20 @@ export function useInstanceTransactions({
   cid,
   chainId,
   batches,
+  updatableFeeds,
   instanceManager,
   createdAtBlock,
   useNonce,
 }: {
   cid: string;
   chainId?: number;
-  instanceManager?: Address;
   batches?: SafeTx[][];
+  updatableFeeds?: Address[][];
+  instanceManager?: Address;
   createdAtBlock?: number;
   useNonce?: number;
 }): {
-  txs: SignedTx[];
+  txs: ExtendedSignedTx[];
   safe?: Address;
   isExecuted: boolean | undefined;
   executedTxHash?: Hex;
@@ -171,7 +173,11 @@ export function useInstanceTransactions({
   });
 
   return {
-    txs: txs ?? [],
+    txs:
+      txs?.map((tx, index) => ({
+        ...tx,
+        updatableFeeds: updatableFeeds?.[index],
+      })) ?? [],
     isExecuted,
     executedTxHash,
     safe: safe,

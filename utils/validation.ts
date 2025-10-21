@@ -34,6 +34,7 @@ export const timelockTxsSchema = z.object({
   marketConfigurator: addressSchema,
   createdAtBlock: z.number(),
   queueBatches: z.array(z.array(safeTxSchema)),
+  updatableFeeds: z.array(z.array(addressSchema)).optional(),
 });
 
 export const instanceTxsSchema = z.object({
@@ -42,4 +43,5 @@ export const instanceTxsSchema = z.object({
   instanceManager: addressSchema,
   createdAtBlock: z.number().optional(),
   batches: z.array(z.array(safeTxSchema)),
+  updatableFeeds: z.array(z.array(addressSchema)).optional(),
 });
