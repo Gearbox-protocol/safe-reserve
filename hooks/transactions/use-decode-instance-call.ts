@@ -59,7 +59,7 @@ export function useGetInstanceCallMeta(
     let setLimiterCalls;
 
     try {
-      const match = parsedCall.args.data.match(/^(\w+)\((\{[\s\S]*\})\)$/);
+      const match = parsedCall.args?.data?.match(/^(\w+)\((\{[\s\S]*\})\)$/);
       if (match) {
         const [, name, jsonStr] = match;
         fnName = name;
@@ -74,7 +74,7 @@ export function useGetInstanceCallMeta(
           }
 
           if (
-            parsedCall.args.data.startsWith("configurePriceFeeds") &&
+            parsedCall.args?.data?.startsWith("configurePriceFeeds") &&
             "calls" in parsed &&
             Array.isArray(parsed.calls)
           ) {

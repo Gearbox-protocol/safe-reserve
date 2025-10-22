@@ -15,8 +15,8 @@ importers:
         specifier: ^1.1.2
         version: 1.1.2(@babel/core@7.28.4)(@tanstack/query-core@5.87.1)(@tanstack/react-query@5.87.1(react@18.3.1))(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(bufferutil@4.0.9)(react-is@18.3.1)(tailwindcss@3.4.17)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
       '@gearbox-protocol/sdk':
-        specifier: ^9.15.4
-        version: 9.15.4(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(viem-deal@2.0.4(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)))
+        specifier: ^9.16.2
+        version: 9.16.2(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(viem-deal@2.0.4(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)))
       '@radix-ui/react-alert-dialog':
         specifier: ^1.1.4
         version: 1.1.15(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -732,8 +732,8 @@ packages:
   '@gearbox-protocol/permissionless-ui@1.1.2':
     resolution: {integrity: sha512-heNHmAxKiFi/kytkKndc1IyNTLWtyn10nGoYFb3Hwf3n768vhxXXh0psVat4vIEnhFW1mjpxO2KF+UbTwUBgPg==}
 
-  '@gearbox-protocol/sdk@9.15.4':
-    resolution: {integrity: sha512-Dh1HFoylBGqoHggpU/WbDscHp3/pL5QPHf7Jp0/9yc05zmsVeW/EeNRyo3lpFeY+Gx+47yousEXVYxALYNDAbw==}
+  '@gearbox-protocol/sdk@9.16.2':
+    resolution: {integrity: sha512-keMoE2bpfiXP4o6yxgKWXtU+JMzwQFRJZKecIn1bB9crzJSlVfaoD6FKWvbYdJyQaauakx1uKZ7gwQA1g1ewtQ==}
     peerDependencies:
       axios: ^1.0.0
       viem-deal: ^2.0.4
@@ -6128,7 +6128,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@gearbox-protocol/sdk@9.15.4(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(viem-deal@2.0.4(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)))':
+  '@gearbox-protocol/sdk@9.16.2(axios@1.11.0)(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(viem-deal@2.0.4(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)))':
     dependencies:
       '@gearbox-protocol/integrations-v3': 1.48.0
       '@redstone-finance/evm-connector': 0.9.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)

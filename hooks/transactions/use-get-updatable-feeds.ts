@@ -74,7 +74,11 @@ export function useGetInstanceUpdatableFeeds({
     chainId,
     instanceManager,
     tx.calls
-  ).filter(({ args }) => args.data.startsWith("addPriceFeed"));
+  ).filter(
+    ({ args }) =>
+      args?.data?.startsWith("addPriceFeed") ||
+      args?.functionName === "addPriceFeed"
+  );
 
   return useGetUpdatableFeeds({
     chainId,

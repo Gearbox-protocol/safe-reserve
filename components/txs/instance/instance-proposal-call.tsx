@@ -46,7 +46,8 @@ export function InstanceProposalCall({
 
         if (
           callMeta.priceFeedDeviations !== undefined &&
-          parsedCall.args.data.startsWith("configurePriceFeeds") &&
+          (parsedCall.args?.data?.startsWith("configurePriceFeeds") ||
+            parsedCall.args?.functionName === "configurePriceFeeds") &&
           "calls" in parsedWithMeta &&
           Array.isArray(parsedWithMeta.calls)
         ) {
@@ -107,14 +108,14 @@ export function InstanceProposalCall({
       }
       return String(parsed);
     },
-    [callMeta, parsedCall.args.data]
+    [callMeta, parsedCall]
   );
 
   const isDecoded = !parsedCall.functionName.startsWith("Unknown function");
   const isExpandable = !isDecoded || Object.keys(parsedCall.args).length > 0;
-  const functionNamePrefix = parsedCall.args.signature
+  const functionNamePrefix = parsedCall.args?.signature
     ? parsedCall.args.signature.split("(")[0]
-    : null;
+    : (parsedCall.args?.functionName ?? null);
 
   return (
     <div className="rounded bg-gray-900/30">

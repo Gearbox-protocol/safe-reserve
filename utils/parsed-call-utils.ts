@@ -4,7 +4,7 @@ import {
 } from "@gearbox-protocol/sdk/permissionless";
 
 export function getPriceFeedFromInstanceParsedCall(parsedCall: ParsedCall) {
-  const match = parsedCall.args.data.match(/^(\w+)\((\{[\s\S]*\})\)$/);
+  const match = parsedCall.args?.data?.match(/^(\w+)\((\{[\s\S]*\})\)$/);
   if (match) {
     const [, name, jsonStr] = match;
     const fnName = name;
