@@ -59,37 +59,43 @@ export function useGetInstanceCallMeta(
     let setLimiterCalls;
 
     try {
+      let name;
+      let jsonStr;
       const match = parsedCall.args?.data?.match(/^(\w+)\((\{[\s\S]*\})\)$/);
       if (match) {
-        const [, name, jsonStr] = match;
+        [, name, jsonStr] = match;
         fnName = name;
-        const parsed = deepJsonParse(jsonStr);
+      } else {
+        fnName = parsedCall.args?.functionName;
+        jsonStr = parsedCall.args?.data;
+      }
 
-        if (typeof parsed === "object" && parsed !== null) {
-          if ("token" in parsed && typeof parsed.token === "string") {
-            token = parsed.token;
-          }
-          if ("priceFeed" in parsed && typeof parsed.priceFeed === "string") {
-            priceFeed = parsed.priceFeed;
-          }
+      const parsed = deepJsonParse(jsonStr);
 
+      if (typeof parsed === "object" && parsed !== null) {
+        if ("token" in parsed && typeof parsed.token === "string") {
+          token = parsed.token;
+        }
+        if ("priceFeed" in parsed && typeof parsed.priceFeed === "string") {
+          priceFeed = parsed.priceFeed;
+        }
+
+        if (
+          (parsedCall.args?.data?.startsWith("configurePriceFeeds") ||
+            parsedCall.args?.functionName === "configurePriceFeeds") &&
+          "calls" in parsed &&
+          Array.isArray(parsed.calls)
+        ) {
           if (
-            parsedCall.args?.data?.startsWith("configurePriceFeeds") &&
-            "calls" in parsed &&
-            Array.isArray(parsed.calls)
+            parsed.calls.every(
+              (call) =>
+                call.functionName === "setLimiter" && "lowerBound" in call.args
+            )
           ) {
-            if (
-              parsed.calls.every(
-                (call) =>
-                  call.functionName === "setLimiter" &&
-                  "lowerBound" in call.args
-              )
-            ) {
-              setLimiterCalls = parsed.calls.map((call) => ({
-                priceFeed: call.target,
-                lowerBound: BigInt(Math.floor(call.args.lowerBound * 1e18)),
-              })) as { priceFeed: Address; lowerBound: bigint }[];
-            }
+            setLimiterCalls = parsed.calls.map((call) => ({
+              priceFeed: call.target,
+              lowerBound: BigInt(Math.floor(call.args.lowerBound * 1e18)),
+            })) as { priceFeed: Address; lowerBound: bigint }[];
           }
         }
       }

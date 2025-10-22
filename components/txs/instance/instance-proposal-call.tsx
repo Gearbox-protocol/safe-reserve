@@ -131,7 +131,9 @@ export function InstanceProposalCall({
         <span className="text-gray-300">
           {isDecoded
             ? `${parsedCall.functionName} ${
-                functionNamePrefix ? `[${functionNamePrefix}]` : ""
+                functionNamePrefix && !callMeta.fnName
+                  ? `[${functionNamePrefix}]`
+                  : ""
               }`
             : "Unknown function"}
         </span>
