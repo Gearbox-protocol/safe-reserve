@@ -1,4 +1,4 @@
-import { ParsedSignedTx, SignedTx } from "@/core/safe-tx";
+import { ExtendedSignedTx, ParsedSignedTx } from "@/core/safe-tx";
 import {
   getCallsTouchedUpdatablePriceFeeds,
   ParsedCall,
@@ -14,11 +14,13 @@ function useGetUpdatableFeeds({
   chainId,
   index,
   parsedCalls,
+  tx,
 }: {
   cid: string;
   chainId: number;
   index: number;
   parsedCalls: ParsedCall[];
+  tx: ExtendedSignedTx;
 }) {
   const publicClient = usePublicClient({ chainId });
 
@@ -26,6 +28,7 @@ function useGetUpdatableFeeds({
     queryKey: [cid, index],
     queryFn: async () => {
       if (!publicClient) return;
+      if (tx.updatableFeeds) return tx.updatableFeeds;
 
       return await getCallsTouchedUpdatablePriceFeeds({
         client: publicClient,
@@ -54,6 +57,7 @@ export function useGetGovernorUpdatableFeeds({
   return useGetUpdatableFeeds({
     chainId,
     parsedCalls,
+    tx,
     ...rest,
   });
 }
@@ -65,7 +69,7 @@ export function useGetInstanceUpdatableFeeds({
   ...rest
 }: {
   instanceManager: Address;
-  tx: SignedTx;
+  tx: ExtendedSignedTx;
   cid: string;
   chainId: number;
   index: number;
@@ -83,6 +87,7 @@ export function useGetInstanceUpdatableFeeds({
   return useGetUpdatableFeeds({
     chainId,
     parsedCalls,
+    tx,
     ...rest,
   });
 }

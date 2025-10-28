@@ -8,7 +8,6 @@ import { useInstanceTransactions } from "./use-instance-transactions";
 
 interface CurrentTransactions {
   safe?: Address;
-  updatableFeeds?: Address[][];
   isLoading: boolean;
   error: Error | null;
   refetchSigs: () => Promise<unknown>;
@@ -83,8 +82,10 @@ export function useCurrentTransactions(
   if (type === "instance")
     return {
       type,
-      txs: instanceTxs,
-      updatableFeeds,
+      txs: instanceTxs.map((tx, index) => ({
+        ...tx,
+        updatableFeeds: tx.updatableFeeds ?? updatableFeeds?.[index],
+      })),
       safe: instanceSafe,
       isExecuted,
       instanceManager,
@@ -96,8 +97,10 @@ export function useCurrentTransactions(
 
   return {
     type: "timelock",
-    txs: governorTxs,
-    updatableFeeds,
+    txs: governorTxs.map((tx, index) => ({
+      ...tx,
+      updatableFeeds: tx.updatableFeeds ?? updatableFeeds?.[index],
+    })),
     safe: governorSafe,
     governor,
     isLoading: isLoadingIpfsData || isLoadingGovernorTxs,
