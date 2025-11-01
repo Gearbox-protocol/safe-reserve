@@ -11,11 +11,11 @@ export function useGetPriceFeedsInfo({
   sdk: GearboxSDK;
   priceFeeds: Address[];
 }) {
-  const publicClient = usePublicClient({ chainId: sdk.provider.chainId });
+  const publicClient = usePublicClient({ chainId: sdk.chainId });
 
   return useQueries({
     queries: priceFeeds.map((priceFeed) => ({
-      queryKey: ["price-feed-info", sdk.provider.chainId, priceFeed],
+      queryKey: ["price-feed-info", sdk.chainId, priceFeed],
       queryFn: async () => {
         if (!publicClient) return;
 

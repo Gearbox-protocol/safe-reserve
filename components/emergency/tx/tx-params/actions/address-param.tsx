@@ -26,9 +26,9 @@ export function AddressParamsView({
       <div className="flex gap-2 text-gray-100">
         <div className="break-all">{address}</div>
         <CopyButton text={address} size="3.5" />
-        {sdk.provider.chain?.blockExplorers?.default.url && (
+        {sdk.chain?.blockExplorers?.default.url && (
           <ExternalButton
-            url={`${sdk.provider.chain.blockExplorers?.default.url}/address/${address}`}
+            url={`${sdk.chain.blockExplorers?.default.url}/address/${address}`}
             size="3.5"
           />
         )}
