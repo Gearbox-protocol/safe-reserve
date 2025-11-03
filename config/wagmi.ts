@@ -3,6 +3,7 @@ import { getDefaultConfig } from "connectkit";
 import { Chain, defineChain, Transport } from "viem";
 import { createConfig, http } from "wagmi";
 import {
+  arbitrum,
   avalanche,
   base,
   berachain,
@@ -11,6 +12,7 @@ import {
   hemi,
   lisk,
   mainnet,
+  optimism,
   plasma,
   worldchain,
 } from "wagmi/chains";
@@ -38,6 +40,8 @@ const plasmaWithMulticall3 = defineChain({
 
 export const chains = [
   mainnet,
+  optimism,
+  arbitrum,
   base,
   avalanche,
   bsc,
@@ -127,6 +131,24 @@ export const getChainTransport = (chain: Chain): Transport => {
     }).getTransport();
   }
 
+  if (chain.id === optimism.id) {
+    return new ArchiveTransport({
+      primaryRpcUrl: drpcUrl("optimism"),
+      archiveRpcUrl: "https://explorer.optimism.io/api/eth-rpc",
+      blockThreshold: 999,
+      enableLogging: true,
+    }).getTransport();
+  }
+
+  if (chain.id === arbitrum.id) {
+    return new ArchiveTransport({
+      primaryRpcUrl: drpcUrl("arbitrum"),
+      archiveRpcUrl: "https://arbitrum.blockscout.com/api/eth-rpc",
+      blockThreshold: 999,
+      enableLogging: true,
+    }).getTransport();
+  }
+
   // Try to use window.ethereum if available
   // if (typeof window !== "undefined" && window.ethereum) {
   //   return custom(window.ethereum);
@@ -155,6 +177,8 @@ export const config = createConfig(
       [lisk.id]: getChainTransport(lisk),
       [berachain.id]: getChainTransport(berachain),
       [plasma.id]: getChainTransport(plasma),
+      [optimism.id]: getChainTransport(optimism),
+      [arbitrum.id]: getChainTransport(arbitrum),
     } as Record<number, Transport>,
 
     // connectors: [
