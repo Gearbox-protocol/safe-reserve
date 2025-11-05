@@ -139,11 +139,10 @@ export function MarketCard({
                     ({shortenHash(market.pool.pool.address)})
                   </div>
 
-                  <CopyButton text={market.pool.pool.address} size="3.5" />
+                  <CopyButton text={market.pool.pool.address} />
                   {chain?.blockExplorers.default.url && (
                     <ExternalButton
                       url={`${chain.blockExplorers.default.url}/address/${market.pool.pool.address}`}
-                      size="3.5"
                     />
                   )}
                 </div>
@@ -197,11 +196,10 @@ export function MarketCard({
                       ({shortenHash(cm.creditManager.address)})
                     </div>
 
-                    <CopyButton text={cm.creditManager.address} size="3.5" />
+                    <CopyButton text={cm.creditManager.address} />
                     {chain?.blockExplorers.default.url && (
                       <ExternalButton
                         url={`${chain.blockExplorers.default.url}/address/${cm.creditManager.address}`}
-                        size="3.5"
                       />
                     )}
                   </div>

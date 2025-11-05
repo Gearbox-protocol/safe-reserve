@@ -114,11 +114,10 @@ export function EmergencyActionView({
           <div className="text-sm text-muted-foreground break-all">
             {chain?.name ?? chainId} · {shortenHash(marketConfigurator)}
           </div>
-          <CopyButton text={marketConfigurator} size="3.5" />
+          <CopyButton text={marketConfigurator} />
           {chain?.blockExplorers.default.url && (
             <ExternalButton
               url={`${chain.blockExplorers.default.url}/address/${marketConfigurator}`}
-              size="3.5"
             />
           )}
         </div>

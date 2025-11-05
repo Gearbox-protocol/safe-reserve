@@ -96,11 +96,10 @@ export function MarketView({
             {shortenHash(marketSuite.pool.pool.address)}
           </div>
 
-          <CopyButton text={marketSuite.pool.pool.address} size="3.5" />
+          <CopyButton text={marketSuite.pool.pool.address} />
           {chain?.blockExplorers.default.url && (
             <ExternalButton
               url={`${chain.blockExplorers.default.url}/address/${marketSuite.pool.pool.address}`}
-              size="3.5"
             />
           )}
         </div>

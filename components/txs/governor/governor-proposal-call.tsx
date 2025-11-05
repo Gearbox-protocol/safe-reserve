@@ -1,30 +1,18 @@
+import { RenderAddressText } from "@/components/ui/render-address-text";
 import { Call } from "@/core/safe-tx";
 import { useDecodeGovernorCall } from "@/hooks";
 import { json_stringify } from "@gearbox-protocol/sdk";
 import { deepJsonParse } from "@gearbox-protocol/sdk/permissionless";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Address } from "viem";
+import { useAccount } from "wagmi";
 
 interface ProposalCallProps {
   chainId: number;
   governor: Address;
   index: number;
   call: Call;
-}
-
-function tryPrettyPrint(value: unknown): React.ReactNode {
-  const parsed = deepJsonParse(value);
-
-  if (typeof parsed === "object" && parsed !== null) {
-    return (
-      <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
-        {json_stringify(parsed)}
-      </pre>
-    );
-  }
-
-  return String(parsed);
 }
 
 export function GovernorProposalCall({
@@ -34,8 +22,34 @@ export function GovernorProposalCall({
   call,
 }: ProposalCallProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { chain } = useAccount();
 
   const parsedCall = useDecodeGovernorCall(chainId, governor, call);
+
+  const tryPrettyPrint = useCallback(
+    (value: unknown) => {
+      const parsed = deepJsonParse(value);
+
+      if (typeof parsed === "object" && parsed !== null) {
+        return (
+          <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
+            <RenderAddressText
+              text={json_stringify(parsed)}
+              blockExplorerUrl={chain?.blockExplorers?.default?.url}
+            />
+          </pre>
+        );
+      }
+
+      return (
+        <RenderAddressText
+          text={String(parsed)}
+          blockExplorerUrl={chain?.blockExplorers?.default?.url}
+        />
+      );
+    },
+    [chain]
+  );
 
   const isDecoded = !parsedCall.functionName.startsWith("Unknown function");
   const isExpandable = !isDecoded || Object.keys(parsedCall.args).length > 0;

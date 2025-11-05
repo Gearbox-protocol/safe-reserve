@@ -168,9 +168,13 @@ export function GovernorTransactionCard({
                             <code className="flex items-center gap-2">
                               <div>{feed}</div>
 
-                              <CopyButton text={feed} />
+                              <CopyButton
+                                text={feed}
+                                className="text-gray-400"
+                              />
                               {chain?.blockExplorers.default.url && (
                                 <ExternalButton
+                                  className="text-gray-400"
                                   url={`${chain.blockExplorers.default.url}/address/${feed}`}
                                 />
                               )}

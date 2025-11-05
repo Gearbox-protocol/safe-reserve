@@ -1,3 +1,4 @@
+import { RenderAddressText } from "@/components/ui/render-address-text";
 import { Call } from "@/core/safe-tx";
 import { useDecodeInstanceCall, useGetInstanceCallMeta } from "@/hooks";
 import { Skeleton } from "@gearbox-protocol/permissionless-ui";
@@ -6,6 +7,7 @@ import { Addresses, deepJsonParse } from "@gearbox-protocol/sdk/permissionless";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Address, formatUnits } from "viem";
+import { useAccount } from "wagmi";
 
 interface ProposalCallProps {
   chainId: number;
@@ -29,6 +31,7 @@ export function InstanceProposalCall({
 
   const callMeta = useGetInstanceCallMeta(chainId, parsedCall);
   const [isExpanded, setIsExpanded] = useState(false);
+  const { chain } = useAccount();
 
   const tryPrettyPrint = useCallback(
     (value: unknown) => {
@@ -76,7 +79,10 @@ export function InstanceProposalCall({
 
         return (
           <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
-            {json_stringify(parsedWithMeta)}
+            <RenderAddressText
+              text={json_stringify(parsedWithMeta)}
+              blockExplorerUrl={chain?.blockExplorers?.default?.url}
+            />
           </pre>
         );
       } else if (
@@ -84,7 +90,6 @@ export function InstanceProposalCall({
         typeof parsed === "string" &&
         parsed !== null
       ) {
-        // parse string "fname(Object)"
         const match = value.match(/^(\w+)\((\{[\s\S]*\})\)$/);
         if (match) {
           const [, fnName, jsonStr] = match;
@@ -104,11 +109,22 @@ export function InstanceProposalCall({
         typeof parsed === "string" &&
         parsed.toLowerCase() === Addresses.PRICE_FEED_STORE.toLowerCase()
       ) {
-        return `${parsed} [Price Feed Store]`;
+        return (
+          <RenderAddressText
+            text={`${parsed} [Price Feed Store]`}
+            blockExplorerUrl={chain?.blockExplorers?.default?.url}
+          />
+        );
       }
-      return String(parsed);
+
+      return (
+        <RenderAddressText
+          text={String(parsed)}
+          blockExplorerUrl={chain?.blockExplorers?.default?.url}
+        />
+      );
     },
-    [callMeta, parsedCall]
+    [callMeta, parsedCall, chain]
   );
 
   const isDecoded = !parsedCall.functionName.startsWith("Unknown function");

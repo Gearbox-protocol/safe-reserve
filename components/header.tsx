@@ -4,17 +4,19 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuPortal,
   DropdownMenuTrigger,
 } from "@gearbox-protocol/permissionless-ui";
 import { ConnectKitButton } from "connectkit";
 import { Ellipsis } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
 
 export default function Header() {
   const { chain, isConnected } = useAccount();
+  const pathname = usePathname();
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-800 bg-background px-4 py-2">
@@ -27,8 +29,28 @@ export default function Header() {
             height={24}
             priority
           />
-          <span className="font-bold italic">Permissionless Safe</span>
+          <span className="font-bold italic">Safe</span>
         </div>
+
+        <nav className="hidden md:flex space-x-4">
+          <Link
+            href="/"
+            className={`text-foreground px-2 py-1 rounded transition-colors duration-200 ease-in-out ${
+              !pathname.startsWith("/emergency") ? "bg-muted" : "hover:bg-muted"
+            }`}
+          >
+            Multisig
+          </Link>
+          <Link
+            href="/emergency"
+            className={`text-foreground px-2 py-1 rounded transition-colors duration-200 ease-in-out ${
+              pathname.startsWith("/emergency") ? "bg-muted" : "hover:bg-muted"
+            }`}
+          >
+            Emergency
+          </Link>
+        </nav>
+
         <div className="flex items-center gap-4">
           {/* Network Display */}
           {isConnected && chain && (
@@ -47,14 +69,7 @@ export default function Header() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuPortal>
-              <DropdownMenuContent>
-                <a href="/">
-                  <DropdownMenuItem>Execute transactions</DropdownMenuItem>
-                </a>
-                <a href="/emergency">
-                  <DropdownMenuItem>Emergency Admin</DropdownMenuItem>
-                </a>
-              </DropdownMenuContent>
+              <DropdownMenuContent></DropdownMenuContent>
             </DropdownMenuPortal>
           </DropdownMenu>
         </div>

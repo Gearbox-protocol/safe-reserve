@@ -93,11 +93,10 @@ export function ViewTxList({
                     </span>
                     <code className="flex items-center gap-2 text-gray-100">
                       {shortenHash(marketConfigurator)}
-                      <CopyButton text={marketConfigurator} size="3.5" />
+                      <CopyButton text={marketConfigurator} />
                       {chain?.blockExplorers?.default?.url && (
                         <ExternalButton
                           url={`${chain.blockExplorers.default.url}/address/${marketConfigurator}`}
-                          size="3.5"
                         />
                       )}
                     </code>
@@ -110,11 +109,10 @@ export function ViewTxList({
                     </span>
                     <code className="flex items-center gap-2 text-gray-100">
                       {shortenHash(instanceManager)}
-                      <CopyButton text={instanceManager} size="3.5" />
+                      <CopyButton text={instanceManager} />
                       {chain?.blockExplorers?.default?.url && (
                         <ExternalButton
                           url={`${chain.blockExplorers.default.url}/address/${instanceManager}`}
-                          size="3.5"
                         />
                       )}
                     </code>
@@ -124,11 +122,10 @@ export function ViewTxList({
                   <span className="min-w-[180px] text-gray-300">Safe:</span>
                   <code className="flex items-center gap-2 text-gray-100">
                     {shortenHash(safe!)}
-                    <CopyButton text={safe!} size="3.5" />
+                    <CopyButton text={safe!} />
                     {chain?.blockExplorers?.default?.url && (
                       <ExternalButton
                         url={`${chain.blockExplorers.default.url}/address/${safe}`}
-                        size="3.5"
                       />
                     )}
                   </code>
@@ -137,11 +134,10 @@ export function ViewTxList({
                   <span className="min-w-[180px] text-gray-300">Author:</span>
                   <code className="flex items-center gap-2 text-gray-100">
                     {shortenHash(author!)}
-                    <CopyButton text={author!} size="3.5" />
+                    <CopyButton text={author!} />
                     {chain?.blockExplorers?.default?.url && (
                       <ExternalButton
                         url={`${chain.blockExplorers.default.url}/address/${author}`}
-                        size="3.5"
                       />
                     )}
                   </code>

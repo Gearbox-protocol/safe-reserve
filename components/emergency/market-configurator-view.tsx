@@ -116,11 +116,10 @@ export function MarketConfiguratorView({
               {chain?.name ?? chainId} · {shortenHash(address)}
             </div>
 
-            <CopyButton text={address} size="3.5" />
+            <CopyButton text={address} />
             {chain?.blockExplorers.default.url && (
               <ExternalButton
                 url={`${chain.blockExplorers.default.url}/address/${address}`}
-                size="3.5"
               />
             )}
           </div>
