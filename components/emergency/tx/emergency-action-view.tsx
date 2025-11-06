@@ -15,8 +15,9 @@ import {
   PageLayout,
 } from "@gearbox-protocol/permissionless-ui";
 import { shortenHash } from "@gearbox-protocol/sdk/permissionless";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Address } from "viem";
+import { useAccount, useSwitchChain } from "wagmi";
 import { EmergencyEoaTx } from "./tx-params/eoa/emergency-eoa-tx";
 import { EmergencySafeTx } from "./tx-params/safe/emergency-safe-tx";
 
@@ -29,7 +30,16 @@ export function EmergencyActionView({
   marketConfigurator: Address;
   action: EmergencyActions;
 }) {
-  const chain = chains.find(({ id }) => id === chainId);
+  const currentChain = chains.find(({ id }) => id === chainId);
+
+  const { switchChain } = useSwitchChain();
+  const { chain } = useAccount();
+
+  useEffect(() => {
+    if (!!chainId && chainId !== chain?.id) {
+      switchChain({ chainId });
+    }
+  }, [chain?.id, chainId, switchChain]);
 
   const {
     data: mcInfo,
@@ -112,12 +122,12 @@ export function EmergencyActionView({
       description={
         <div className="flex items-center gap-2 text-gray-100">
           <div className="text-sm text-muted-foreground break-all">
-            {chain?.name ?? chainId} · {shortenHash(marketConfigurator)}
+            {currentChain?.name ?? chainId} · {shortenHash(marketConfigurator)}
           </div>
           <CopyButton text={marketConfigurator} />
-          {chain?.blockExplorers.default.url && (
+          {currentChain?.blockExplorers.default.url && (
             <ExternalButton
-              url={`${chain.blockExplorers.default.url}/address/${marketConfigurator}`}
+              url={`${currentChain.blockExplorers.default.url}/address/${marketConfigurator}`}
             />
           )}
         </div>
