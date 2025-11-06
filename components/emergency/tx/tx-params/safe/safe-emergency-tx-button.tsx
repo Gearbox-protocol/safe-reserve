@@ -14,6 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Address, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
 import { DownloadTxButton } from "../download-tx-button";
+import { SimulateSafeEmergencyTxButton } from "./simulate-safe-emergency-tx-button";
 
 interface ButtonTxProps {
   chainId: number;
@@ -109,6 +110,14 @@ export function SafeEmergencyTxButton({
         admin={safeAddress}
         emergencyTx={emergencyTx}
       />
+
+      <SimulateSafeEmergencyTxButton
+        chainId={chainId}
+        tx={tx}
+        emergencyTx={emergencyTx}
+        safeAddress={safeAddress}
+      />
+
       {isSignButton && (
         <div className="flex items-center">
           <Button

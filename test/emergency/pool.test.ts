@@ -4,7 +4,7 @@ import { GearboxSDK, MarketSuite } from "@gearbox-protocol/sdk";
 import {
   iPoolQuotaKeeperV310Abi,
   iPoolV310Abi,
-} from "@gearbox-protocol/sdk/abi";
+} from "@gearbox-protocol/sdk/abi/310/generated";
 import { detectChain } from "@gearbox-protocol/sdk/dev";
 import { MarketConfiguratorContract } from "@gearbox-protocol/sdk/permissionless";
 import { config as dotenvConfig } from "dotenv";

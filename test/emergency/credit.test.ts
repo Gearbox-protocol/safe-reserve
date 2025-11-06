@@ -6,7 +6,7 @@ import {
   iCreditFacadeV310Abi,
   iCreditManagerV310Abi,
   iMarketConfiguratorV310Abi,
-} from "@gearbox-protocol/sdk/abi";
+} from "@gearbox-protocol/sdk/abi/310/generated";
 import { detectChain } from "@gearbox-protocol/sdk/dev";
 import { MarketConfiguratorContract } from "@gearbox-protocol/sdk/permissionless";
 import { config as dotenvConfig } from "dotenv";
