@@ -60,6 +60,7 @@ export function useCurrentTransactions(
     eta,
     queueBatches: batches,
     createdAtBlock,
+    updatableFeeds,
   });
 
   const {
@@ -77,15 +78,13 @@ export function useCurrentTransactions(
     batches,
     createdAtBlock,
     useNonce,
+    updatableFeeds,
   });
 
   if (type === "instance")
     return {
       type,
-      txs: instanceTxs.map((tx, index) => ({
-        ...tx,
-        updatableFeeds: tx.updatableFeeds ?? updatableFeeds?.[index],
-      })),
+      txs: instanceTxs,
       safe: instanceSafe,
       isExecuted,
       instanceManager,
@@ -97,10 +96,7 @@ export function useCurrentTransactions(
 
   return {
     type: "timelock",
-    txs: governorTxs.map((tx, index) => ({
-      ...tx,
-      updatableFeeds: tx.updatableFeeds ?? updatableFeeds?.[index],
-    })),
+    txs: governorTxs,
     safe: governorSafe,
     governor,
     isLoading: isLoadingIpfsData || isLoadingGovernorTxs,

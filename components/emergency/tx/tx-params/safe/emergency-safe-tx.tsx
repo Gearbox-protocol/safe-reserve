@@ -79,15 +79,17 @@ export function EmergencySafeTx({
             </div>
           )
         ) : (
-          <div className="gridgrid-cols-[1fr_minmax(300px,max-content)] gap-12 overflow-x-auto">
-            {Object.keys(emergencyTx.action.params ?? {}).length > 0 && (
-              <div className="border-t border-gray-800 pt-3">
-                <div className="font-semibold text-gray-200 mb-2 text-lg">
-                  Params
+          <div className="grid grid-cols-[1fr_minmax(300px,max-content)] gap-12 overflow-x-auto">
+            <>
+              {Object.keys(emergencyTx.action.params ?? {}).length > 0 && (
+                <div className="border-t border-gray-800 pt-3">
+                  <div className="font-semibold text-gray-200 mb-2 text-lg">
+                    Params
+                  </div>
+                  <RenderedParams sdk={sdk} action={emergencyTx.action} />
                 </div>
-                <RenderedParams sdk={sdk} action={emergencyTx.action} />
-              </div>
-            )}
+              )}
+            </>
 
             <div className="border-l border-gray-800 pl-8">
               <InstanceProposalSignatures
