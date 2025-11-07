@@ -501,7 +501,7 @@ In these Terms, unless the context requires otherwise, the terms shall have the 
 
 "**Materials**" means any information, statements, announcements, data, content, and other materials provided via the Communication Channels, or otherwise communicated by us or on our behalf in relation to the Platform, Protocol, or Smart Contracts.
 
-"**Platform**" means the Website and any web-based interface solutions provided by us from time to time for interaction with the Protocol and Markets, including: (i) the Gearbox App, accessible at [https://app.gearbox.fi](https://app.gearbox.fi), which enables your interaction with certain Markets, and (ii) permissionless interface and permissionless safe, which enable your interaction with the Protocol in a Market Curator capacity; together with associated software that may be from time to time provided by us or our Affiliates, but expressly excluding the Blockchain-Based Infrastructure.
+"**Platform**" means the Website and any web-based interface solutions provided by us from time to time for interaction with the Protocol and Markets, including: (i) the Gearbox App, accessible at [https://safe.gearbox.fi](https://safe.gearbox.fi), which enables your interaction with certain Markets, and (ii) permissionless interface and permissionless safe, which enable your interaction with the Protocol in a Market Curator capacity; together with associated software that may be from time to time provided by us or our Affiliates, but expressly excluding the Blockchain-Based Infrastructure.
 
 "**Prohibited Person**" means any individual or legal entity that is: (i) a citizen, national, resident, or organised under the laws of, or located or ordinarily resident in the United States of America and its territories (including American Samoa, Guam, Puerto Rico, the Northern Mariana Islands, and the U.S. Virgin Islands), or any country or territory that is the subject of comprehensive, country-wide or territory-wide sanctions administered or enforced by the government of the Cayman Islands, the United Kingdom, the United States, the European Union, any EU member state, or any other applicable governmental or international authority; or (ii) listed on, or otherwise directly subject to, any sanctions-related list of restricted persons maintained by any of the foregoing authorities, including but not limited to the United Nations, the Cayman Islands Financial Reporting Authority (FRA), U.S. Office of Foreign Assets Control (OFAC) Specially Designated Nationals and Blocked Persons List, the UK Sanctions List, the EU Consolidated List, or similar.
 
@@ -535,7 +535,7 @@ In these Terms, unless the context requires otherwise, the terms shall have the 
 
 "**Wallet**" means a pair of public and private cryptographic keys which can be used to track ownership of, receive, manage, and spend Virtual Assets on a blockchain network.
 
-"**Website**" means the website available at [https://safe.gearbox.finance](https://safe.gearbox.finance), including any of its subdomains.
+"**Website**" means the website available at [https://gearbox.finance](https://gearbox.finance), including any of its subdomains.
 
 "**you**", "**your**" means a person who accepts these Terms; if you are acting on behalf of an entity, "**your**" and "**you**" shall refer to both you as an individual using the Platform, and the entity on whose behalf you are acting.
 
