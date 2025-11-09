@@ -61,7 +61,8 @@ export function MarketCard({
         }}
       >
         <Card
-          className={`flex items-center justify-between space-x-4 p-4 cursor-pointer ${marketPaused ? "border-destructive/70 bg-red-900/20 hover:bg-red-900/25" : "hover:bg-muted/50"}`}
+          variant="interactive"
+          className={`flex items-center justify-between space-x-4 p-4 ${marketPaused ? "border-destructive/70 bg-red-900/20 hover:bg-red-900/25" : ""}`}
           onClick={() => onSelect(market.pool.pool.address)}
         >
           <div className="flex items-center space-x-4">
@@ -150,7 +151,7 @@ export function MarketCard({
               <TableCell className="text-right">
                 {market.pool.pool.isPaused ? (
                   <Button
-                    className="w-24  text-accent-foreground/80 disabled:opacity-100"
+                    className="w-24 text-accent-foreground/80 disabled:opacity-100"
                     size={"xs"}
                     variant={"ghost"}
                     disabled

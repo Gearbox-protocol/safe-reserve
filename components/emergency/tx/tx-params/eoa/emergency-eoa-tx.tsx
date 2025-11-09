@@ -23,29 +23,23 @@ export function EmergencyEoaTx({
 
   return (
     <Card>
-      <CardHeader className="p-4">
-        <div className="flex items-center justify-between">
+      <CardHeader className="justify-between items-start p-4">
+        <div>
           <CardTitle className="text-xl">{emergencyTx.action.type}</CardTitle>
-
-          <EoaEmergencyTxButton
-            chainId={chainId}
-            emergencyTx={emergencyTx}
-            admin={adminInfo}
-          />
-        </div>
-
-        <div className="text-gray-300 text-sm font-normal">
-          {actionMeta?.description}
-        </div>
-      </CardHeader>
-      <CardContent className="p-4 pt-0 space-y-3 text-sm">
-        {Object.keys(emergencyTx.action.params ?? {}).length > 0 && (
-          <div className="border-t border-gray-800 pt-3">
-            <div className="font-semibold text-gray-200 mb-2 text-lg">
-              Params
-            </div>
-            <RenderedParams sdk={sdk} action={emergencyTx.action} />
+          <div className="text-muted-foreground text-sm">
+            {actionMeta?.description}
           </div>
+        </div>
+
+        <EoaEmergencyTxButton
+          chainId={chainId}
+          emergencyTx={emergencyTx}
+          admin={adminInfo}
+        />
+      </CardHeader>
+      <CardContent className="bg-gray-900/30">
+        {Object.keys(emergencyTx.action.params ?? {}).length > 0 && (
+          <RenderedParams sdk={sdk} action={emergencyTx.action} />
         )}
       </CardContent>
     </Card>

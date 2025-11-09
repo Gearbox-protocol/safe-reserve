@@ -51,37 +51,35 @@ export function SetPriceFeedParamsView({
         description={sdk.tokensMeta.symbol(action.params.token)}
       />
 
-      <div className="grid grid-cols-[140px_auto] gap-2">
-        <div className="text-gray-400 font-semibold font-mono">priceFeed:</div>
+      <div className="grid grid-cols-[160px_auto] gap-2 items-center">
+        <div className="text-muted-foreground">priceFeed:</div>
 
-        <div>
-          <div className="flex gap-2 text-gray-100 font-mono">
-            <div className="break-all">{action.params.priceFeed}</div>
-            <CopyButton text={action.params.priceFeed} />
-            {sdk.chain?.blockExplorers?.default.url && (
-              <ExternalButton
-                url={`${sdk.chain.blockExplorers.default.url}/address/${action.params.priceFeed}`}
-              />
-            )}
+        <div className="flex gap-2 items-center text-sm font-mono">
+          <div className="break-all">{action.params.priceFeed}</div>
+          <CopyButton text={action.params.priceFeed} />
+          {sdk.chain?.blockExplorers?.default.url && (
+            <ExternalButton
+              url={`${sdk.chain.blockExplorers.default.url}/address/${action.params.priceFeed}`}
+            />
+          )}
 
-            {queries[1].isLoading ? (
-              <Skeleton className="h-5 w-1/4" />
-            ) : (
-              <div className="break-all font-mono">{`[${queries[1].data?.type ?? "unknown"}]`}</div>
-            )}
-            {queries[0].isLoading || queries[1].isLoading ? (
-              <Skeleton className="h-5 w-1/3" />
-            ) : !queries[0].data || !queries[1].data ? (
-              <></>
-            ) : (
-              <div className="flex gap-2 text-gray-400">
-                <div>{`[price change:`}</div>
-                <div>{convertToUsd(queries[0].data?.price[0][1])}</div>
-                <div>{" → "}</div>
-                <div>{`${convertToUsd(queries[1].data?.price[0][1])}]`}</div>
-              </div>
-            )}
-          </div>
+          {queries[1].isLoading ? (
+            <Skeleton className="h-5 w-1/4" />
+          ) : (
+            <div className="break-all text-muted-foreground">{`[${queries[1].data?.type ?? "unknown"}]`}</div>
+          )}
+          {queries[0].isLoading || queries[1].isLoading ? (
+            <Skeleton className="h-5 w-1/3" />
+          ) : !queries[0].data || !queries[1].data ? (
+            <></>
+          ) : (
+            <div className="flex gap-2 text-muted-foreground">
+              <div>{`[price change:`}</div>
+              <div>{convertToUsd(queries[0].data?.price[0][1])}</div>
+              <div>{" → "}</div>
+              <div>{`${convertToUsd(queries[1].data?.price[0][1])}]`}</div>
+            </div>
+          )}
         </div>
       </div>
     </div>

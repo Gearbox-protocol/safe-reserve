@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
   CardTitle,
   CopyButton,
   ExternalButton,
@@ -134,22 +133,22 @@ export function CreditManagerDetails({
             </TableEditable>
           ) : (
             <Card>
-              <CardHeader className="p-4">
-                <CardTitle className="font-bold">Collateral</CardTitle>
-              </CardHeader>
-              {isLoading ? (
-                <div className="space-y-2 p-4">
-                  <Skeleton className="h-6 w-full" />
-                  <Skeleton className="h-6 w-full" />
-                  <Skeleton className="h-6 w-full" />
-                </div>
-              ) : error ? (
-                <div className="space-y-2 p-4">
-                  Something went wrong loading collaterals: {error.message}
-                </div>
-              ) : (
-                <></>
-              )}
+              <CardContent>
+                <span className="text-2xl font-bold">Collateral</span>
+                {isLoading ? (
+                  <div className="space-y-2 pt-4">
+                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className="h-6 w-full" />
+                  </div>
+                ) : error ? (
+                  <div className="space-y-2 pt-4">
+                    Something went wrong loading collaterals: {error.message}
+                  </div>
+                ) : (
+                  <></>
+                )}
+              </CardContent>
             </Card>
           )}
 

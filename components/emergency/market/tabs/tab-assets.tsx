@@ -6,8 +6,6 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
   Skeleton,
   TableBody,
   TableCell,
@@ -213,22 +211,22 @@ export function AssetsTab(props: MarketProps) {
           </>
         ) : (
           <Card>
-            <CardHeader className="p-4">
-              <CardTitle className="font-bold">Assets</CardTitle>
-            </CardHeader>
-            {isLoading ? (
-              <div className="space-y-2 p-4">
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-6 w-full" />
-              </div>
-            ) : error ? (
-              <div className="space-y-2 p-4">
-                Something went wrong loading assets: {error.message}
-              </div>
-            ) : (
-              <></>
-            )}
+            <CardContent>
+              <span className="text-2xl font-bold">Assets</span>
+              {isLoading ? (
+                <div className="space-y-2 pt-4">
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
+                </div>
+              ) : error ? (
+                <div className="space-y-2 pt-4">
+                  Something went wrong loading assets: {error.message}
+                </div>
+              ) : (
+                <></>
+              )}
+            </CardContent>
           </Card>
         )}
       </CardContent>

@@ -20,10 +20,10 @@ export function AddressParamsView({
   isLoading?: boolean;
 }) {
   return (
-    <div className="grid grid-cols-[140px_auto] gap-2 font-mono">
-      <div className="text-gray-400 font-semibold">{title}:</div>
+    <div className="grid grid-cols-[160px_auto] gap-2 items-center">
+      <div className="text-muted-foreground">{title}:</div>
 
-      <div className="flex gap-2 text-gray-100">
+      <div className="flex items-center gap-2 text-sm font-mono">
         <div className="break-all">{address}</div>
         <CopyButton text={address} />
         {sdk.chain?.blockExplorers?.default.url && (
@@ -36,7 +36,7 @@ export function AddressParamsView({
           (isLoading ? (
             <Skeleton className="h-5 w-1/3" />
           ) : (
-            <div className="break-all font-mono">{`[${description}]`}</div>
+            <div className="break-all text-muted-foreground">{`[${description}]`}</div>
           ))}
       </div>
     </div>

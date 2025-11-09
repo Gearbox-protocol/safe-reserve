@@ -23,6 +23,7 @@ export function DownloadTxButton({
   return (
     <Button
       variant="outline"
+      size="sm"
       disabled={isLoading}
       onClick={async (e) => {
         e.preventDefault();

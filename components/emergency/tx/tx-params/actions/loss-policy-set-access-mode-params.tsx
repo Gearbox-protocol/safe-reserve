@@ -23,9 +23,9 @@ export function SetAccessModeParamsView({
         title="pool"
         description={`${marketSuite.pool.pool.symbol} market`}
       />
-      <div className="grid grid-cols-[140px_auto] gap-2 font-mono">
-        <div className="text-gray-400 font-semibold">mode:</div>
-        <div className="break-all text-gray-100">
+      <div className="grid grid-cols-[160px_auto] gap-2 items-center">
+        <div className="text-muted-foreground">mode:</div>
+        <div className="break-all text-sm font-mono">
           {AccessMode[action.params.mode]}
         </div>
       </div>

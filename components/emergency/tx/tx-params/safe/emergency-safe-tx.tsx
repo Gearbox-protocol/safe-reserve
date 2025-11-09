@@ -52,23 +52,24 @@ export function EmergencySafeTx({
 
   return (
     <Card>
-      <CardHeader className="p-4">
-        <div className="flex items-center justify-between">
+      <CardHeader className="justify-between items-start p-4">
+        <div>
           <CardTitle className="text-xl">{emergencyTx.action.type}</CardTitle>
-          {tx && (
-            <SafeEmergencyTxButton
-              chainId={chainId}
-              tx={tx}
-              emergencyTx={emergencyTx}
-              safeAddress={adminInfo.admin}
-            />
-          )}
+          <div className="text-muted-foreground text-sm">
+            {actionMeta?.description}
+          </div>
         </div>
-        <div className="text-gray-300 text-sm font-normal">
-          {actionMeta?.description}
-        </div>
+
+        {tx && (
+          <SafeEmergencyTxButton
+            chainId={chainId}
+            tx={tx}
+            emergencyTx={emergencyTx}
+            safeAddress={adminInfo.admin}
+          />
+        )}
       </CardHeader>
-      <CardContent className="p-4 pt-0 space-y-3 text-sm w-full">
+      <CardContent className="bg-gray-900/30">
         {!tx ? (
           isLoadingTx ? (
             <SkeletonStacks />
@@ -80,18 +81,13 @@ export function EmergencySafeTx({
           )
         ) : (
           <div className="grid grid-cols-[1fr_minmax(300px,max-content)] gap-12 overflow-x-auto">
-            <>
+            <div>
               {Object.keys(emergencyTx.action.params ?? {}).length > 0 && (
-                <div className="border-t border-gray-800 pt-3">
-                  <div className="font-semibold text-gray-200 mb-2 text-lg">
-                    Params
-                  </div>
-                  <RenderedParams sdk={sdk} action={emergencyTx.action} />
-                </div>
+                <RenderedParams sdk={sdk} action={emergencyTx.action} />
               )}
-            </>
+            </div>
 
-            <div className="border-l border-gray-800 pl-8">
+            <div className="border-l pl-8">
               <InstanceProposalSignatures
                 chainId={chainId}
                 signers={tx.signedBy || []}

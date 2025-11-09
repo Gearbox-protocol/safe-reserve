@@ -119,9 +119,10 @@ export function SafeEmergencyTxButton({
       />
 
       {isSignButton && (
-        <div className="flex items-center">
+        <div className="flex items-center gap-4">
           <Button
             variant="outline"
+            size="sm"
             onClick={async (e) => {
               if (!isSignPending) {
                 e.stopPropagation();
@@ -154,9 +155,10 @@ export function SafeEmergencyTxButton({
       )}
 
       {isSendButton && (
-        <div className="flex items-center">
+        <div className="flex items-center gap-4">
           <Button
             variant="outline"
+            size="sm"
             onClick={async (e) => {
               if (!isSendPending) {
                 e.stopPropagation();

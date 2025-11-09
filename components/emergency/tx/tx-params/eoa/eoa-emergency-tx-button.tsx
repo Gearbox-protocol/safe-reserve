@@ -46,6 +46,7 @@ export function EoaEmergencyTxButton({
               <TooltipTrigger>
                 <Button
                   variant="outline"
+                  size="sm"
                   onClick={async (e) => {
                     if (!isSendPending) {
                       e.stopPropagation();

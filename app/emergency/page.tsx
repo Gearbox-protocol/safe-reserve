@@ -2,7 +2,9 @@
 
 import { MarketConfiguratorList } from "@/components/emergency/market-configurator-list";
 import { MarketConfiguratorView } from "@/components/emergency/market-configurator-view";
+import { SkeletonStacks } from "@/components/ui/skeleton";
 import { chains } from "@/config/wagmi";
+import { PageLayout } from "@gearbox-protocol/permissionless-ui";
 import { Suspense, useEffect, useState } from "react";
 import { Address, isAddress } from "viem";
 
@@ -28,7 +30,12 @@ function EmergencyContent() {
     setIsLoadedParams(true);
   }, []);
 
-  if (!isLoadedParams) return <div>Loading...</div>;
+  if (!isLoadedParams)
+    return (
+      <PageLayout title={"Emergency"}>
+        <SkeletonStacks />
+      </PageLayout>
+    );
 
   if (!addr || !chainId) {
     return (

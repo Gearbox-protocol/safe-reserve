@@ -4,8 +4,6 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
   TableBody,
   TableCell,
   TableCellUpdatable,
@@ -33,13 +31,12 @@ export function LossPolicyTab({
       <Card className="max-h-[calc(100vh-320px)] overflow-auto">
         <CardContent className="pt-6 space-y-8">
           {lossPolicyState.state === undefined ? (
-            <Card>
-              <CardHeader className="p-4">
-                <CardTitle className="font-bold">{`Loss Policy: ${lossPolicyState.type.replace("LOSS_POLICY::", "")}`}</CardTitle>
-              </CardHeader>
-
-              <div className="space-y-2 p-4">Unknown loss policy type</div>
-            </Card>
+            <div>
+              <span className="text-2xl font-bold">{`Loss Policy: ${lossPolicyState.type.replace("LOSS_POLICY::", "")}`}</span>
+              <div className="text-muted-foreground text-sm">
+                Unknown loss policy type
+              </div>
+            </div>
           ) : (
             <TableEditable
               title={`Loss Policy: ${lossPolicyState.type.replace("LOSS_POLICY::", "")}`}
