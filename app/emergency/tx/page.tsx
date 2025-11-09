@@ -1,11 +1,13 @@
 "use client";
 
 import { EmergencyActionView } from "@/components/emergency/tx/emergency-action-view";
+import { SkeletonStacks } from "@/components/ui/skeleton";
 import { chains } from "@/config/wagmi";
 import {
   EmergencyActions,
   validateEmergencyAction,
 } from "@/core/emergency-actions";
+import { PageLayout } from "@gearbox-protocol/permissionless-ui";
 import { Suspense, useEffect, useState } from "react";
 import { Address, isAddress } from "viem";
 
@@ -54,7 +56,11 @@ function EmergencyTxContent() {
   if (isError) return <div>Error: invalid tx URL</div>;
 
   if (!addr || !chainId || !action) {
-    return <div>Loading...</div>;
+    return (
+      <PageLayout title={"Emergency tx"}>
+        <SkeletonStacks />
+      </PageLayout>
+    );
   }
 
   return (

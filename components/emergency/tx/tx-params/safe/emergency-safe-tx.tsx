@@ -4,12 +4,7 @@ import { InstanceProposalSignatures } from "@/components/txs/instance/instance-p
 import { SkeletonStacks } from "@/components/ui/skeleton";
 import { emergencyActionsMap } from "@/core/emergency-actions";
 import { useBuildEmergencySafeTx } from "@/hooks";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@gearbox-protocol/permissionless-ui";
+import { CardTitle, ExpandableCard } from "@gearbox-protocol/permissionless-ui";
 import { useEffect, useState } from "react";
 import { RenderedParams } from "../rendered-tx-params";
 import { EmergencyTxProps } from "../types";
@@ -51,54 +46,56 @@ export function EmergencySafeTx({
   if (adminInfo.type !== "safe") return <></>;
 
   return (
-    <Card>
-      <CardHeader className="justify-between items-start p-4">
-        <div>
-          <CardTitle className="text-xl">{emergencyTx.action.type}</CardTitle>
-          <div className="text-muted-foreground text-sm">
-            {actionMeta?.description}
+    <ExpandableCard
+      alwaysExpanded
+      header={
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle className="text-xl">{emergencyTx.action.type}</CardTitle>
+            <div className="text-muted-foreground text-sm">
+              {actionMeta?.description}
+            </div>
+          </div>
+
+          {tx && (
+            <SafeEmergencyTxButton
+              chainId={chainId}
+              tx={tx}
+              emergencyTx={emergencyTx}
+              safeAddress={adminInfo.admin}
+            />
+          )}
+        </div>
+      }
+    >
+      {!tx ? (
+        isLoadingTx ? (
+          <SkeletonStacks />
+        ) : (
+          <div className="space-y-2 p-4">
+            Something went wrong loading tx:{" "}
+            {errorTx?.message ?? "Unable to get safe transaction"}
+          </div>
+        )
+      ) : (
+        <div className="grid grid-cols-[1fr_minmax(300px,max-content)] gap-12 overflow-x-auto">
+          <div>
+            {Object.keys(emergencyTx.action.params ?? {}).length > 0 && (
+              <RenderedParams sdk={sdk} action={emergencyTx.action} />
+            )}
+          </div>
+
+          <div className="border-l pl-8">
+            <InstanceProposalSignatures
+              chainId={chainId}
+              signers={tx.signedBy || []}
+              safeAddress={adminInfo.admin}
+              nonce={nonce}
+              isExecuted={false}
+            />
           </div>
         </div>
-
-        {tx && (
-          <SafeEmergencyTxButton
-            chainId={chainId}
-            tx={tx}
-            emergencyTx={emergencyTx}
-            safeAddress={adminInfo.admin}
-          />
-        )}
-      </CardHeader>
-      <CardContent className="bg-gray-900/30">
-        {!tx ? (
-          isLoadingTx ? (
-            <SkeletonStacks />
-          ) : (
-            <div className="space-y-2 p-4">
-              Something went wrong loading tx:{" "}
-              {errorTx?.message ?? "Unable to get safe transaction"}
-            </div>
-          )
-        ) : (
-          <div className="grid grid-cols-[1fr_minmax(300px,max-content)] gap-12 overflow-x-auto">
-            <div>
-              {Object.keys(emergencyTx.action.params ?? {}).length > 0 && (
-                <RenderedParams sdk={sdk} action={emergencyTx.action} />
-              )}
-            </div>
-
-            <div className="border-l pl-8">
-              <InstanceProposalSignatures
-                chainId={chainId}
-                signers={tx.signedBy || []}
-                safeAddress={adminInfo.admin}
-                nonce={nonce}
-                isExecuted={false}
-              />
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      )}
+    </ExpandableCard>
   );
 }
