@@ -5,6 +5,7 @@ import { shortenHash } from "@/utils/format";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
   CopyButton,
@@ -96,7 +97,7 @@ export function ViewTxList({
                       ? cidChain.name
                       : `Unknown chain (${chainId})`}
                   </CardTitle>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <CardDescription className="flex items-center gap-2">
                     <div className="flex items-center gap-1">
                       <span>Created by {shortenHash(author!)}</span>
                       <CopyButton text={author!} />
@@ -107,7 +108,7 @@ export function ViewTxList({
                       )}
                     </div>
                     {createdAt && <span>at {formatTimestamp(createdAt)}</span>}
-                  </div>
+                  </CardDescription>
                 </div>
               </CardHeader>
               <CardContent className="space-y-2">

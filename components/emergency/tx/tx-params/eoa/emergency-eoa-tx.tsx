@@ -1,7 +1,11 @@
 "use client";
 
 import { emergencyActionsMap } from "@/core/emergency-actions";
-import { CardTitle, ExpandableCard } from "@gearbox-protocol/permissionless-ui";
+import {
+  CardDescription,
+  CardTitle,
+  ExpandableCard,
+} from "@gearbox-protocol/permissionless-ui";
 import { RenderedParams } from "../rendered-tx-params";
 import { EmergencyTxProps } from "../types";
 import { EoaEmergencyTxButton } from "./eoa-emergency-tx-button";
@@ -23,9 +27,7 @@ export function EmergencyEoaTx({
         <div className="flex justify-between items-start">
           <div>
             <CardTitle className="text-xl">{emergencyTx.action.type}</CardTitle>
-            <div className="text-muted-foreground text-sm">
-              {actionMeta?.description}
-            </div>
+            <CardDescription>{actionMeta?.description}</CardDescription>
           </div>
 
           <EoaEmergencyTxButton

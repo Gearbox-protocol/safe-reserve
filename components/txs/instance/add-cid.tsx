@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
   Input,
@@ -35,7 +36,7 @@ export default function AddCid({
           <CardTitle>
             {`${index === cids.length ? "Add IPFS CID" : `Replace or Remove IPFS CID #${index}`} with transactions`}
           </CardTitle>
-          {msg && <div className="text-sm text-muted-foreground">{msg}</div>}
+          {msg && <CardDescription>{msg}</CardDescription>}
         </div>
       </CardHeader>
       <CardContent>

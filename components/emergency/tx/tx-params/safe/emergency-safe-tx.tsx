@@ -4,7 +4,11 @@ import { InstanceProposalSignatures } from "@/components/txs/instance/instance-p
 import { SkeletonStacks } from "@/components/ui/skeleton";
 import { emergencyActionsMap } from "@/core/emergency-actions";
 import { useBuildEmergencySafeTx } from "@/hooks";
-import { CardTitle, ExpandableCard } from "@gearbox-protocol/permissionless-ui";
+import {
+  CardTitle,
+  CardDescription,
+  ExpandableCard,
+} from "@gearbox-protocol/permissionless-ui";
 import { useEffect, useState } from "react";
 import { RenderedParams } from "../rendered-tx-params";
 import { EmergencyTxProps } from "../types";
@@ -52,9 +56,7 @@ export function EmergencySafeTx({
         <div className="flex justify-between items-start">
           <div>
             <CardTitle className="text-xl">{emergencyTx.action.type}</CardTitle>
-            <div className="text-muted-foreground text-sm">
-              {actionMeta?.description}
-            </div>
+            <CardDescription>{actionMeta?.description}</CardDescription>
           </div>
 
           {tx && (

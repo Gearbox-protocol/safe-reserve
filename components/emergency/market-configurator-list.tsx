@@ -5,6 +5,7 @@ import { shortenHash } from "@/utils/format";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardTitle,
   PageLayout,
   SearchBar,
@@ -102,9 +103,9 @@ export function MarketConfiguratorList({
                       <CardTitle className="truncate text-base font-medium">
                         {name || ""}
                       </CardTitle>
-                      <div className="text-sm text-muted-foreground break-all">
+                      <CardDescription className="break-all">
                         {chain.name} · {shortenHash(marketConfigurator)}
-                      </div>
+                      </CardDescription>
                     </CardContent>
                   </Card>
                 </Link>
