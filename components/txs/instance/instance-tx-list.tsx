@@ -33,7 +33,7 @@ export function InstanceTxList({
   }
 
   return (
-    <div className="divide-y divide-gray-800 space-y-2">
+    <div className="divide-y space-y-2">
       {cids.map((cid, index) => (
         <div
           key={`${cid}-${nonces![index]}-${index}`}

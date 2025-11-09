@@ -100,10 +100,56 @@ export function InstanceButtonTx({
     return !isSafeApp && (canSend || (!isSignPending && canSignaAndSend));
   }, [isSafeApp, canSend, isSignPending, canSignaAndSend]);
 
+  if (isSent) {
+    const explorer = chain?.blockExplorers?.default?.url;
+
+    return (
+      <>
+        <span className="flex items-center text-white gap-1">
+          <span className="text-2xl">•</span>
+          <span className="text-white">Executed</span>
+        </span>
+
+        {isSent && txHash && explorer && (
+          <div className="mx-[-12px]" onClick={(e) => e.stopPropagation()}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(
+                  `${explorer}${explorer.endsWith("/") ? "" : "/"}tx/${txHash}`,
+                  "_blank"
+                );
+              }}
+            >
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </>
+    );
+  }
+
+  if (
+    tx.signedBy
+      .map((s) => s.toLowerCase())
+      .includes(address?.toLowerCase() || "") &&
+    !canSignaAndSend &&
+    !canSend
+  ) {
+    return (
+      <span className="flex items-center text-white gap-1">
+        <span className="text-2xl">•</span>
+        <span className="text-white">Signed</span>
+      </span>
+    );
+  }
+
   return (
-    <div className="flex items-center gap-4">
+    <>
       {isSignButton && (
-        <div className="flex items-center">
+        <div className="flex items-center gap-4">
           <Button
             variant="outline"
             onClick={async (e) => {
@@ -133,9 +179,10 @@ export function InstanceButtonTx({
       )}
 
       {isSendButton && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <Button
             variant="outline"
+            size="sm"
             onClick={async (e) => {
               if (!isSendPending) {
                 e.stopPropagation();
@@ -148,25 +195,12 @@ export function InstanceButtonTx({
           >
             {isSendPending ? "Executing.." : isSent ? "Executed" : "Execute"}
           </Button>
-          {isSent && txHash && chain?.blockExplorers.default.url && (
-            <Button
-              variant="outline"
-              onClick={() =>
-                window.open(
-                  `${chain?.blockExplorers.default.url}/tx/${txHash}`,
-                  "_blank"
-                )
-              }
-            >
-              View
-              <ExternalLink className="h-4 w-4" />
-            </Button>
-          )}
+
           {!isSent && (
             <TransactionInfoDialog isConfirmButton={false} canSend={canSend} />
           )}
         </div>
       )}
-    </div>
+    </>
   );
 }

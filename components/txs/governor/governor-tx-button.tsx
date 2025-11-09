@@ -122,19 +122,20 @@ export function GovernorButtonTx({
     ].includes(tx.status)
   ) {
     return (
-      <span className="flex items-center gap-1.5">
-        <span className="h-2 w-2 rounded-full bg-white"></span>
+      <span className="flex items-center text-white gap-1">
+        <span className="text-2xl">•</span>
         <span className="text-white">{getButtonText(tx.status, tx.eta)}</span>
       </span>
     );
   }
 
   return (
-    <div className="flex items-center gap-4">
+    <>
       {isSignButton && (
-        <div className="flex items-center">
+        <div className="flex items-center gap-4">
           <Button
             variant="outline"
+            size="sm"
             onClick={async (e) => {
               if (!isSignPending) {
                 e.stopPropagation();
@@ -162,9 +163,10 @@ export function GovernorButtonTx({
       )}
 
       {isSendButton && (
-        <div className="flex items-center">
+        <div className="flex items-center gap-4">
           <Button
             variant="outline"
+            size="sm"
             onClick={async (e) => {
               if (!isSendPending) {
                 e.stopPropagation();
@@ -190,6 +192,6 @@ export function GovernorButtonTx({
           <TransactionInfoDialog isConfirmButton={false} canSend={canSend} />
         </div>
       )}
-    </div>
+    </>
   );
 }

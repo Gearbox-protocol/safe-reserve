@@ -4,8 +4,12 @@ import { useCurrentTransactions, useIpfsData, useSafeParams } from "@/hooks";
 import { shortenHash } from "@/utils/format";
 import {
   Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   CopyButton,
   ExternalButton,
+  formatTimestamp,
   PageLayout,
 } from "@gearbox-protocol/permissionless-ui";
 import { useEffect } from "react";
@@ -27,6 +31,7 @@ export function ViewTxList({
 
   const {
     type,
+    createdAt,
     txs,
     safe,
     isLoading: isLoadingTxs,
@@ -46,6 +51,7 @@ export function ViewTxList({
 
   const { switchChain, chains } = useSwitchChain();
   const { chain, address } = useAccount();
+  const cidChain = chains.find(({ id }) => id === chainId);
 
   useEffect(() => {
     if (!!chainId && chainId !== chain?.id) {
@@ -54,7 +60,13 @@ export function ViewTxList({
   }, [chain?.id, chainId, switchChain]);
 
   if (errorTxs || errorInfo) {
-    return <div>Error: {errorTxs?.message || errorInfo?.message}</div>;
+    return (
+      <PageLayout title={"Transactions"}>
+        <div className="font-semibold text-muted-foreground">
+          Error: {errorTxs?.message || errorInfo?.message}
+        </div>
+      </PageLayout>
+    );
   }
 
   return (
@@ -74,107 +86,102 @@ export function ViewTxList({
           </div>
         ) : (
           <div className="space-y-6 min-w-[620px]">
-            <Card className="p-4">
-              <div className="space-y-2">
-                <div className="flex w-full items-center gap-2">
-                  <span className="min-w-[180px] text-gray-300">Chain:</span>
-                  <code className="flex items-center gap-2 text-gray-100">
-                    {chainId !== chain?.id
-                      ? chains.map(({ id }) => id).includes(chainId ?? 0)
-                        ? chainId
-                        : `Unknown chain (${chainId})`
-                      : (chain?.name ?? chainId)}
-                  </code>
-                </div>
-                {marketConfigurator && (
-                  <div className="flex w-full items-center gap-2">
-                    <span className="min-w-[180px] text-gray-300">
-                      Market configurator:
-                    </span>
-                    <code className="flex items-center gap-2 text-gray-100">
-                      {shortenHash(marketConfigurator)}
-                      <CopyButton text={marketConfigurator} />
-                      {chain?.blockExplorers?.default?.url && (
+            <Card variant="transparent" className="mx-1">
+              <CardHeader>
+                <div>
+                  <CardTitle>
+                    {type === "timelock" ? "Curator" : "Instance"} transactions
+                    on{" "}
+                    {cidChain?.name
+                      ? cidChain.name
+                      : `Unknown chain (${chainId})`}
+                  </CardTitle>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <span>Created by {shortenHash(author!)}</span>
+                      <CopyButton text={author!} />
+                      {cidChain?.blockExplorers?.default?.url && (
                         <ExternalButton
-                          url={`${chain.blockExplorers.default.url}/address/${marketConfigurator}`}
+                          url={`${cidChain.blockExplorers.default.url}/address/${author!}`}
                         />
                       )}
-                    </code>
-                  </div>
-                )}
-                {instanceManager && (
-                  <div className="flex w-full items-center gap-2">
-                    <span className="min-w-[180px] text-gray-300">
-                      Instance manager:
-                    </span>
-                    <code className="flex items-center gap-2 text-gray-100">
-                      {shortenHash(instanceManager)}
-                      <CopyButton text={instanceManager} />
-                      {chain?.blockExplorers?.default?.url && (
-                        <ExternalButton
-                          url={`${chain.blockExplorers.default.url}/address/${instanceManager}`}
-                        />
-                      )}
-                    </code>
-                  </div>
-                )}
-                <div className="flex w-full items-center gap-2">
-                  <span className="min-w-[180px] text-gray-300">Safe:</span>
-                  <code className="flex items-center gap-2 text-gray-100">
-                    {shortenHash(safe!)}
-                    <CopyButton text={safe!} />
-                    {chain?.blockExplorers?.default?.url && (
-                      <ExternalButton
-                        url={`${chain.blockExplorers.default.url}/address/${safe}`}
-                      />
-                    )}
-                  </code>
-                </div>
-                <div className="flex w-full items-center gap-2">
-                  <span className="min-w-[180px] text-gray-300">Author:</span>
-                  <code className="flex items-center gap-2 text-gray-100">
-                    {shortenHash(author!)}
-                    <CopyButton text={author!} />
-                    {chain?.blockExplorers?.default?.url && (
-                      <ExternalButton
-                        url={`${chain.blockExplorers.default.url}/address/${author}`}
-                      />
-                    )}
-                  </code>
-                </div>
-              </div>
-            </Card>
-            {chainId &&
-              (chainId === chain?.id || !address) &&
-              (type === "timelock" ? (
-                <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
-                  {cids.length > 1 && (
-                    <div className="text-sm text-gray-500">
-                      Note: Multiple CIDs with governor transactions are not
-                      supported; showing only the first CID
                     </div>
-                  )}
-                  {txs.map((tx, index) => (
-                    <GovernorTransactionCard
-                      key={tx.hash}
+                    {createdAt && <span>at {formatTimestamp(createdAt)}</span>}
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {[
+                  {
+                    name: "Market configurator",
+                    value: marketConfigurator,
+                  },
+                  {
+                    name: "Instance manager",
+                    value: instanceManager,
+                  },
+                  {
+                    name: "Safe",
+                    value: safe,
+                  },
+                ].map(({ name, value }) =>
+                  !!value ? (
+                    <div key={name} className="flex w-full items-center gap-2">
+                      <span className="min-w-[180px] text-gray-300">
+                        {name}:
+                      </span>
+                      <code className="flex items-center gap-2 font-mono">
+                        {shortenHash(value)}
+                        <CopyButton text={value} />
+                        {cidChain?.blockExplorers?.default?.url && (
+                          <ExternalButton
+                            url={`${cidChain.blockExplorers.default.url}/address/${value}`}
+                          />
+                        )}
+                      </code>
+                    </div>
+                  ) : (
+                    <></>
+                  )
+                )}
+              </CardContent>
+            </Card>
+
+            <div className="overflow-y-auto max-h-[70vh]">
+              <div className="px-1">
+                {chainId &&
+                  (chainId === chain?.id || !address) &&
+                  (type === "timelock" ? (
+                    <div className="flex flex-col gap-2">
+                      {cids.length > 1 && (
+                        <div className="text-sm text-muted-foreground">
+                          Note: Multiple CIDs with governor transactions are not
+                          supported; showing only the first CID
+                        </div>
+                      )}
+                      {txs.map((tx, index) => (
+                        <GovernorTransactionCard
+                          key={tx.hash}
+                          chainId={chainId}
+                          cid={cids[0]}
+                          tx={tx}
+                          safeAddress={safe!}
+                          governor={currentTransactions.governor!}
+                          threshold={threshold || 0}
+                          index={index}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <InstanceTxList
+                      cids={cids}
+                      onSelect={onSelect}
                       chainId={chainId}
-                      cid={cids[0]}
-                      tx={tx}
-                      safeAddress={safe!}
-                      governor={currentTransactions.governor!}
-                      threshold={threshold || 0}
-                      index={index}
+                      instanceManager={currentTransactions.instanceManager!}
                     />
                   ))}
-                </div>
-              ) : (
-                <InstanceTxList
-                  cids={cids}
-                  onSelect={onSelect}
-                  chainId={chainId}
-                  instanceManager={currentTransactions.instanceManager!}
-                />
-              ))}
+              </div>
+            </div>
           </div>
         )}
       </div>

@@ -6,10 +6,17 @@ import { Footer } from "@gearbox-protocol/permissionless-ui";
 import SafeProvider from "@safe-global/safe-apps-react-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConnectKitProvider } from "connectkit";
+import localFont from "next/font/local";
 import { Toaster } from "sonner";
 import { WagmiProvider } from "wagmi";
 
 import "@gearbox-protocol/permissionless-ui/globals.css";
+
+const geistMono = localFont({
+  src: "./fonts/GeistMonoVF.woff",
+  variable: "--font-geist-mono",
+  weight: "100 900",
+});
 
 const queryClient = new QueryClient();
 
@@ -24,7 +31,9 @@ export default function RootLayout({
         <ConnectKitProvider>
           <SafeProvider>
             <html lang="en" className="dark h-full">
-              <body className="h-full bg-background font-sans antialiased">
+              <body
+                className={`h-full bg-background font-sans antialiased ${geistMono.variable}`}
+              >
                 <Toaster position="top-center" />
                 <HeaderLayout />
                 <div className="flex min-h-[calc(100vh-64px)] flex-col">

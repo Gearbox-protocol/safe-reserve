@@ -101,7 +101,7 @@ export function InstanceTxs({
 
   return (
     <>
-      <div className="flex flex-col gap-2 overflow-y-auto max-h-[70vh] px-1">
+      <div className="flex flex-col gap-2">
         {txs.map((tx, idx) => (
           <InstanceTransactionCard
             key={`${cids[index]}-${index}-${tx.hash}-${idx}`}
@@ -119,7 +119,7 @@ export function InstanceTxs({
       </div>
 
       {index === cids.length - 1 && (
-        <div className="pt-4">
+        <div className="pt-6">
           <AddCid cids={cids} index={cids.length} onSelect={onSelect} />
         </div>
       )}

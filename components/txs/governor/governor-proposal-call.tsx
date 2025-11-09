@@ -1,9 +1,10 @@
 import { RenderAddressText } from "@/components/ui/render-address-text";
 import { Call } from "@/core/safe-tx";
 import { useDecodeGovernorCall } from "@/hooks";
+import { cn } from "@gearbox-protocol/permissionless-ui";
 import { json_stringify } from "@gearbox-protocol/sdk";
 import { deepJsonParse } from "@gearbox-protocol/sdk/permissionless";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Address } from "viem";
 import { useAccount } from "wagmi";
@@ -53,12 +54,12 @@ export function GovernorProposalCall({
 
   const isDecoded = !parsedCall.functionName.startsWith("Unknown function");
   const isExpandable = !isDecoded || Object.keys(parsedCall.args).length > 0;
-  const functionNamePrefix = parsedCall.args.signature
+  const functionNamePostfix = parsedCall.args.signature
     ? parsedCall.args.signature.split("(")[0]
     : null;
 
   return (
-    <div className="rounded bg-gray-900/30">
+    <div className="rounded bg-gray-900/50">
       <div
         className={`flex ${isExpandable ? "cursor-pointer" : ""} items-center gap-2 p-3`}
         onClick={() => {
@@ -67,37 +68,51 @@ export function GovernorProposalCall({
           }
         }}
       >
-        <span className="text-gray-300">#{index}</span>
-        <span className="text-gray-300">
+        <span className="text-muted-foreground">#{index}</span>
+        <span className="text-muted-foreground">
           {isDecoded
-            ? `${parsedCall.functionName} ${functionNamePrefix ? `[${functionNamePrefix}]` : ""}`
+            ? `${parsedCall.functionName}${functionNamePostfix ? ":" : ""}`
             : "Unknown function"}
         </span>
+        {isDecoded && functionNamePostfix && <span>{functionNamePostfix}</span>}
 
-        {isExpandable &&
-          (isExpanded ? (
-            <ChevronUp className="ml-auto h-4 w-4 text-gray-400" />
-          ) : (
-            <ChevronDown className="ml-auto h-4 w-4 text-gray-400" />
-          ))}
+        <ChevronDown
+          className={cn(
+            "ml-auto h-4 w-4 text-muted-foreground",
+            isExpanded ? "rotate-180" : "",
+            "transition-transform duration-200 ease-in-out"
+          )}
+        />
       </div>
 
-      {isExpanded &&
-        (isDecoded ? (
-          Object.entries(parsedCall.args).map(([arg, value], i) => (
-            <div
-              key={i}
-              className="grid grid-cols-[120px_auto] border-t border-gray-800 p-4 text-sm text-gray-400 font-mono"
-            >
-              <div className="font-semibold">{arg}: </div>
-              <div>{tryPrettyPrint(value)}</div>
+      {isExpanded && (
+        <div className="border-t border-gray-800 p-4 space-y-2">
+          {isDecoded ? (
+            Object.entries(parsedCall.args).map(([arg, value], i) => (
+              <div
+                key={i}
+                className="grid grid-cols-[140px_auto] gap-2 items-center"
+              >
+                <div className="h-full flex items-top text-muted-foreground">
+                  {arg}:{" "}
+                </div>
+                <div className="text-medium text-sm font-mono">
+                  {tryPrettyPrint(value)}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="grid grid-cols-[140px_auto] gap-2 items-center">
+              <div className="h-full flex items-top text-muted-foreground">
+                calldata:
+              </div>
+              <div className="text-medium text-sm font-mono break-all">
+                {call.data}
+              </div>
             </div>
-          ))
-        ) : (
-          <div className="border-t border-gray-800 p-4 text-sm text-gray-400">
-            calldata: {call.data}
-          </div>
-        ))}
+          )}
+        </div>
+      )}
     </div>
   );
 }

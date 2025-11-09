@@ -13,7 +13,7 @@ function SkeletonStacks() {
   return (
     <div className="divide-y divide-muted space-y-6">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="p-4">
+        <div key={i} className="flex flex-col gap-4 pt-4">
           <SkeletonStack />
         </div>
       ))}

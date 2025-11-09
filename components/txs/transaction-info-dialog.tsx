@@ -22,8 +22,8 @@ export function TransactionInfoDialog({
       <DialogTrigger asChild>
         <Button
           variant="ghost"
-          size="sm"
-          className="h-6 w-6 p-0 ml-2 text-gray-400 hover:text-white transition-colors"
+          size="icon"
+          className="mx-[-12px]"
           onClick={(e) => e.stopPropagation()}
         >
           <Info className="h-4 w-4" />

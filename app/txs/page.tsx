@@ -1,6 +1,8 @@
 "use client";
 
 import { ViewTxList } from "@/components/txs/view-tx-list";
+import { SkeletonStacks } from "@/components/ui/skeleton";
+import { PageLayout } from "@gearbox-protocol/permissionless-ui";
 import { Suspense, useEffect, useState } from "react";
 
 function TxsContent() {
@@ -25,12 +27,18 @@ function TxsContent() {
   if (cids && cids.length > 0) {
     return <ViewTxList cids={cids} onSelect={setCids} />;
   } else if (cids === undefined) {
-    <div>Loading...</div>;
+    return (
+      <PageLayout title={"Transactions"}>
+        <SkeletonStacks />
+      </PageLayout>
+    );
   } else {
     return (
-      <div>
-        Please provide a valid IPFS CID in the URL: /txs?cid=your_cid_here
-      </div>
+      <PageLayout title={"Transactions"}>
+        <div className="font-semibold text-muted-foreground">
+          Please provide a valid IPFS CID in the URL: /txs?cid=your_cid_here
+        </div>
+      </PageLayout>
     );
   }
 }

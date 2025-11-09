@@ -15,7 +15,7 @@ export function RenderAddressText({
   blockExplorerUrl,
 }: RenderAddressTextProps) {
   const result = useMemo(() => {
-    const addressRegex = /0x[a-fA-F0-9]{40}/g;
+    const addressRegex = /0x[a-fA-F0-9]{40}(?![a-fA-F0-9])/g;
     const matches = Array.from(text.matchAll(addressRegex));
 
     if (matches.length === 0) {

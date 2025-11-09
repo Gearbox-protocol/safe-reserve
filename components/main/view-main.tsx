@@ -4,8 +4,6 @@ import {
   Button,
   Card,
   CardContent,
-  CardFooter,
-  CardHeader,
   Input,
 } from "@gearbox-protocol/permissionless-ui";
 import { useRouter } from "next/navigation";
@@ -17,12 +15,11 @@ export default function ViewMain() {
 
   return (
     <div className="flex min-h-[calc(100vh-64px)] items-center justify-center">
-      <Card className="w-full max-w-md bg-[rgb(30,30,30)] border-[rgb(60,60,60)]">
-        <CardHeader>
-          <h1 className="text-center text-2xl font-bold text-white">
-            Enter IPFS CID with transactions
-          </h1>
-        </CardHeader>
+      <Card className="w-full max-w-[600px] p-4 space-y-4 mb-32">
+        <h1 className="text-center text-2xl font-bold text-white">
+          Enter IPFS CID with transactions
+        </h1>
+
         <CardContent className="space-y-4">
           <Input
             placeholder="Enter your ipfs cid..."
@@ -32,7 +29,7 @@ export default function ViewMain() {
             }}
           />
         </CardContent>
-        <CardFooter className="justify-end">
+        <div className="flex w-full justify-end">
           <Button
             onClick={() => {
               router.push(`/txs?cid=${cid}`);
@@ -41,7 +38,7 @@ export default function ViewMain() {
           >
             Open transactions
           </Button>
-        </CardFooter>
+        </div>
       </Card>
     </div>
   );

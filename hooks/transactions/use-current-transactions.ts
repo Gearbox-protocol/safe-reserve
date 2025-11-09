@@ -3,11 +3,13 @@
 import { ExtendedSignedTx, ParsedSignedTx } from "@/core/safe-tx";
 import { useIpfsData } from "@/hooks";
 import { Address, Hex } from "viem";
+import { useBlock } from "wagmi";
 import { useGovernanceTransactions } from "./use-governance-transactions";
 import { useInstanceTransactions } from "./use-instance-transactions";
 
 interface CurrentTransactions {
   safe?: Address;
+  createdAt?: number;
   isLoading: boolean;
   error: Error | null;
   refetchSigs: () => Promise<unknown>;
@@ -81,25 +83,38 @@ export function useCurrentTransactions(
     updatableFeeds,
   });
 
+  const { data: createdAt, isLoading: isLoadingCreatedAt } = useBlock({
+    chainId,
+    blockNumber: BigInt(createdAtBlock ?? 0),
+    query: {
+      enabled: !!createdAtBlock,
+      select: (block) =>
+        createdAtBlock === undefined ? undefined : Number(block.timestamp),
+    },
+  });
+
   if (type === "instance")
     return {
       type,
+      createdAt,
       txs: instanceTxs,
       safe: instanceSafe,
       isExecuted,
       instanceManager,
       executedTxHash,
-      isLoading: isLoadingIpfsData || isLoadingInstanceTxs,
+      isLoading:
+        isLoadingIpfsData || isLoadingInstanceTxs || isLoadingCreatedAt,
       error: errorIpfsData || errorInstanceTxs,
       refetchSigs: refetchInstanceSigs,
     };
 
   return {
     type: "timelock",
+    createdAt,
     txs: governorTxs,
     safe: governorSafe,
     governor,
-    isLoading: isLoadingIpfsData || isLoadingGovernorTxs,
+    isLoading: isLoadingIpfsData || isLoadingGovernorTxs || isLoadingCreatedAt,
     error: errorIpfsData || errorGovernorTxs,
     refetchSigs: refetchGovernorSigs,
   };

@@ -1,6 +1,13 @@
 "use client";
 
-import { Button, Card, Input } from "@gearbox-protocol/permissionless-ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input,
+} from "@gearbox-protocol/permissionless-ui";
 import { Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -22,14 +29,16 @@ export default function AddCid({
     [cid, cids, index]
   );
   return (
-    <div className="px-1">
-      <Card className="w-full p-6 space-y-4">
+    <Card variant="transparent">
+      <CardHeader>
         <div className="space-y-0">
-          {msg && <div>{msg}</div>}
-          <div>
+          <CardTitle>
             {`${index === cids.length ? "Add IPFS CID" : `Replace or Remove IPFS CID #${index}`} with transactions`}
-          </div>
+          </CardTitle>
+          {msg && <div className="text-sm text-muted-foreground">{msg}</div>}
         </div>
+      </CardHeader>
+      <CardContent>
         <div className="flex items-center gap-2 w-full">
           <div className="w-full">
             <Input
@@ -86,7 +95,7 @@ export default function AddCid({
             </Link>
           )}
         </div>
-      </Card>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
