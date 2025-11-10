@@ -1,11 +1,10 @@
 import { RenderAddressText } from "@/components/ui/render-address-text";
 import { Call } from "@/core/safe-tx";
 import { useDecodeInstanceCall, useGetInstanceCallMeta } from "@/hooks";
-import { cn, Skeleton } from "@gearbox-protocol/permissionless-ui";
+import { ExpandablCall, Skeleton } from "@gearbox-protocol/permissionless-ui";
 import { json_stringify } from "@gearbox-protocol/sdk";
 import { Addresses, deepJsonParse } from "@gearbox-protocol/sdk/permissionless";
-import { ChevronDown } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { Address, formatUnits } from "viem";
 import { useAccount } from "wagmi";
 
@@ -30,7 +29,6 @@ export function InstanceProposalCall({
   const parsedCall = useDecodeInstanceCall(chainId, instanceManager, call);
 
   const callMeta = useGetInstanceCallMeta(chainId, parsedCall);
-  const [isExpanded, setIsExpanded] = useState(false);
   const { chain } = useAccount();
 
   const tryPrettyPrint = useCallback(
@@ -134,75 +132,59 @@ export function InstanceProposalCall({
     : (parsedCall.args?.functionName ?? null);
 
   return (
-    <div className="rounded bg-gray-900/50">
-      <div
-        className={`flex ${isExpandable ? "cursor-pointer" : ""} items-center gap-2 p-3`}
-        onClick={() => {
-          if (isExpandable) {
-            setIsExpanded(!isExpanded);
-          }
-        }}
-      >
-        <span className="text-muted-foreground">#{index}</span>
-        <span className="text-muted-foreground">
-          {isDecoded
-            ? `${parsedCall.functionName}${functionNamePostfix || callMeta.fnName ? ":" : ""}`
-            : "Unknown function"}
-        </span>
-        {isDecoded && (functionNamePostfix || !!callMeta.fnName) && (
-          <span>{functionNamePostfix || callMeta.fnName}</span>
-        )}
-
-        {!!callMeta.fnName &&
-          (callMeta.isLoading ? (
-            <Skeleton className="h-4 min-w-[56px] w-[56px]" />
-          ) : (
-            <span className="text-muted-foreground font-mono">
-              {`[${callMeta.priceFeedType ? callMeta.priceFeedType : ""}${callMeta.symbol ? ` for ${callMeta.symbol}` : ""}${callMeta.latestRoundData ? ` with ${convertToUsd(callMeta.latestRoundData[1])} price` : ""}]`}
-            </span>
-          ))}
-
-        <ChevronDown
-          className={cn(
-            "ml-auto h-4 w-4 text-muted-foreground",
-            isExpanded ? "rotate-180" : "",
-            "transition-transform duration-200 ease-in-out"
+    <ExpandablCall
+      index={index}
+      isExpandable={isExpandable}
+      header={
+        <>
+          <span className="text-muted-foreground">
+            {isDecoded
+              ? `${parsedCall.functionName}${functionNamePostfix || callMeta.fnName ? ":" : ""}`
+              : "Unknown function"}
+          </span>
+          {isDecoded && (functionNamePostfix || !!callMeta.fnName) && (
+            <span>{functionNamePostfix || callMeta.fnName}</span>
           )}
-        />
-      </div>
 
-      {isExpanded && (
-        <div className="border-t border-gray-800 p-4 space-y-2">
-          {isDecoded ? (
-            Object.entries(parsedCall.args).map(([arg, value], i) => (
-              <div
-                key={i}
-                className="grid grid-cols-[140px_auto] gap-2 items-center"
-              >
-                <div className="h-full flex items-top text-muted-foreground">
-                  {arg}:{" "}
-                </div>
-                {arg === "data" && callMeta.isLoading ? (
-                  <Skeleton className="h-4 w-1/2" />
-                ) : (
-                  <div className="text-medium text-sm font-mono">
-                    {tryPrettyPrint(value)}
-                  </div>
-                )}
-              </div>
-            ))
-          ) : (
-            <div className="grid grid-cols-[140px_auto] gap-2 items-center">
-              <div className="h-full flex items-top text-muted-foreground">
-                calldata:
-              </div>
-              <div className="text-medium text-sm font-mono break-all">
-                {call.data}
-              </div>
+          {!!callMeta.fnName &&
+            (callMeta.isLoading ? (
+              <Skeleton className="h-4 min-w-[56px] w-[56px]" />
+            ) : (
+              <span className="text-muted-foreground font-mono">
+                {`[${callMeta.priceFeedType ? callMeta.priceFeedType : ""}${callMeta.symbol ? ` for ${callMeta.symbol}` : ""}${callMeta.latestRoundData ? ` with ${convertToUsd(callMeta.latestRoundData[1])} price` : ""}]`}
+              </span>
+            ))}
+        </>
+      }
+    >
+      {isDecoded ? (
+        Object.entries(parsedCall.args).map(([arg, value], i) => (
+          <div
+            key={i}
+            className="grid grid-cols-[140px_auto] gap-2 items-center"
+          >
+            <div className="h-full flex items-top text-muted-foreground">
+              {arg}:{" "}
             </div>
-          )}
+            {arg === "data" && callMeta.isLoading ? (
+              <Skeleton className="h-4 w-1/2" />
+            ) : (
+              <div className="text-medium text-sm font-mono">
+                {tryPrettyPrint(value)}
+              </div>
+            )}
+          </div>
+        ))
+      ) : (
+        <div className="grid grid-cols-[140px_auto] gap-2 items-center">
+          <div className="h-full flex items-top text-muted-foreground">
+            calldata:
+          </div>
+          <div className="text-medium text-sm font-mono break-all">
+            {call.data}
+          </div>
         </div>
       )}
-    </div>
+    </ExpandablCall>
   );
 }

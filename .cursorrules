@@ -1,0 +1,31 @@
+[
+  {
+    "pattern": "*.tsx",
+    "rules": [
+      {
+        "role": "user",
+        "content": "In this repository, most core UI elements (buttons, inputs, dialogs, tooltips, tables, toasts, etc.) are implemented in the shared library `@gearbox-protocol/permissionless-ui`. When generating or editing UI code under `apps/*/src`, first try to use an existing component from `@gearbox-protocol/permissionless-ui` if it matches the use case."
+      },
+      {
+        "role": "user",
+        "content": "Always prefer importing reusable UI primitives from `@gearbox-protocol/permissionless-ui` over bringing in new external UI libraries. For example: `import { Button, Dialog, CardTable, Tooltip } from '@gearbox-protocol/permissionless-ui';`. Avoid adding new dependencies like Radix UI or other large UI libraries in application code."
+      },
+      {
+        "role": "user",
+        "content": "Raw HTML elements (div, span, etc.) ARE allowed. It is perfectly fine to:\n- use plain HTML elements for layout, structure, and simple UI pieces;\n- compose `@gearbox-protocol/permissionless-ui` components together with raw HTML containers;\n- create small, app-specific components using raw HTML when there is no suitable component in the shared UI library.\n\nHowever, do NOT reimplement from scratch what already exists in `@gearbox-protocol/permissionless-ui` (for example, dialogs, toasts, tooltips, complex tables) unless there is a specific reason."
+      },
+      {
+        "role": "user",
+        "content": "Preferred component usage is described inside `@gearbox-protocol/permissionless-ui`."
+      },
+      {
+        "role": "user",
+        "content": "When generating new React components, pages, or feature UIs under `src/*`, follow this decision process:\n1) Check if there is an appropriate component in `@gearbox-protocol/permissionless-ui` that solves most of the problem.\n2) If yes, compose that component with some light HTML wrappers and props.\n3) If no, build the UI with raw HTML and minimal custom styling, keeping the structure clear and reusable.\n4) If the new pattern looks generic and reusable across apps, consider implementing it as a shared component."
+      },
+      {
+        "role": "user",
+        "content": "If multiple solutions are possible, choose the one that:\n- reuses existing components from `@gearbox-protocol/permissionless-ui` when they fit;\n- keeps visual and interaction patterns consistent;\n- avoids unnecessary complexity or over-engineering.\nDo not force the shared UI library when it clearly does not match the required behavior; in that case, a small raw-HTML-based component is acceptable."
+      }
+    ]
+  }
+]
