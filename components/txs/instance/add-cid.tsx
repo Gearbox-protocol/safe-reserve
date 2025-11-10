@@ -82,8 +82,8 @@ export default function AddCid({
               }}
             >
               <Button
-                variant="outline"
-                className="w-[36px] text-red-400 border-red-400 hover:bg-red-400 hover:text-white"
+                variant="destructive"
+                size="icon"
                 onClick={async () => {
                   await onSelect([
                     ...cids.slice(0, index),

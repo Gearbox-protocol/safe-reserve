@@ -81,9 +81,9 @@ export function ViewTxList({
           <SkeletonStacks />
         ) : txs.length === 0 ? (
           <div className="p-4">
-            <text className="font-semibold text-white">
+            <p className="font-semibold text-white">
               Invalid cid: transactions not found
-            </text>
+            </p>
           </div>
         ) : (
           <div className="space-y-6 min-w-[620px]">
@@ -128,7 +128,7 @@ export function ViewTxList({
                 ].map(({ name, value }) =>
                   !!value ? (
                     <div key={name} className="flex w-full items-center gap-2">
-                      <span className="min-w-[180px] text-gray-300">
+                      <span className="min-w-[180px] text-muted-foreground">
                         {name}:
                       </span>
                       <code className="flex items-center gap-2 font-mono">

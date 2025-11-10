@@ -102,14 +102,14 @@ export function EmergencyActionView({
   ) {
     return (
       <div className="p-4">
-        <text className="font-semibold text-white">
+        <p className="font-semibold text-white">
           Invalid market cofigurator:{" "}
           {adminInfoError?.message ||
             mcInfoError?.message ||
             sdkError?.message ||
             txError?.message ||
             "Unknown address"}
-        </text>
+        </p>
       </div>
     );
   }

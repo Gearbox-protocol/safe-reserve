@@ -95,9 +95,9 @@ export function MarketConfiguratorView({
   if (sdkError || infoError || multipauseError) {
     return (
       <div className="p-4">
-        <text className="font-semibold text-white">
+        <p className="font-semibold text-white">
           Invalid market cofigurator: {sdkError?.message || infoError?.message}
-        </text>
+        </p>
       </div>
     );
   }
