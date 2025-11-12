@@ -172,7 +172,7 @@ export function InstanceProposalCall({
             {arg === "data" && callMeta.isLoading ? (
               <Skeleton className="h-4 w-1/2" />
             ) : (
-              <div className="text-medium text-sm font-mono">
+              <div className="text-medium text-sm font-mono break-all">
                 {tryPrettyPrint(value)}
               </div>
             )}

@@ -81,7 +81,7 @@ export function GovernorProposalCall({
             <div className="h-full flex items-top text-muted-foreground">
               {arg}:{" "}
             </div>
-            <div className="text-medium text-sm font-mono">
+            <div className="text-medium text-sm font-mono break-all">
               {tryPrettyPrint(value)}
             </div>
           </div>
