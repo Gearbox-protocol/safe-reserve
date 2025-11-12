@@ -44,6 +44,7 @@ export function useCurrentTransactions(
     updatableFeeds,
     marketConfigurator,
     instanceManager,
+    safeAddress,
     isLoading: isLoadingIpfsData,
     error: errorIpfsData,
   } = useIpfsData(cid);
@@ -77,6 +78,7 @@ export function useCurrentTransactions(
     cid,
     chainId,
     instanceManager,
+    safeAddress,
     batches,
     createdAtBlock,
     useNonce,

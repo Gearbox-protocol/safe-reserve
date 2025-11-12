@@ -7,13 +7,15 @@ function useAddress(args: {
   address?: Address;
   functionName: string;
   key: string;
+  value?: Address;
 }) {
-  const { chainId, address, functionName, key } = args;
+  const { chainId, address, functionName, key, value } = args;
   const publicClient = usePublicClient({ chainId });
 
   return useQuery({
-    queryKey: [key, address],
+    queryKey: value ? [key, "value", value] : [key, address],
     queryFn: async () => {
+      if (value) return value;
       if (!publicClient || !address) return;
 
       if (!isAddress(address)) {
@@ -34,7 +36,7 @@ function useAddress(args: {
         functionName,
       });
     },
-    enabled: !!publicClient && !!address,
+    enabled: !!value || (!!publicClient && !!address),
     retry: 3,
   });
 }
@@ -72,12 +74,17 @@ export function useGovernorAddress(chainId?: number, timelock?: Address) {
   };
 }
 
-export function useSafeAddress(chainId?: number, governor?: Address) {
+export function useSafeAddress(
+  chainId?: number,
+  governor?: Address,
+  safeAddress?: Address
+) {
   const { data, isLoading, error } = useAddress({
     chainId,
     key: "safe-address",
     address: governor,
     functionName: "owner",
+    value: safeAddress,
   });
 
   return {

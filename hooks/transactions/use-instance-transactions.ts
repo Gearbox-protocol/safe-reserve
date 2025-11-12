@@ -19,6 +19,7 @@ export function useInstanceTransactions({
   batches,
   updatableFeeds,
   instanceManager,
+  safeAddress,
   createdAtBlock,
   useNonce,
 }: {
@@ -27,6 +28,7 @@ export function useInstanceTransactions({
   batches?: SafeTx[][];
   updatableFeeds?: Address[][];
   instanceManager?: Address;
+  safeAddress?: Address;
   createdAtBlock?: number;
   useNonce?: number;
 }): {
@@ -44,7 +46,7 @@ export function useInstanceTransactions({
     safe,
     isLoading: isLoadingSafe,
     error: errorSafe,
-  } = useSafeAddress(chainId, instanceManager);
+  } = useSafeAddress(chainId, instanceManager, safeAddress);
 
   const { nonce, signers } = useSafeParams(chainId, safe);
 
@@ -58,7 +60,7 @@ export function useInstanceTransactions({
     cid,
     chainId,
     batches,
-    instanceManager,
+    safeAddress: safe,
     createdAtBlock,
   });
 
