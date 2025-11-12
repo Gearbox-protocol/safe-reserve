@@ -89,7 +89,7 @@ export function useInstanceTransactionNonces({
     chainId: chainId,
     batches: preparedIPFSData.map(({ item }) => item.batches),
     instanceManager: instanceManager,
-    safeAddress,
+    safeAddress: safe,
     createdAtBlock: preparedIPFSData.map(({ item }) => item.createdAtBlock),
   });
 

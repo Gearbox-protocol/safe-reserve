@@ -228,7 +228,7 @@ export function useInstanceTransactionsExecuted({
     error: errorHashes,
   } = useExecutedTxs({
     chainId,
-    safeAddress,
+    safeAddress: safe,
     createdAtBlock: minCreatedAtBlock,
   });
 
