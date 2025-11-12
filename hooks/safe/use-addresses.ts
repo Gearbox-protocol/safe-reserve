@@ -72,8 +72,16 @@ export function useGovernorAddress(chainId?: number, timelock?: Address) {
   };
 }
 
-export function useSafeAddress(chainId?: number, governor?: Address) {
-  const { data, isLoading, error } = useAddress({
+export function useSafeAddress(
+  chainId?: number,
+  governor?: Address,
+  safeAddress?: Address
+) {
+  const {
+    data: ownerAddress,
+    isLoading,
+    error,
+  } = useAddress({
     chainId,
     key: "safe-address",
     address: governor,
@@ -81,9 +89,9 @@ export function useSafeAddress(chainId?: number, governor?: Address) {
   });
 
   return {
-    safe: data,
-    isLoading,
-    error: error as Error | null,
+    safe: safeAddress ?? ownerAddress,
+    isLoading: safeAddress ? false : isLoading,
+    error: safeAddress ? null : (error as Error | null),
   };
 }
 

@@ -12,10 +12,12 @@ import { usePublicClient } from "wagmi";
 export function useExecutedTxs({
   chainId,
   instanceManager,
+  safeAddress,
   createdAtBlock,
 }: {
   chainId?: number;
   instanceManager?: Address;
+  safeAddress?: Address;
   createdAtBlock?: number;
 }): {
   executedHashes?: {
@@ -45,7 +47,7 @@ export function useExecutedTxs({
     safe,
     isLoading: isLoadingSafe,
     error: errorSafe,
-  } = useSafeAddress(chainId, instanceManager);
+  } = useSafeAddress(chainId, instanceManager, safeAddress);
 
   const {
     data: executedHashes,
@@ -83,11 +85,13 @@ export function useInstanceTransactionExecuted({
   chainId,
   batches,
   instanceManager,
+  safeAddress,
   createdAtBlock,
 }: {
   cid: string;
   chainId?: number;
   instanceManager?: Address;
+  safeAddress?: Address;
   batches?: SafeTx[][];
   createdAtBlock?: number;
 }): {
@@ -103,7 +107,7 @@ export function useInstanceTransactionExecuted({
     safe,
     isLoading: isLoadingSafe,
     error: errorSafe,
-  } = useSafeAddress(chainId, instanceManager);
+  } = useSafeAddress(chainId, instanceManager, safeAddress);
 
   const {
     nonce,
@@ -118,6 +122,7 @@ export function useInstanceTransactionExecuted({
   } = useExecutedTxs({
     chainId,
     instanceManager,
+    safeAddress,
     createdAtBlock,
   });
 
@@ -182,11 +187,13 @@ export function useInstanceTransactionsExecuted({
   chainId,
   batches,
   instanceManager,
+  safeAddress,
   createdAtBlock,
 }: {
   cids: string[];
   chainId?: number;
   instanceManager?: Address;
+  safeAddress?: Address;
   batches?: Array<SafeTx[][]>;
   createdAtBlock?: Array<number | undefined>;
 }): {
@@ -210,7 +217,7 @@ export function useInstanceTransactionsExecuted({
     safe,
     isLoading: isLoadingSafe,
     error: errorSafe,
-  } = useSafeAddress(chainId, instanceManager);
+  } = useSafeAddress(chainId, instanceManager, safeAddress);
 
   const {
     nonce,
@@ -231,6 +238,7 @@ export function useInstanceTransactionsExecuted({
   } = useExecutedTxs({
     chainId,
     instanceManager,
+    safeAddress,
     createdAtBlock: minCreatedAtBlock,
   });
 

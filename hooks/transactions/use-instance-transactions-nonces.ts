@@ -14,10 +14,12 @@ export function useInstanceTransactionNonces({
   cids,
   chainId,
   instanceManager,
+  safeAddress,
 }: {
   cids: string[];
   chainId: number;
   instanceManager: Address;
+  safeAddress?: Address;
 }): {
   nonces?: number[];
   isLoading: boolean;
@@ -69,7 +71,7 @@ export function useInstanceTransactionNonces({
     safe,
     isLoading: isLoadingSafe,
     error: errorSafe,
-  } = useSafeAddress(chainId, instanceManager);
+  } = useSafeAddress(chainId, instanceManager, safeAddress);
 
   const {
     nonce: safeCurrentNonce,
@@ -87,6 +89,7 @@ export function useInstanceTransactionNonces({
     chainId: chainId,
     batches: preparedIPFSData.map(({ item }) => item.batches),
     instanceManager: instanceManager,
+    safeAddress,
     createdAtBlock: preparedIPFSData.map(({ item }) => item.createdAtBlock),
   });
 
