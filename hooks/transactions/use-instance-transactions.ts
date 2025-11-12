@@ -60,7 +60,6 @@ export function useInstanceTransactions({
     cid,
     chainId,
     batches,
-    instanceManager,
     safeAddress,
     createdAtBlock,
   });

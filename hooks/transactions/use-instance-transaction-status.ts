@@ -11,12 +11,10 @@ import { usePublicClient } from "wagmi";
 
 export function useExecutedTxs({
   chainId,
-  instanceManager,
   safeAddress,
   createdAtBlock,
 }: {
   chainId?: number;
-  instanceManager?: Address;
   safeAddress?: Address;
   createdAtBlock?: number;
 }): {
@@ -44,24 +42,18 @@ export function useExecutedTxs({
   const effectiveCreatedAtBlock = createdAtRef.current;
 
   const {
-    safe,
-    isLoading: isLoadingSafe,
-    error: errorSafe,
-  } = useSafeAddress(chainId, instanceManager, safeAddress);
-
-  const {
     data: executedHashes,
     isLoading,
     error,
   } = useQuery({
     queryKey: ["executed-txs", effectiveCreatedAtBlock],
     queryFn: async () => {
-      if (!safe || !publicClient) return;
+      if (!safeAddress || !publicClient) return;
 
       return (
         await executedSafeTxs({
           publicClient,
-          safe,
+          safe: safeAddress,
           createdAtBlock: effectiveCreatedAtBlock,
         })
       ).map(({ safeTxHash, txHash }) => ({
@@ -69,14 +61,14 @@ export function useExecutedTxs({
         txHash: txHash.toLowerCase() as Hex,
       }));
     },
-    enabled: !!publicClient && !!safe,
+    enabled: !!publicClient && !!safeAddress,
     retry: 3,
   });
 
   return {
     executedHashes,
-    isLoading: isLoadingSafe || isLoading,
-    error: errorSafe || error,
+    isLoading,
+    error,
   };
 }
 
@@ -84,7 +76,6 @@ export function useInstanceTransactionExecuted({
   cid,
   chainId,
   batches,
-  instanceManager,
   safeAddress,
   createdAtBlock,
 }: {
@@ -104,16 +95,10 @@ export function useInstanceTransactionExecuted({
   const publicClient = usePublicClient({ chainId });
 
   const {
-    safe,
-    isLoading: isLoadingSafe,
-    error: errorSafe,
-  } = useSafeAddress(chainId, instanceManager, safeAddress);
-
-  const {
     nonce,
     isLoading: isLoadingNonce,
     error: errorNonce,
-  } = useSafeParams(chainId, safe);
+  } = useSafeParams(chainId, safeAddress);
 
   const {
     executedHashes,
@@ -121,7 +106,6 @@ export function useInstanceTransactionExecuted({
     error: errorHashes,
   } = useExecutedTxs({
     chainId,
-    instanceManager,
     safeAddress,
     createdAtBlock,
   });
@@ -133,7 +117,12 @@ export function useInstanceTransactionExecuted({
   } = useQuery({
     queryKey: ["is-executed", cid],
     queryFn: async () => {
-      if (!safe || !publicClient || !executedHashes || nonce === undefined)
+      if (
+        !safeAddress ||
+        !publicClient ||
+        !executedHashes ||
+        nonce === undefined
+      )
         return;
 
       const nonces = executedHashes.map(
@@ -144,7 +133,7 @@ export function useInstanceTransactionExecuted({
           getReserveMultisigBatch({
             type: "queue",
             client: publicClient,
-            safeAddress: safe,
+            safeAddress,
             batch: batches![0] as SafeTx[],
             nonce: nonce,
           })
@@ -168,7 +157,10 @@ export function useInstanceTransactionExecuted({
       return { isExecuted: false };
     },
     enabled:
-      !!publicClient && !!safe && !!executedHashes && nonce !== undefined,
+      !!publicClient &&
+      !!safeAddress &&
+      !!executedHashes &&
+      nonce !== undefined,
     retry: 3,
   });
 
@@ -176,9 +168,8 @@ export function useInstanceTransactionExecuted({
     isExecuted: status?.isExecuted,
     nonce: status?.nonce,
     txHash: status?.txHash,
-    isLoading:
-      isLoadingSafe || isLoadingNonce || isLoadingHashes || isLoadingStatus,
-    error: errorSafe || errorNonce || errorHashes || errorStatus,
+    isLoading: isLoadingNonce || isLoadingHashes || isLoadingStatus,
+    error: errorNonce || errorHashes || errorStatus,
   };
 }
 
@@ -237,7 +228,6 @@ export function useInstanceTransactionsExecuted({
     error: errorHashes,
   } = useExecutedTxs({
     chainId,
-    instanceManager,
     safeAddress,
     createdAtBlock: minCreatedAtBlock,
   });
