@@ -1,6 +1,6 @@
 "use client";
 
-import { useSafeAddress, useSafeParams } from "@/hooks";
+import { useSafeParams } from "@/hooks";
 import { getReserveMultisigBatch } from "@/utils/multisend";
 import { executedSafeTxs } from "@/utils/tx-status";
 import { SafeTx } from "@gearbox-protocol/sdk/permissionless";
@@ -177,7 +177,6 @@ export function useInstanceTransactionsExecuted({
   cids,
   chainId,
   batches,
-  instanceManager,
   safeAddress,
   createdAtBlock,
 }: {
@@ -205,16 +204,10 @@ export function useInstanceTransactionsExecuted({
   const publicClient = usePublicClient({ chainId });
 
   const {
-    safe,
-    isLoading: isLoadingSafe,
-    error: errorSafe,
-  } = useSafeAddress(chainId, instanceManager, safeAddress);
-
-  const {
     nonce,
     isLoading: isLoadingNonce,
     error: errorNonce,
-  } = useSafeParams(chainId, safe);
+  } = useSafeParams(chainId, safeAddress);
 
   const minCreatedAtBlock = createdAtBlock?.reduce<number | undefined>(
     (min, cur) =>
@@ -228,7 +221,7 @@ export function useInstanceTransactionsExecuted({
     error: errorHashes,
   } = useExecutedTxs({
     chainId,
-    safeAddress: safe,
+    safeAddress,
     createdAtBlock: minCreatedAtBlock,
   });
 
@@ -236,7 +229,12 @@ export function useInstanceTransactionsExecuted({
     queries: cids.map((cid, idx) => ({
       queryKey: ["is-executed", cid],
       queryFn: async () => {
-        if (!safe || !publicClient || !executedHashes || nonce === undefined)
+        if (
+          !safeAddress ||
+          !publicClient ||
+          !executedHashes ||
+          nonce === undefined
+        )
           return;
 
         if (!cid) return;
@@ -252,7 +250,7 @@ export function useInstanceTransactionsExecuted({
             getReserveMultisigBatch({
               type: "queue",
               client: publicClient,
-              safeAddress: safe,
+              safeAddress,
               batch: currentFirstBatch,
               nonce: nonce,
             })
@@ -279,7 +277,7 @@ export function useInstanceTransactionsExecuted({
       enabled:
         !!cid &&
         !!publicClient &&
-        !!safe &&
+        !!safeAddress &&
         !!executedHashes &&
         nonce !== undefined,
       retry: 3,
@@ -299,12 +297,10 @@ export function useInstanceTransactionsExecuted({
         }
       | undefined,
     isLoading:
-      isLoadingSafe ||
       isLoadingNonce ||
       isLoadingHashes ||
       result.some(({ isLoading }) => isLoading),
     error:
-      errorSafe ||
       errorNonce ||
       errorHashes ||
       result.find(({ error }) => error)?.error ||
