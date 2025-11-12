@@ -147,6 +147,9 @@ export function InstanceProposalCall({
           )}
 
           {!!callMeta.fnName &&
+            (!!callMeta.priceFeedType ||
+              !!callMeta.symbol ||
+              !!callMeta.latestRoundData) &&
             (callMeta.isLoading ? (
               <Skeleton className="h-4 min-w-[56px] w-[56px]" />
             ) : (
