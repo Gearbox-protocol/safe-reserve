@@ -166,7 +166,7 @@ export function InstanceButtonTx({
                   }
                 }
               }}
-              disabled={!canSign || isSignPending}
+              disabled={!canSign || canSend || isSignPending}
               className={
                 "px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
               }
@@ -208,7 +208,7 @@ export function InstanceButtonTx({
               <TooltipContent>
                 <p>
                   {!isNonceReady
-                    ? "Execute previous tx firts"
+                    ? "Execute previous tx first"
                     : "Not enough signatures"}
                 </p>
               </TooltipContent>
