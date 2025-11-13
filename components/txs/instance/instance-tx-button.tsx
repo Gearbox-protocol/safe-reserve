@@ -8,7 +8,13 @@ import {
   useSendInstanceTx,
   useSignTx,
 } from "@/hooks";
-import { Button } from "@gearbox-protocol/permissionless-ui";
+import {
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@gearbox-protocol/permissionless-ui";
 import { useSafeAppsSDK } from "@safe-global/safe-apps-react-sdk";
 import { ExternalLink } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -92,17 +98,8 @@ export function InstanceButtonTx({
     return tx.nonce === (nonce || 0n);
   }, [nonce, tx.nonce]);
 
-  const isSignButton = useMemo(() => {
-    return isSafeApp || (!isSendPending && !canSend);
-  }, [isSafeApp, isSendPending, canSend]);
-
-  const isSendButton = useMemo(() => {
-    return !isSafeApp && (canSend || (!isSignPending && canSignaAndSend));
-  }, [isSafeApp, canSend, isSignPending, canSignaAndSend]);
-
   if (isSent) {
     const explorer = chain?.blockExplorers?.default?.url;
-
     return (
       <>
         <span className="flex items-center text-white gap-1">
@@ -148,59 +145,81 @@ export function InstanceButtonTx({
 
   return (
     <>
-      {isSignButton && (
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            onClick={async (e) => {
-              if (!isSignPending) {
-                e.stopPropagation();
-                if (isSafeApp) {
-                  await sdk.txs.send({
-                    txs: tx.calls.map((tx) => ({
-                      ...tx,
-                      value: tx.value.toString(),
-                    })),
-                  });
-                } else {
-                  await signTx({ txHash: tx.hash });
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async (e) => {
+                if (!isSignPending) {
+                  e.stopPropagation();
+                  if (isSafeApp) {
+                    await sdk.txs.send({
+                      txs: tx.calls.map((tx) => ({
+                        ...tx,
+                        value: tx.value.toString(),
+                      })),
+                    });
+                  } else {
+                    await signTx({ txHash: tx.hash });
+                  }
                 }
+              }}
+              disabled={!canSign || isSignPending}
+              className={
+                "px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
               }
-            }}
-            disabled={!canSign}
-            className={`px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 ${
-              !canSign && "border-gray-600 text-gray-600 hover:bg-transparent"
-            }`}
-          >
-            {isSignPending ? "Signing..." : "Confirm"}
-          </Button>
-          <TransactionInfoDialog isConfirmButton={true} />
-        </div>
-      )}
-
-      {isSendButton && (
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={async (e) => {
-              if (!isSendPending) {
-                e.stopPropagation();
-                const isTxSent = await sendTx();
-                setIsSent(!!isTxSent);
-              }
-            }}
-            disabled={!isNonceReady || isSent}
-            className="px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
-          >
-            {isSendPending ? "Executing.." : isSent ? "Executed" : "Execute"}
-          </Button>
-
-          {!isSent && (
-            <TransactionInfoDialog isConfirmButton={false} canSend={canSend} />
+            >
+              {isSignPending ? "Signing..." : "Confirm"}
+            </Button>
+          </TooltipTrigger>
+          {!canSign && !isSignPending && (
+            <TooltipContent>
+              <p>You are not the signer</p>
+            </TooltipContent>
           )}
-        </div>
-      )}
+        </Tooltip>
+      </TooltipProvider>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async (e) => {
+                if (!isSendPending) {
+                  e.stopPropagation();
+                  const isTxSent = await sendTx();
+                  setIsSent(!!isTxSent);
+                }
+              }}
+              disabled={
+                !isNonceReady || !(canSend || canSignaAndSend) || isSendPending
+              }
+              className="px-6 bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10 min-w-[100px]"
+            >
+              {isSendPending ? "Executing.." : "Execute"}
+            </Button>
+          </TooltipTrigger>
+          {(!isNonceReady || !(canSend || canSignaAndSend)) &&
+            !isSendPending && (
+              <TooltipContent>
+                <p>
+                  {!isNonceReady
+                    ? "Execute previous tx firts"
+                    : "Not enough signatures"}
+                </p>
+              </TooltipContent>
+            )}
+        </Tooltip>
+      </TooltipProvider>
+
+      <TransactionInfoDialog
+        isConfirmButton={!(canSend || canSignaAndSend)}
+        canSend={canSend}
+      />
     </>
   );
 }
