@@ -1,4 +1,7 @@
-import { ArchiveTransport } from "@gearbox-protocol/sdk/permissionless";
+import {
+  ArchiveTransport,
+  chunkedLogsTransport,
+} from "@gearbox-protocol/sdk/permissionless";
 import { getDefaultConfig } from "connectkit";
 import { Chain, defineChain, Transport } from "viem";
 import { createConfig, http } from "wagmi";
@@ -14,9 +17,28 @@ import {
   mainnet,
   optimism,
   plasma,
+  monad as viemMonad,
   worldchain,
 } from "wagmi/chains";
 // import { safe, walletConnect } from "wagmi/connectors";
+
+const monad = defineChain({
+  ...viemMonad,
+  rpcUrls: {
+    default: {
+      http: [
+        "https://permissionless-staging.gearbox.foundation/api/proxy/rpc/143",
+      ],
+    },
+  },
+  contracts: {
+    ...viemMonad.contracts,
+    multicall3: {
+      address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+      blockCreated: 9248132,
+    },
+  },
+});
 
 const hemiWithMulticall3 = defineChain({
   ...hemi,
@@ -51,6 +73,7 @@ export const chains = [
   lisk,
   berachain,
   plasmaWithMulticall3,
+  monad,
 ] as const;
 
 export const ADDRESS_PROVIDER = process.env.NEXT_PUBLIC_ADDRESS_PROVIDER;
@@ -149,6 +172,24 @@ export const getChainTransport = (chain: Chain): Transport => {
     }).getTransport();
   }
 
+  // Monad
+  if (chain.id === 143) {
+    const primaryTransport = chunkedLogsTransport({
+      transport: http(monad.rpcUrls.default.http[0], {
+        batch: true,
+      }),
+      chunkSize: 100,
+      enableLogging: true,
+    });
+    return new ArchiveTransport({
+      primaryTransport,
+      archiveRpcUrl:
+        "https://permissionless-staging.gearbox.foundation/api/thirdweb/rpc/143",
+      blockThreshold: 199,
+      enableLogging: true,
+    }).getTransport();
+  }
+
   // Try to use window.ethereum if available
   // if (typeof window !== "undefined" && window.ethereum) {
   //   return custom(window.ethereum);
@@ -179,6 +220,7 @@ export const config = createConfig(
       [plasma.id]: getChainTransport(plasma),
       [optimism.id]: getChainTransport(optimism),
       [arbitrum.id]: getChainTransport(arbitrum),
+      [monad.id]: getChainTransport(monad),
     } as Record<number, Transport>,
 
     // connectors: [
@@ -196,10 +238,10 @@ export const config = createConfig(
       process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
 
     // Required App Info
-    appName: "Gearbox Safe Reserve",
+    appName: "Gearbox Safe",
 
     // Optional App Info
-    appDescription: "Gearbox Safe Reserve",
+    appDescription: "Gearbox Safe",
     appUrl: "https://gearbox.fi", // your app's url
     appIcon: "https://static.gearbox.fi/logo/logo_symbol.png", // your app's icon, no bigger than 1024x1024px (max. 1MB)
   })
