@@ -26,6 +26,7 @@ export interface InstanceTxs extends IpfsTxs {
   type: "instance";
 
   instanceManager: Address;
+  safeAddress?: Address;
   createdAtBlock?: number;
   batches: SafeTx[][];
 }
@@ -106,6 +107,7 @@ function getTypedIPFSData(ipfsData: TimelockTxs | InstanceTxs | undefined) {
       chainId: ipfsData?.chainId,
       author: ipfsData?.author,
       instanceManager: ipfsData?.instanceManager,
+      safeAddress: ipfsData?.safeAddress,
       batches: ipfsData?.batches,
       createdAtBlock: ipfsData?.createdAtBlock,
       updatableFeeds: ipfsData?.updatableFeeds,
@@ -125,6 +127,7 @@ export function useIpfsData(cid: string): {
 
   marketConfigurator?: Address;
   instanceManager?: Address;
+  safeAddress?: Address;
 
   isLoading: boolean;
   error: Error | null;
@@ -175,6 +178,7 @@ export function useMultipleIpfsData(cids: string[]): {
 
     instanceManager?: Address;
     marketConfigurator?: Address;
+    safeAddress?: Address;
   }[];
 
   isLoading: boolean;
