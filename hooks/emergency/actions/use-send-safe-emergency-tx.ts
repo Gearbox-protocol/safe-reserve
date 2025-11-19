@@ -1,4 +1,5 @@
 import { safeAbi } from "@/abi";
+import { SDK_GAS_LIMIT_BY_CHAIN } from "@/config/wagmi";
 import { EmergencyTx } from "@/core/emergency-actions";
 import { SignedTx } from "@/core/safe-tx";
 import { useSafeParams } from "@/hooks";
@@ -104,6 +105,7 @@ export function useSendSafeEmergencyTx({
               client: publicClient,
               priceFeeds,
               useMulticall3: true,
+              gasLimit: SDK_GAS_LIMIT_BY_CHAIN[chainId],
             });
 
       try {

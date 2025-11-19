@@ -1,4 +1,5 @@
 import { safeAbi } from "@/abi";
+import { SDK_GAS_LIMIT_BY_CHAIN } from "@/config/wagmi";
 import { ParsedSignedTx } from "@/core/safe-tx";
 import { useDecodeGovernorCalls, useSafeParams } from "@/hooks";
 import { useSafeSignature } from "@/hooks/actions/use-safe-signature";
@@ -17,7 +18,6 @@ import {
   useSwitchChain,
   useWalletClient,
 } from "wagmi";
-
 export function useSendGovernorTx(
   chainId: number,
   safeAddress: Address,
@@ -106,6 +106,7 @@ export function useSendGovernorTx(
           : await getPriceUpdateTx({
               client: publicClient,
               priceFeeds,
+              gasLimit: SDK_GAS_LIMIT_BY_CHAIN[chainId],
             });
 
       try {

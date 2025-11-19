@@ -109,7 +109,7 @@ export function useGetInstanceCallMeta(
     ];
   }, [parsedCall]);
 
-  const { data: sdk, isLoading, error } = useSDK({});
+  const { data: sdk, isLoading, error } = useSDK({ chainId });
 
   const {
     data: symbol,
@@ -229,6 +229,7 @@ export function useGetInstanceCallMeta(
             args: [],
           },
         ],
+        gas: sdk.gasLimit,
       });
 
       try {

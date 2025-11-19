@@ -27,7 +27,7 @@ function useGetUpdatableFeeds({
   parsedCalls: ParsedCall[];
   tx: ExtendedSignedTx;
 }) {
-  const { data: sdk } = useSDK({});
+  const { data: sdk } = useSDK({ chainId });
   const publicClient = usePublicClient({ chainId });
 
   return useQuery({
@@ -58,6 +58,7 @@ function useGetUpdatableFeeds({
       return await getCallsTouchedUpdatablePriceFeeds({
         client: publicClient,
         parsedCalls,
+        gasLimit: sdk.gasLimit,
       });
     },
     enabled: !!publicClient || !!sdk,
