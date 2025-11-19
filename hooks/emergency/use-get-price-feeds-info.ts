@@ -46,6 +46,7 @@ export function useGetPriceFeedsInfo({
               args: [],
             },
           ],
+          gas: sdk.gasLimit,
         });
 
         try {

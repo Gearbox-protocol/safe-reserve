@@ -37,7 +37,7 @@ export function InstanceTransactionCard({
   executedTxHash,
   isExecuted,
 }: InstanceTransactionCardProps) {
-  useSDK({});
+  useSDK({ chainId });
   const { nonce: currentNonce } = useSafeParams(chainId, safeAddress);
   const chain = chains.find(({ id }) => id === chainId);
 
