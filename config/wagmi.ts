@@ -248,3 +248,7 @@ export const config = createConfig(
 );
 
 export const defaultChainId = 1;
+
+export const SDK_GAS_LIMIT_BY_CHAIN: Record<number, bigint> = {
+  [monad.id]: 100_000_000n,
+}; // SDK set by default gas limit to 550_000_000n
