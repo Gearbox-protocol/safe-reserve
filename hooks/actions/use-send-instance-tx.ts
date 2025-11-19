@@ -1,4 +1,5 @@
 import { safeAbi } from "@/abi";
+import { SDK_GAS_LIMIT_BY_CHAIN } from "@/config/wagmi";
 import { ExtendedSignedTx } from "@/core/safe-tx";
 import { useDecodeInstanceCalls, useSafeParams } from "@/hooks";
 import { useSafeSignature } from "@/hooks/actions/use-safe-signature";
@@ -111,6 +112,7 @@ export function useSendInstanceTx(
               client: publicClient,
               priceFeeds,
               useMulticall3: true,
+              gasLimit: SDK_GAS_LIMIT_BY_CHAIN[chainId],
             });
 
       try {

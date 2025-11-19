@@ -1,3 +1,4 @@
+import { SDK_GAS_LIMIT_BY_CHAIN } from "@/config/wagmi";
 import { EmergencyTx } from "@/core/emergency-actions";
 import { getPriceUpdateTx } from "@gearbox-protocol/sdk/permissionless";
 import { useMutation } from "@tanstack/react-query";
@@ -40,6 +41,7 @@ export function useSendEoaEmergencyTx({
               client: publicClient,
               priceFeeds,
               useMulticall3: true,
+              gasLimit: SDK_GAS_LIMIT_BY_CHAIN[chainId],
             });
 
       if (updateTx) {

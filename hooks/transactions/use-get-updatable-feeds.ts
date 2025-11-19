@@ -58,6 +58,7 @@ function useGetUpdatableFeeds({
       return await getCallsTouchedUpdatablePriceFeeds({
         client: publicClient,
         parsedCalls,
+        gasLimit: sdk.gasLimit,
       });
     },
     enabled: !!publicClient || !!sdk,

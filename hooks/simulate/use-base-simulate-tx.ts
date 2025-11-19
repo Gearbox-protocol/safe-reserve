@@ -1,4 +1,5 @@
 import { safeAbi, simulateTxAccessorAbi } from "@/abi";
+import { SDK_GAS_LIMIT_BY_CHAIN } from "@/config/wagmi";
 import { SignedTx } from "@/core/safe-tx";
 import { traceCall } from "@/utils/debug-trace";
 import { formatFullTrace } from "@/utils/fromat-trace";
@@ -128,6 +129,7 @@ export function useBaseSimulateTx(config: SimulationConfig) {
                 client: publicClient,
                 priceFeeds: config.priceFeeds,
                 useMulticall3: config.useMulticall3ForPriceUpdate ?? true,
+                gasLimit: SDK_GAS_LIMIT_BY_CHAIN[config.chainId],
               });
             })();
 
