@@ -1,11 +1,16 @@
 import { ExtendedSignedTx, ParsedSignedTx } from "@/core/safe-tx";
+import { AP_PRICE_FEED_COMPRESSOR } from "@gearbox-protocol/sdk";
 import {
+  Addresses,
+  AddressProviderContract,
   getCallsTouchedUpdatablePriceFeeds,
+  getUpdatablePriceFeeds,
   ParsedCall,
 } from "@gearbox-protocol/sdk/permissionless";
 import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 import { usePublicClient } from "wagmi";
+import { useSDK } from "../use-sdk";
 import { useDecodeGovernorCalls } from "./use-decode-governor-call";
 import { useDecodeInstanceCalls } from "./use-decode-instance-call";
 
@@ -22,20 +27,40 @@ function useGetUpdatableFeeds({
   parsedCalls: ParsedCall[];
   tx: ExtendedSignedTx;
 }) {
+  const { data: sdk } = useSDK({});
   const publicClient = usePublicClient({ chainId });
 
   return useQuery({
     queryKey: [cid, index],
     queryFn: async () => {
-      if (!publicClient) return;
-      if (tx.updatableFeeds) return tx.updatableFeeds;
+      if (!publicClient || !sdk) return;
+      if (tx.updatableFeeds) {
+        const addressProvider = new AddressProviderContract(
+          Addresses.ADDRESS_PROVIDER,
+          publicClient
+        );
+
+        const pfCompressor = await addressProvider.getAddressOrRevert(
+          AP_PRICE_FEED_COMPRESSOR,
+          310n
+        );
+
+        return (
+          await getUpdatablePriceFeeds({
+            sdk,
+            client: publicClient,
+            pfCompressor,
+            priceFeeds: tx.updatableFeeds,
+          })
+        ).map((feed) => feed.address);
+      }
 
       return await getCallsTouchedUpdatablePriceFeeds({
         client: publicClient,
         parsedCalls,
       });
     },
-    enabled: !!publicClient,
+    enabled: !!publicClient || !!sdk,
     retry: 3,
   });
 }
