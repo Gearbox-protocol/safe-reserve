@@ -1,4 +1,4 @@
-// modeified from 
+// modeified from
 // https://github.com/Rubilmax/viem-tracer/blob/main/src/format.ts
 
 import {
@@ -10,10 +10,10 @@ import {
   decodeAbiParameters,
   decodeEventLog,
   decodeFunctionData,
-  erc20Abi,
-  erc721Abi,
   erc1155Abi,
+  erc20Abi,
   erc4626Abi,
+  erc721Abi,
   formatEther,
   isAddress,
   isHex,
@@ -60,9 +60,14 @@ export interface SignaturesCache {
 
 export const getSelector = (input: Hex) => slice(input, 0, 4);
 
-export const getCallTraceUnknownFunctionSelectors = (trace: RpcCallTrace, signatures: SignaturesCache): string => {
+export const getCallTraceUnknownFunctionSelectors = (
+  trace: RpcCallTrace,
+  signatures: SignaturesCache
+): string => {
   const rest = (trace.calls ?? [])
-    .flatMap((subtrace) => getCallTraceUnknownFunctionSelectors(subtrace, signatures))
+    .flatMap((subtrace) =>
+      getCallTraceUnknownFunctionSelectors(subtrace, signatures)
+    )
     .filter(Boolean);
 
   if (trace.input) {
@@ -74,9 +79,14 @@ export const getCallTraceUnknownFunctionSelectors = (trace: RpcCallTrace, signat
   return rest.join(",");
 };
 
-export const getCallTraceUnknownEventSelectors = (trace: RpcCallTrace, signatures: SignaturesCache): string => {
+export const getCallTraceUnknownEventSelectors = (
+  trace: RpcCallTrace,
+  signatures: SignaturesCache
+): string => {
   const rest = (trace.calls ?? [])
-    .flatMap((subtrace) => getCallTraceUnknownEventSelectors(subtrace, signatures))
+    .flatMap((subtrace) =>
+      getCallTraceUnknownEventSelectors(subtrace, signatures)
+    )
     .filter(Boolean);
 
   if (trace.logs) {
@@ -93,19 +103,25 @@ export const getCallTraceUnknownEventSelectors = (trace: RpcCallTrace, signature
 export const getIndentLevel = (level: number, index = false) =>
   `${"  ".repeat(level - 1)}${index ? formatText.cyan(`${level - 1} ↳ `) : "    "}`;
 
-export const formatAddress = (address: Address) => `${slice(address, 0, 4)}…${slice(address, -2).slice(2)}`;
+export const formatAddress = (address: Address) =>
+  `${slice(address, 0, 4)}…${slice(address, -2).slice(2)}`;
 export const formatHex = (hex: Hex) => {
   if (hex === zeroHash) return "bytes(0)";
 
   return size(hex) > 8 ? `${slice(hex, 0, 4)}…${slice(hex, -1).slice(2)}` : hex;
 };
 export const formatInt = (value: bigint | number) => {
-  for (let i = 32n; i <= 256n; i++) if (BigInt(value) === 2n ** i - 1n) return `2 ** ${i} - 1`;
+  for (let i = 32n; i <= 256n; i++)
+    if (BigInt(value) === 2n ** i - 1n) return `2 ** ${i} - 1`;
 
   return String(value);
 };
 
-export const formatArg = (arg: unknown, level: number, config: Partial<TraceFormatConfig>): string => {
+export const formatArg = (
+  arg: unknown,
+  level: number,
+  config: Partial<TraceFormatConfig>
+): string => {
   if (Array.isArray(arg)) {
     const { length } = arg;
     const wrapLines = length > 5 || arg.some((a) => Array.isArray(a));
@@ -114,8 +130,8 @@ export const formatArg = (arg: unknown, level: number, config: Partial<TraceForm
       .map(
         (arg: unknown, i) =>
           `${wrapLines ? `\n${getIndentLevel(level + 1)}` : ""}${formatText.grey(
-            formatArg(arg, level + 1, config),
-          )}${i !== length - 1 || wrapLines ? "," : ""}`,
+            formatArg(arg, level + 1, config)
+          )}${i !== length - 1 || wrapLines ? "," : ""}`
       )
       .join(wrapLines ? "" : " ");
 
@@ -129,7 +145,10 @@ export const formatArg = (arg: unknown, level: number, config: Partial<TraceForm
       if (arg == null) return "";
 
       const formattedObj = Object.entries(arg)
-        .map(([key, value]) => `\n${getIndentLevel(level + 1)}${key}: ${formatText.grey(formatArg(value, level + 1, config))},`)
+        .map(
+          ([key, value]) =>
+            `\n${getIndentLevel(level + 1)}${key}: ${formatText.grey(formatArg(value, level + 1, config))},`
+        )
         .join("");
 
       return `{${formattedObj ? `${formattedObj}\n` : ""}${getIndentLevel(level)}}`;
@@ -137,7 +156,13 @@ export const formatArg = (arg: unknown, level: number, config: Partial<TraceForm
     case "string":
       if (config.fullArgs) return formatText.grey(arg);
 
-      return formatText.grey(isAddress(arg, { strict: false }) ? formatAddress(arg) : isHex(arg) ? formatHex(arg) : arg);
+      return formatText.grey(
+        isAddress(arg, { strict: false })
+          ? formatAddress(arg)
+          : isHex(arg)
+            ? formatHex(arg)
+            : arg
+      );
     case "bigint":
     case "number":
       if (config.fullArgs) return formatText.grey(String(arg));
@@ -152,7 +177,7 @@ export const formatCallSignature = (
   trace: RpcCallTrace,
   config: Partial<TraceFormatConfig>,
   level: number,
-  signatures: SignaturesCache,
+  signatures: SignaturesCache
 ) => {
   const selector = getSelector(trace.input);
 
@@ -160,14 +185,14 @@ export const formatCallSignature = (
   if (!signature) return trace.input;
 
   const { functionName, args } = decodeFunctionData({
-    abi: parseAbi(
-      [`function ${signature}`] as [string],
-    ),
+    abi: parseAbi([`function ${signature}`] as [string]),
     data: trace.input,
   });
 
   const value = BigInt(trace.value ?? "0x0");
-  const formattedArgs = args?.map((arg: unknown) => formatArg(arg, level, config)).join(", ");
+  const formattedArgs = args
+    ?.map((arg: unknown) => formatArg(arg, level, config))
+    .join(", ");
 
   const error = trace.revertReason || trace.error;
   let returnValue: string = trace.output || error;
@@ -179,24 +204,34 @@ export const formatCallSignature = (
         .concat(erc1155Abi)
         .concat(erc4626Abi)
         .concat(multicall3Abi)
-        .find((abi): abi is AbiFunction => abi.type === "function" && abi.name === functionName);
+        .find(
+          (abi): abi is AbiFunction =>
+            abi.type === "function" && abi.name === functionName
+        );
 
       if (functionAbi != null) {
-        const decodedOutputs = decodeAbiParameters(functionAbi.outputs, trace.output);
+        const decodedOutputs = decodeAbiParameters(
+          functionAbi.outputs,
+          trace.output
+        );
 
-        returnValue = decodedOutputs.map((arg: unknown) => formatArg(arg, level, config)).join(", ");
+        returnValue = decodedOutputs
+          .map((arg: unknown) => formatArg(arg, level, config))
+          .join(", ");
       }
     }
   } catch {}
 
   return `${formatText.bold(
-    (trace.revertReason || trace.error ? formatText.red : formatText.green)(functionName),
+    (trace.revertReason || trace.error ? formatText.red : formatText.green)(
+      functionName
+    )
   )}${value !== 0n ? formatText.grey(`{ ${formatText.white(formatEther(value))} ETH }`) : ""}${
     config.gas
       ? formatText.grey(
           `[ ${formatText.dim(formatText.magenta(Number(trace.gasUsed).toLocaleString()))} / ${formatText.dim(
-            formatText.magenta(Number(trace.gas).toLocaleString()),
-          )} ]`,
+            formatText.magenta(Number(trace.gas).toLocaleString())
+          )} ]`
         )
       : ""
   }(${formattedArgs ?? ""})${returnValue ? (error ? formatText.red : formatText.grey)(` -> ${returnValue}`) : ""}`;
@@ -206,7 +241,7 @@ export const formatCallLog = (
   log: RpcLogTrace,
   level: number,
   signatures: SignaturesCache,
-  config: Partial<TraceFormatConfig>,
+  config: Partial<TraceFormatConfig>
 ) => {
   const selector = log.topics[0]!;
 
@@ -214,15 +249,15 @@ export const formatCallLog = (
   if (!signature) return concatHex(log.topics);
 
   const { eventName, args } = decodeEventLog({
-    abi: parseAbi(
-      [`event ${signature}`] as [string],
-    ),
+    abi: parseAbi([`event ${signature}`] as [string]),
     data: concatHex(log.topics.slice(1).concat(log.data)),
     topics: log.topics,
     strict: false,
   });
 
-  const formattedArgs = args?.map((arg: unknown) => formatArg(arg, level, config)).join(", ");
+  const formattedArgs = args
+    ?.map((arg: unknown) => formatArg(arg, level, config))
+    .join(", ");
 
   return `${getIndentLevel(level + 1, true)}${formatText.yellow("LOG")} ${eventName}(${formattedArgs ?? ""})`;
 };
@@ -231,7 +266,7 @@ export const formatCallTrace = (
   trace: RpcCallTrace,
   config: Partial<TraceFormatConfig> = {},
   signatures: SignaturesCache = { events: {}, functions: {} },
-  level = 1,
+  level = 1
 ): string => {
   const rest = (trace.calls ?? [])
     .map((subtrace) => formatCallTrace(subtrace, config, signatures, level + 1))
@@ -240,9 +275,13 @@ export const formatCallTrace = (
   const indentLevel = getIndentLevel(level, true);
 
   return `${
-    level === 1 ? `${indentLevel}${formatText.cyan("FROM")} ${formatText.grey(trace.from)}\n` : ""
+    level === 1
+      ? `${indentLevel}${formatText.cyan("FROM")} ${formatText.grey(trace.from)}\n`
+      : ""
   }${indentLevel}${formatText.yellow(trace.type)} ${
-    trace.from === trace.to ? formatText.grey("self") : `(${formatText.white(trace.to)})`
+    trace.from === trace.to
+      ? formatText.grey("self")
+      : `(${formatText.white(trace.to)})`
   }.${formatCallSignature(trace, config, level, signatures)}${trace.logs ? `\n${trace.logs.map((log) => formatCallLog(log, level, signatures, config))}` : ""}
 ${config.raw ? `${formatText.grey(JSON.stringify(trace))}\n` : ""}${rest}`;
 };
@@ -250,28 +289,42 @@ ${config.raw ? `${formatText.grey(JSON.stringify(trace))}\n` : ""}${rest}`;
 export async function formatFullTrace(
   trace: RpcCallTrace,
   config?: Partial<TraceFormatConfig>,
-  signatures: SignaturesCache = { events: {}, functions: {} },
+  signatures: SignaturesCache = { events: {}, functions: {} }
 ) {
-  const unknownFunctionSelectors = getCallTraceUnknownFunctionSelectors(trace, signatures);
-  const unknownEventSelectors = getCallTraceUnknownEventSelectors(trace, signatures);
+  const unknownFunctionSelectors = getCallTraceUnknownFunctionSelectors(
+    trace,
+    signatures
+  );
+  const unknownEventSelectors = getCallTraceUnknownEventSelectors(
+    trace,
+    signatures
+  );
 
   if (unknownFunctionSelectors || unknownEventSelectors) {
     const searchParams = new URLSearchParams({ filter: "false" });
-    if (unknownFunctionSelectors) searchParams.append("function", unknownFunctionSelectors);
-    if (unknownEventSelectors) searchParams.append("event", unknownEventSelectors);
+    if (unknownFunctionSelectors)
+      searchParams.append("function", unknownFunctionSelectors);
+    if (unknownEventSelectors)
+      searchParams.append("event", unknownEventSelectors);
 
-    const lookupRes = await fetch(`https://api.openchain.xyz/signature-database/v1/lookup?${searchParams.toString()}`);
+    const lookupRes = await fetch(
+      `https://api.openchain.xyz/signature-database/v1/lookup?${searchParams.toString()}`
+    );
     const lookup = await lookupRes.json();
 
     if (lookup.ok) {
-      Object.entries<{ name: string; filtered: boolean }[]>(lookup.result.function).map(([sig, results]) => {
-        const match = results.find(({ filtered }) => !filtered)?.name;
+      Object.entries<{ name: string; filtered: boolean }[]>(
+        lookup.result.function
+      ).map(([sig, results]) => {
+        const match = (results ?? []).find(({ filtered }) => !filtered)?.name;
         if (!match) return;
 
         signatures.functions[sig as Hex] = match;
       });
-      Object.entries<{ name: string; filtered: boolean }[]>(lookup.result.event).map(([sig, results]) => {
-        const match = results.find(({ filtered }) => !filtered)?.name;
+      Object.entries<{ name: string; filtered: boolean }[]>(
+        lookup.result.event
+      ).map(([sig, results]) => {
+        const match = (results ?? []).find(({ filtered }) => !filtered)?.name;
         if (!match) return;
 
         signatures.events[sig as Hex] = match;
@@ -280,7 +333,7 @@ export async function formatFullTrace(
       console.warn(
         `Failed to fetch signatures for unknown selectors: ${unknownFunctionSelectors},${unknownEventSelectors}`,
         lookup.error,
-        "\n",
+        "\n"
       );
     }
   }
