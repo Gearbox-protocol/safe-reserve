@@ -1,4 +1,7 @@
-import { ArchiveTransport } from "@gearbox-protocol/sdk/permissionless";
+import {
+  ArchiveTransport,
+  chunkedLogsTransport,
+} from "@gearbox-protocol/sdk/permissionless";
 import { getDefaultConfig } from "connectkit";
 import { Chain, defineChain, Transport } from "viem";
 import { createConfig, http } from "wagmi";
@@ -199,8 +202,16 @@ export const getChainTransport = (chain: Chain): Transport => {
   }
 
   if (chain.id === monad.id) {
+    const primaryTransport = chunkedLogsTransport({
+      transport: http(monad.rpcUrls.default.http[0], {
+        batch: true,
+      }),
+      chunkSize: 100,
+      enableLogging: true,
+    });
+
     return new ArchiveTransport({
-      primaryRpcUrl: drpcUrl("monad-mainnet"),
+      primaryTransport,
       archiveRpcUrl:
         "https://permissionless-staging.gearbox.foundation/api/thirdweb/rpc/143",
       blockThreshold: 199,
