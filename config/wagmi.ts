@@ -221,16 +221,10 @@ export const getChainTransport = (chain: Chain): Transport => {
   }
 
   if (chain.id === somnia.id) {
-    const primaryTransport = chunkedLogsTransport({
-      transport: http(monad.rpcUrls.default.http[0], {
-        batch: true,
-      }),
-      chunkSize: 1000,
-      enableLogging: true,
-    });
     return new ArchiveTransport({
-      primaryTransport,
-      archiveRpcUrl: "https://explorer.somnia.network/api/eth-rpc",
+      primaryRpcUrl: chain.rpcUrls.default.http[0],
+      archiveRpcUrl:
+        "https://permissionless-staging.gearbox.foundation/api/thirdweb/rpc/5031",
       blockThreshold: 999,
       enableLogging: true,
     }).getTransport();
