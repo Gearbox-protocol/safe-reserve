@@ -103,6 +103,7 @@ export const chains = [
   berachain,
   plasmaWithMulticall3,
   monad,
+  somnia,
 ] as const;
 
 export const ADDRESS_PROVIDER = process.env.NEXT_PUBLIC_ADDRESS_PROVIDER;
