@@ -1,7 +1,4 @@
-import {
-  ArchiveTransport,
-  chunkedLogsTransport,
-} from "@gearbox-protocol/sdk/permissionless";
+import { ArchiveTransport } from "@gearbox-protocol/sdk/permissionless";
 import { getDefaultConfig } from "connectkit";
 import { Chain, defineChain, Transport } from "viem";
 import { createConfig, http } from "wagmi";
@@ -60,6 +57,35 @@ const plasmaWithMulticall3 = defineChain({
   },
 });
 
+const somnia = defineChain({
+  id: 5031,
+  name: "Somnia",
+  blockTime: 200,
+  nativeCurrency: {
+    name: "Somnia",
+    symbol: "STT",
+    decimals: 18,
+  },
+  rpcUrls: {
+    default: {
+      http: ["https://api.infra.mainnet.somnia.network"],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Somnia Explorer",
+      url: "https://explorer.somnia.network",
+    },
+  },
+  contracts: {
+    multicall3: {
+      address: "0x5e44F178E8cF9B2F5409B6f18ce936aB817C5a11",
+      blockCreated: 38516341,
+    },
+  },
+  testnet: false,
+});
+
 export const chains = [
   mainnet,
   optimism,
@@ -91,6 +117,14 @@ const getHyperRpcUrl = (chainId: number) => {
 };
 
 export const getChainTransport = (chain: Chain): Transport => {
+  if (chain.id === mainnet.id) {
+    return http(process.env.NEXT_PUBLIC_RPC_URL || drpcUrl("ethereum"), {
+      retryCount: 3,
+      retryDelay: 1000,
+      timeout: 10000,
+    });
+  }
+
   if (chain.id === etherlink.id) {
     return new ArchiveTransport({
       primaryRpcUrl: "https://node.mainnet.etherlink.com",
@@ -116,14 +150,6 @@ export const getChainTransport = (chain: Chain): Transport => {
       blockThreshold: 50,
       enableLogging: true,
     }).getTransport();
-  }
-
-  if (chain.id === mainnet.id) {
-    return http(process.env.NEXT_PUBLIC_RPC_URL || drpcUrl("ethereum"), {
-      retryCount: 3,
-      retryDelay: 1000,
-      timeout: 10000,
-    });
   }
 
   if (chain.id === lisk.id) {
@@ -172,20 +198,21 @@ export const getChainTransport = (chain: Chain): Transport => {
     }).getTransport();
   }
 
-  // Monad
-  if (chain.id === 143) {
-    const primaryTransport = chunkedLogsTransport({
-      transport: http(monad.rpcUrls.default.http[0], {
-        batch: true,
-      }),
-      chunkSize: 100,
-      enableLogging: true,
-    });
+  if (chain.id === monad.id) {
     return new ArchiveTransport({
-      primaryTransport,
+      primaryRpcUrl: drpcUrl("monad-mainnet"),
       archiveRpcUrl:
         "https://permissionless-staging.gearbox.foundation/api/thirdweb/rpc/143",
       blockThreshold: 199,
+      enableLogging: true,
+    }).getTransport();
+  }
+
+  if (chain.id === somnia.id) {
+    return new ArchiveTransport({
+      primaryRpcUrl: chain.rpcUrls.default.http[0],
+      archiveRpcUrl: "https://explorer.somnia.network/api/eth-rpc",
+      blockThreshold: 999,
       enableLogging: true,
     }).getTransport();
   }
@@ -221,6 +248,7 @@ export const config = createConfig(
       [optimism.id]: getChainTransport(optimism),
       [arbitrum.id]: getChainTransport(arbitrum),
       [monad.id]: getChainTransport(monad),
+      [somnia.id]: getChainTransport(somnia),
     } as Record<number, Transport>,
 
     // connectors: [
