@@ -31,6 +31,12 @@ const monad = defineChain({
       ],
     },
   },
+  blockExplorers: {
+    default: {
+      name: "Monadscan",
+      url: "https://monadscan.com/",
+    },
+  },
   contracts: {
     ...viemMonad.contracts,
     multicall3: {
