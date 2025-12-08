@@ -2,6 +2,7 @@
 
 import { SkeletonStack } from "@/components/ui/skeleton";
 import { useCurrentTransactions, useIpfsData, useSafeParams } from "@/hooks";
+import { Container } from "@gearbox-protocol/permissionless-ui";
 import { Address } from "viem";
 import AddCid from "./add-cid";
 import { InstanceTransactionCard } from "./instance-tx-card";
@@ -43,7 +44,11 @@ export function InstanceTxs({
   const { threshold } = useSafeParams(chainId, safe);
 
   if (isLoadingTxs || isLoadingInfo) {
-    return <SkeletonStack />;
+    return (
+      <Container>
+        <SkeletonStack />
+      </Container>
+    );
   }
 
   if (errorTxs || errorInfo) {

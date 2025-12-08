@@ -1,7 +1,13 @@
-import { MarkdownViewer } from "@gearbox-protocol/permissionless-ui";
+import { MarkdownViewer } from "@/components/ui/markdown-viewer";
 import { promises as fs } from "fs";
 import { notFound } from "next/navigation";
 import path from "path";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "Terms of Service for Gearbox Safe",
+};
 
 export default async function TermsOfServicePage() {
   try {

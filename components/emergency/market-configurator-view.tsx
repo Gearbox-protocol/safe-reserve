@@ -8,6 +8,7 @@ import {
 } from "@/hooks";
 import {
   Button,
+  Container,
   CopyButton,
   ExternalButton,
   PageLayout,
@@ -89,7 +90,11 @@ export function MarketConfiguratorView({
   }, []);
 
   if (isLoadingSdk || isLoadingInfo || isLoadingMultipause) {
-    return <SkeletonStacks />;
+    return (
+      <Container>
+        <SkeletonStacks />
+      </Container>
+    );
   }
 
   if (sdkError || infoError || multipauseError) {

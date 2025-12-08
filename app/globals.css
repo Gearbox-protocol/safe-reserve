@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+/* Tailwind 4 CSS-first configuration */
+@source "../app/**/*.{js,ts,jsx,tsx}";
+@source "../components/**/*.{js,ts,jsx,tsx}";
+
+@source "../node_modules/@gearbox-protocol/permissionless-ui/src/**/*.{js,ts,jsx,tsx}";
+@source "../node_modules/@gearbox-protocol/permissionless-ui/dist/**/*.js";

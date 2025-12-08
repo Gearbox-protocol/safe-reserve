@@ -48,7 +48,7 @@ export function MarketCard({
   );
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-y-4">
       <Link
         key={`${chainId}-${marketConfigurator}-${market.pool.pool.address}`}
         href={{
@@ -95,27 +95,29 @@ export function MarketCard({
           />
         </div>
 
-        {!!multipause && multipause !== zeroAddress && !marketPaused ? (
-          <Link
-            key={`${chainId}-${marketConfigurator}-pauseMarket`}
-            href={{
-              pathname: "/emergency/tx",
-              query: {
-                chainId: chainId,
-                mc: marketConfigurator,
-                action: "MULTI_PAUSE::pauseMarket",
-                params: JSON.stringify({
-                  pool: market.pool.pool.address,
-                }),
-              },
-            }}
-          >
-            <Button size="sm" variant={"destructive"}>
-              Pause market
-            </Button>
-          </Link>
-        ) : undefined}
-      </div>
+        {
+          !!multipause && multipause !== zeroAddress && !marketPaused ? (
+            <Link
+              key={`${chainId}-${marketConfigurator}-pauseMarket`}
+              href={{
+                pathname: "/emergency/tx",
+                query: {
+                  chainId: chainId,
+                  mc: marketConfigurator,
+                  action: "MULTI_PAUSE::pauseMarket",
+                  params: JSON.stringify({
+                    pool: market.pool.pool.address,
+                  }),
+                },
+              }}
+            >
+              <Button size="sm" variant={"destructive"}>
+                Pause market
+              </Button>
+            </Link>
+          ) : undefined
+        }
+      </div >
 
       <div className="px-4">
         <Table>
@@ -245,6 +247,6 @@ export function MarketCard({
           </TableBody>
         </Table>
       </div>
-    </div>
+    </div >
   );
 }

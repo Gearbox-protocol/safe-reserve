@@ -14,9 +14,9 @@ export default function ViewMain() {
   const router = useRouter();
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center">
-      <Card className="w-full max-w-[600px] p-4 space-y-4 mb-32">
-        <h1 className="text-center text-2xl font-bold text-white">
+    <div className="flex items-center justify-center h-full p-4">
+      <Card className="w-full max-w-[600px] p-4 space-y-4">
+        <h1 className="text-center text-lg md:text-2xl font-bold text-white">
           Enter IPFS CID with transactions
         </h1>
 
@@ -29,7 +29,7 @@ export default function ViewMain() {
             }}
           />
         </CardContent>
-        <div className="flex w-full justify-end">
+        <div className="flex w-full justify-center">
           <Button
             onClick={() => {
               router.push(`/txs?cid=${cid}`);

@@ -5,18 +5,26 @@ const nextConfig = {
   distDir: "out",
   basePath: "",
   assetPrefix: "",
-  experimental: {
-    serverComponentsExternalPackages: ["sequelize", "pino", "pino-pretty"],
-  },
+  serverExternalPackages: ["sequelize", "pino", "pino-pretty"],
   images: {
     domains: ["static.gearbox.fi"],
     unoptimized: true,
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.module.rules.push({
       test: /\.txt$/,
       use: "raw-loader",
     });
+    
+    // Exclude fs and path from client bundle
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+      };
+    }
+    
     return config;
   },
 };

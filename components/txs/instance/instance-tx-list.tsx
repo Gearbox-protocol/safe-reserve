@@ -1,6 +1,7 @@
 "use client";
 
 import { SkeletonStacks } from "@/components/ui/skeleton";
+import { Container } from "@gearbox-protocol/permissionless-ui";
 import { useInstanceTransactionNonces } from "@/hooks/transactions/use-instance-transactions-nonces";
 import { Address } from "viem";
 import { InstanceTxs } from "./instance-txs";
@@ -29,7 +30,11 @@ export function InstanceTxList({
   }
 
   if (isLoading) {
-    return <SkeletonStacks />;
+    return (
+      <Container>
+        <SkeletonStacks />
+      </Container>
+    );
   }
 
   return (

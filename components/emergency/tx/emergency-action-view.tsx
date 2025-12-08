@@ -10,6 +10,7 @@ import {
   useSDK,
 } from "@/hooks";
 import {
+  Container,
   CopyButton,
   ExternalButton,
   PageLayout,
@@ -88,7 +89,11 @@ export function EmergencyActionView({
   );
 
   if (isLoadingMcInfo || isLoadingAdminInfo || isLoadingSdk || isLoadingTx) {
-    return <SkeletonStacks />;
+    return (
+      <Container>
+        <SkeletonStacks />
+      </Container>
+    );
   }
 
   if (
